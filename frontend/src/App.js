@@ -491,31 +491,31 @@ function App() {
                 exit={{ height: 0, opacity: 0 }}
                 className="border-b border-white/5 overflow-hidden"
               >
-                <div className="p-4 max-h-48 overflow-y-auto">
-                  <h3 className="font-mono text-xs text-cyan-500/70 uppercase tracking-wider mb-3">
+                <div className="p-2 max-h-32 overflow-y-auto">
+                  <h3 className="font-mono text-[10px] text-cyan-500/70 uppercase tracking-wider mb-2">
                     Recent Calls
                   </h3>
                   {callHistory.length === 0 ? (
-                    <p className="text-slate-600 text-sm font-mono">No call history</p>
+                    <p className="text-slate-600 text-xs font-mono">No call history</p>
                   ) : (
-                    <div className="space-y-2">
-                      {callHistory.slice(0, 10).map((call) => (
+                    <div className="space-y-1">
+                      {callHistory.slice(0, 5).map((call) => (
                         <div 
                           key={call.id}
-                          className="flex items-center justify-between p-2 rounded bg-white/5 hover:bg-white/10 transition-colors"
+                          className="flex items-center justify-between p-1.5 rounded bg-white/5 hover:bg-white/10 transition-colors"
                         >
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1.5">
                             {getStatusIcon(call.status)}
-                            <span className="font-mono text-xs text-slate-300">
+                            <span className="font-mono text-[10px] text-slate-300">
                               {call.config?.recipient_number || "Unknown"}
                             </span>
                             {call.dtmf_code && (
-                              <Badge variant="outline" className="text-xs bg-cyan-500/10 text-cyan-400 border-cyan-500/30">
-                                Code: {call.dtmf_code}
+                              <Badge variant="outline" className="text-[10px] px-1 py-0 bg-cyan-500/10 text-cyan-400 border-cyan-500/30">
+                                {call.dtmf_code}
                               </Badge>
                             )}
                           </div>
-                          <span className="font-mono text-xs text-slate-500">
+                          <span className="font-mono text-[10px] text-slate-500">
                             {formatDateTime(call.created_at)}
                           </span>
                         </div>
@@ -531,7 +531,7 @@ function App() {
           <div className="logs-container" data-testid="logs-container">
             <AnimatePresence>
               {logs.length === 0 ? (
-                <div className="text-center text-slate-600 font-mono text-sm py-8">
+                <div className="text-center text-slate-600 font-mono text-xs py-4">
                   No logs yet. Start a call to see events.
                 </div>
               ) : (
@@ -543,29 +543,29 @@ function App() {
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0 }}
-                      className={`log-entry ${style.bg ? `${style.bg} border rounded-lg` : ''}`}
+                      className={`log-entry ${style.bg ? `${style.bg} border rounded` : ''}`}
                       data-testid={`log-entry-${index}`}
                     >
-                      <div className="flex items-start gap-3">
-                        <span className="text-lg">{style.icon}</span>
+                      <div className="flex items-start gap-2">
+                        <span className="text-sm">{style.icon}</span>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
+                          <div className="flex items-center gap-1.5 flex-wrap">
                             <span className="log-timestamp">
                               [{formatTimestamp(log.timestamp)}]
                             </span>
-                            <span className={`font-mono text-xs font-semibold ${style.color}`}>
+                            <span className={`font-mono text-[10px] font-semibold ${style.color}`}>
                               {log.event_type}
                             </span>
                           </div>
-                          <div className="log-details mt-1">
+                          <div className="log-details">
                             {log.details}
                           </div>
                           
                           {/* DTMF Code Display */}
                           {log.dtmf_code && (
-                            <div className="mt-2 flex items-center gap-2">
-                              <Keyboard className="w-4 h-4 text-emerald-400" />
-                              <span className="font-mono text-sm text-slate-400">User Input:</span>
+                            <div className="mt-1 flex items-center gap-1.5">
+                              <Keyboard className="w-3 h-3 text-emerald-400" />
+                              <span className="font-mono text-[10px] text-slate-400">Input:</span>
                               <Badge 
                                 variant="outline" 
                                 className="font-mono text-lg px-3 py-1 text-emerald-400 bg-emerald-500/10 border-emerald-500/30 cursor-pointer hover:bg-emerald-500/20 tracking-widest"

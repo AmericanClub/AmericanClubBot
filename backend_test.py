@@ -83,6 +83,27 @@ class BotCallingAPITester:
             return False
         return False
     
+    def test_config_endpoint(self) -> bool:
+        """Test the config API endpoint for Infobip configuration"""
+        success, response = self.run_test(
+            "Config API Endpoint",
+            "GET", 
+            "config",
+            200
+        )
+        
+        if success:
+            infobip_configured = response.get("infobip_configured", False)
+            from_number = response.get("from_number", "")
+            app_name = response.get("app_name", "")
+            
+            self.log(f"   Infobip configured: {infobip_configured}")
+            self.log(f"   From number: {from_number}")
+            self.log(f"   App name: {app_name}")
+            
+            return infobip_configured  # Should return True for proper Infobip config
+        return False
+    
     def test_voice_models_endpoint(self) -> bool:
         """Test voice models endpoint"""
         success, response = self.run_test(

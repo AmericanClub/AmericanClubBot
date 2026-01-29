@@ -238,6 +238,11 @@ function App() {
   // Clear logs
   const handleClearLogs = () => {
     setLogs([]);
+    // Also reset call state if no active call
+    if (!isCallActive) {
+      setCurrentCallId(null);
+      setCallStatus("IDLE");
+    }
     toast.success("Logs cleared");
   };
 

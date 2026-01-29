@@ -233,11 +233,14 @@ async def create_outbound_call(call_id: str, config: CallConfig):
     try:
         http = await get_http_client()
         
-        # Ensure application exists
-        app_id = await create_calls_application()
-        if not app_id:
-            await add_call_event(call_id, "CALL_ERROR", "Failed to create/get Infobip application")
-            return None
+        # Use configuration ID directly if available
+        config_id = INFOBIP_CONFIG_ID
+        if not config_id:
+            # Fallback to creating/getting application
+            config_id = await create_calls_application()
+            if not config_id:
+                await add_call_event(call_id, "CALL_ERROR", "Failed to get Infobip configuration")
+                return None
         
         to_num = config.recipient_number.replace("+", "").replace(" ", "").replace("-", "")
         from_num = config.from_number.replace("+", "").replace(" ", "").replace("-", "")
@@ -248,7 +251,7 @@ async def create_outbound_call(call_id: str, config: CallConfig):
                 "phoneNumber": to_num
             },
             "from": from_num,
-            "applicationId": app_id,
+            "callsConfigurationId": config_id,
             "connectTimeout": 60,
             "machineDetection": {
                 "enabled": True  # Enable AMD to detect human/voicemail

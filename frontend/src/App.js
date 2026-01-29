@@ -848,7 +848,7 @@ function App() {
                     rows={2}
                     data-testid={`step-message-${step}`}
                   />
-                  <div className="mt-2 text-xs text-slate-500 font-mono">
+                  <div className="mt-1 text-[9px] text-slate-500 font-mono">
                     Variables: {"{name}"}, {"{service}"}, {"{digits}"}
                   </div>
                 </TabsContent>
@@ -858,8 +858,8 @@ function App() {
 
           {/* Call Button */}
           <motion.div
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
           >
             {!isCallActive ? (
               <button
@@ -869,9 +869,9 @@ function App() {
                 data-testid="start-call-btn"
               >
                 {isLoading ? (
-                  <RefreshCw className="w-5 h-5 animate-spin" />
+                  <RefreshCw className="w-4 h-4 animate-spin" />
                 ) : (
-                  <Play className="w-5 h-5" />
+                  <Play className="w-4 h-4" />
                 )}
                 {isLoading ? "Initiating..." : "Start Call"}
               </button>
@@ -883,9 +883,9 @@ function App() {
                 data-testid="hangup-btn"
               >
                 {isLoading ? (
-                  <RefreshCw className="w-5 h-5 animate-spin" />
+                  <RefreshCw className="w-4 h-4 animate-spin" />
                 ) : (
-                  <PhoneOff className="w-5 h-5" />
+                  <PhoneOff className="w-4 h-4" />
                 )}
                 {isLoading ? "Terminating..." : "Hang Up"}
               </button>

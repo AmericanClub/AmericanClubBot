@@ -449,34 +449,34 @@ function App() {
         {/* Left Panel - Bot Logs */}
         <div className="logs-panel glass-panel" data-testid="logs-panel">
           <div className="logs-header">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <div className={`status-indicator ${getStatusClass(callStatus)}`} data-testid="status-indicator" />
-              <h2 className="font-heading text-xl font-semibold text-white">
+              <h2 className="font-heading text-sm font-semibold text-white">
                 Bot Logs
               </h2>
-              <span className="font-mono text-xs text-slate-500 uppercase">
+              <span className="font-mono text-[10px] text-slate-500 uppercase">
                 {callStatus}
               </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => { setShowHistory(!showHistory); fetchCallHistory(); }}
-                className="text-slate-400 hover:text-white hover:bg-white/5"
+                className="text-slate-400 hover:text-white hover:bg-white/5 h-7 px-2 text-xs"
                 data-testid="history-btn"
               >
-                <History className="w-4 h-4 mr-2" />
+                <History className="w-3 h-3 mr-1" />
                 History
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleClearLogs}
-                className="text-slate-400 hover:text-white hover:bg-white/5"
+                className="text-slate-400 hover:text-white hover:bg-white/5 h-7 px-2 text-xs"
                 data-testid="clear-logs-btn"
               >
-                <Trash2 className="w-4 h-4 mr-2" />
+                <Trash2 className="w-3 h-3 mr-1" />
                 Clear
               </Button>
             </div>

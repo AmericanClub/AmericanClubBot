@@ -713,8 +713,7 @@ function App() {
               </div>
               
               <div>
-                <label className="form-label flex items-center gap-1">
-                  <Phone className="w-2.5 h-2.5" />
+                <label className="form-label">
                   Caller ID
                 </label>
                 <Input
@@ -728,8 +727,7 @@ function App() {
               </div>
               
               <div>
-                <label className="form-label flex items-center gap-1">
-                  <User className="w-2.5 h-2.5" />
+                <label className="form-label">
                   Recipient Name
                 </label>
                 <Input
@@ -743,8 +741,7 @@ function App() {
               </div>
               
               <div>
-                <label className="form-label flex items-center gap-1">
-                  <Phone className="w-2.5 h-2.5" />
+                <label className="form-label">
                   Recipient Number
                 </label>
                 <Input
@@ -758,8 +755,7 @@ function App() {
               </div>
               
               <div>
-                <label className="form-label flex items-center gap-1">
-                  <Building className="w-2.5 h-2.5" />
+                <label className="form-label">
                   Service Name
                 </label>
                 <Input
@@ -773,8 +769,7 @@ function App() {
               </div>
               
               <div>
-                <label className="form-label flex items-center gap-1">
-                  <Hash className="w-2.5 h-2.5" />
+                <label className="form-label">
                   OTP Digits
                 </label>
                 <Select value={otpDigits} onValueChange={setOtpDigits}>

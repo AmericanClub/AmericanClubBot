@@ -568,15 +568,15 @@ function App() {
                               <span className="font-mono text-[10px] text-slate-400">Input:</span>
                               <Badge 
                                 variant="outline" 
-                                className="font-mono text-lg px-3 py-1 text-emerald-400 bg-emerald-500/10 border-emerald-500/30 cursor-pointer hover:bg-emerald-500/20 tracking-widest"
+                                className="font-mono text-sm px-2 py-0.5 text-emerald-400 bg-emerald-500/10 border-emerald-500/30 cursor-pointer hover:bg-emerald-500/20 tracking-wider"
                                 onClick={() => copyToClipboard(log.dtmf_code)}
                                 data-testid={`dtmf-badge-${index}`}
                               >
                                 {log.dtmf_code}
-                                <Copy className="w-3 h-3 ml-2" />
+                                <Copy className="w-2.5 h-2.5 ml-1" />
                               </Badge>
                               {log.dtmf_code.length >= parseInt(otpDigits) && (
-                                <span className="text-xs text-emerald-400 font-mono">(Complete: {log.dtmf_code.length} digits)</span>
+                                <span className="text-[10px] text-emerald-400 font-mono">({log.dtmf_code.length} digits)</span>
                               )}
                             </div>
                           )}
@@ -597,30 +597,26 @@ function App() {
               data-testid="decision-box"
             >
                 <div className="decision-box-inner">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                      <Keyboard className="w-5 h-5 text-emerald-400" />
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                      <Keyboard className="w-4 h-4 text-emerald-400" />
                     </div>
                     <div>
-                      <div className="font-mono text-xs text-slate-400 uppercase tracking-wider">Security Code Received</div>
-                      <div className="font-mono text-2xl text-emerald-400 tracking-widest flex items-center gap-2">
+                      <div className="font-mono text-[10px] text-slate-400 uppercase tracking-wider">Security Code</div>
+                      <div className="font-mono text-lg text-emerald-400 tracking-widest flex items-center gap-1.5">
                         {dtmfCode}
                         <button 
                           onClick={() => copyToClipboard(dtmfCode)}
-                          className="p-1 hover:bg-white/10 rounded transition-colors"
+                          className="p-0.5 hover:bg-white/10 rounded transition-colors"
                           data-testid="copy-code-main"
                         >
-                          {copiedCode ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-slate-400" />}
+                          {copiedCode ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3 text-slate-400" />}
                         </button>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="font-mono text-xs text-slate-500 mb-4">
-                    Verify the code and choose an action:
-                  </div>
-                  
-                  <div className="flex gap-3">
+                  <div className="flex gap-2">
                     <button
                       onClick={() => handleVerify(true)}
                       disabled={isVerifying}
@@ -628,9 +624,9 @@ function App() {
                       data-testid="accept-btn"
                     >
                       {isVerifying ? (
-                        <RefreshCw className="w-5 h-5 animate-spin" />
+                        <RefreshCw className="w-4 h-4 animate-spin" />
                       ) : (
-                        <ThumbsUp className="w-5 h-5" />
+                        <ThumbsUp className="w-4 h-4" />
                       )}
                       ACCEPT
                     </button>
@@ -641,9 +637,9 @@ function App() {
                       data-testid="deny-btn"
                     >
                       {isVerifying ? (
-                        <RefreshCw className="w-5 h-5 animate-spin" />
+                        <RefreshCw className="w-4 h-4 animate-spin" />
                       ) : (
-                        <ThumbsDown className="w-5 h-5" />
+                        <ThumbsDown className="w-4 h-4" />
                       )}
                       DENY
                     </button>
@@ -656,8 +652,8 @@ function App() {
         {/* Right Panel - Call Setup */}
         <div className="setup-panel" data-testid="setup-panel">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="font-heading text-2xl font-bold text-white">
+          <div className="flex items-center justify-between mb-3">
+            <h1 className="font-heading text-lg font-bold text-white">
               Voice Bot Control
             </h1>
             <Badge 

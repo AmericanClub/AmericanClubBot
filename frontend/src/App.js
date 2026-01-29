@@ -14,7 +14,11 @@ import {
   Hash,
   Building,
   Play,
-  RefreshCw
+  RefreshCw,
+  History,
+  CheckCircle,
+  XCircle,
+  Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +33,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -50,6 +55,9 @@ const CALL_TYPES = [
 ];
 
 function App() {
+  // Infobip config state
+  const [infobipConfigured, setInfobipConfigured] = useState(false);
+  
   // Call configuration state
   const [callType, setCallType] = useState("login_verification");
   const [voiceModel, setVoiceModel] = useState("hera");
@@ -89,10 +97,30 @@ function App() {
   const [callStatus, setCallStatus] = useState("IDLE");
   const [logs, setLogs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Call history state
+  const [callHistory, setCallHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
 
   // Refs
   const logsEndRef = useRef(null);
   const eventSourceRef = useRef(null);
+
+  // Fetch Infobip config on mount
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const response = await axios.get(`${API}/config`);
+        setInfobipConfigured(response.data.infobip_configured);
+        if (response.data.from_number) {
+          setFromNumber(response.data.from_number);
+        }
+      } catch (e) {
+        console.error("Error fetching config:", e);
+      }
+    };
+    fetchConfig();
+  }, []);
 
   // Auto-scroll logs
   useEffect(() => {
@@ -106,6 +134,16 @@ function App() {
         eventSourceRef.current.close();
       }
     };
+  }, []);
+
+  // Fetch call history
+  const fetchCallHistory = useCallback(async () => {
+    try {
+      const response = await axios.get(`${API}/calls`);
+      setCallHistory(response.data);
+    } catch (e) {
+      console.error("Error fetching call history:", e);
+    }
   }, []);
 
   // Subscribe to SSE events
@@ -141,6 +179,9 @@ function App() {
             CALL_FINISHED: "FINISHED",
             CALL_FAILED: "FAILED",
             CALL_HANGUP: "FINISHED",
+            STATUS_DELIVERED: "FINISHED",
+            STATUS_REJECTED: "FAILED",
+            STATUS_UNDELIVERABLE: "FAILED",
           };
           
           const newStatus = statusMap[data.event_type];
@@ -151,6 +192,8 @@ function App() {
             if (["FINISHED", "FAILED"].includes(newStatus)) {
               setIsCallActive(false);
               eventSource.close();
+              // Refresh call history
+              fetchCallHistory();
             }
           }
         }
@@ -163,7 +206,7 @@ function App() {
       console.error("SSE connection error");
       eventSource.close();
     };
-  }, []);
+  }, [fetchCallHistory]);
 
   // Start call
   const handleStartCall = async () => {
@@ -194,7 +237,7 @@ function App() {
         steps: stepMessages,
       });
 
-      const { call_id } = response.data;
+      const { call_id, using_infobip } = response.data;
       setCurrentCallId(call_id);
       setIsCallActive(true);
       setCallStatus("PENDING");
@@ -202,7 +245,7 @@ function App() {
       // Subscribe to events
       subscribeToEvents(call_id);
       
-      toast.success("Call initiated successfully");
+      toast.success(using_infobip ? "Call initiated via Infobip" : "Call initiated (simulation mode)");
     } catch (error) {
       console.error("Error starting call:", error);
       toast.error(error.response?.data?.detail || "Failed to start call");
@@ -227,6 +270,7 @@ function App() {
       }
       
       toast.success("Call terminated");
+      fetchCallHistory();
     } catch (error) {
       console.error("Error hanging up:", error);
       toast.error(error.response?.data?.detail || "Failed to hang up");
@@ -257,6 +301,17 @@ function App() {
     });
   };
 
+  // Format date for history
+  const formatDateTime = (isoString) => {
+    const date = new Date(isoString);
+    return date.toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   // Get status color class
   const getStatusClass = (status) => {
     const classes = {
@@ -269,6 +324,13 @@ function App() {
       FAILED: "status-failed",
     };
     return classes[status] || "status-pending";
+  };
+
+  // Get status icon for history
+  const getStatusIcon = (status) => {
+    if (status === "FINISHED") return <CheckCircle className="w-4 h-4 text-emerald-400" />;
+    if (status === "FAILED") return <XCircle className="w-4 h-4 text-red-400" />;
+    return <Clock className="w-4 h-4 text-yellow-400" />;
   };
 
   return (
@@ -288,17 +350,69 @@ function App() {
                 {callStatus}
               </span>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleClearLogs}
-              className="text-slate-400 hover:text-white hover:bg-white/5"
-              data-testid="clear-logs-btn"
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Clear
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => { setShowHistory(!showHistory); fetchCallHistory(); }}
+                className="text-slate-400 hover:text-white hover:bg-white/5"
+                data-testid="history-btn"
+              >
+                <History className="w-4 h-4 mr-2" />
+                History
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleClearLogs}
+                className="text-slate-400 hover:text-white hover:bg-white/5"
+                data-testid="clear-logs-btn"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Clear
+              </Button>
+            </div>
           </div>
+          
+          {/* Call History Panel */}
+          <AnimatePresence>
+            {showHistory && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="border-b border-white/5 overflow-hidden"
+              >
+                <div className="p-4 max-h-48 overflow-y-auto">
+                  <h3 className="font-mono text-xs text-cyan-500/70 uppercase tracking-wider mb-3">
+                    Recent Calls
+                  </h3>
+                  {callHistory.length === 0 ? (
+                    <p className="text-slate-600 text-sm font-mono">No call history</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {callHistory.slice(0, 10).map((call) => (
+                        <div 
+                          key={call.id}
+                          className="flex items-center justify-between p-2 rounded bg-white/5 hover:bg-white/10 transition-colors"
+                        >
+                          <div className="flex items-center gap-2">
+                            {getStatusIcon(call.status)}
+                            <span className="font-mono text-xs text-slate-300">
+                              {call.config?.recipient_number || "Unknown"}
+                            </span>
+                          </div>
+                          <span className="font-mono text-xs text-slate-500">
+                            {formatDateTime(call.created_at)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
           
           <div className="logs-container scanlines" data-testid="logs-container">
             <AnimatePresence>
@@ -335,6 +449,19 @@ function App() {
 
         {/* Right Panel - Call Setup */}
         <div className="setup-panel" data-testid="setup-panel">
+          {/* Infobip Status Badge */}
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="font-heading text-2xl font-bold text-white">
+              Voice Bot Control
+            </h1>
+            <Badge 
+              variant={infobipConfigured ? "default" : "secondary"}
+              className={infobipConfigured ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"}
+            >
+              {infobipConfigured ? "Infobip Connected" : "Simulation Mode"}
+            </Badge>
+          </div>
+          
           {/* Call Configuration */}
           <div className="form-section glass-panel p-6 rounded-xl mb-6" data-testid="call-config-section">
             <h3 className="section-title">

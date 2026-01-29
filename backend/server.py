@@ -191,10 +191,14 @@ async def create_calls_application():
                         INFOBIP_APP_ID = app_data["id"]
                         logger.info(f"Found existing application: {INFOBIP_APP_ID}")
                         return INFOBIP_APP_ID
+        elif response.status_code == 404:
+            logger.warning("Calls API applications endpoint not available - Calls API may not be enabled for this account")
+            return None
     except Exception as e:
         logger.warning(f"Error listing applications: {e}")
+        return None
     
-    # Create new application
+    # Create new application if listing succeeded but no app found
     try:
         payload = {
             "name": "BotCallerIVR",

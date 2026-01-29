@@ -645,9 +645,8 @@ function App() {
                     </button>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
         </div>
 
         {/* Right Panel - Call Setup */}

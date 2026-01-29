@@ -327,6 +327,7 @@ class BotCallingAPITester:
         
         # Test basic endpoints
         results["tests"]["root_endpoint"] = self.test_root_endpoint()
+        results["tests"]["config_endpoint"] = self.test_config_endpoint()
         results["tests"]["voice_models"] = self.test_voice_models_endpoint()
         results["tests"]["call_types"] = self.test_call_types_endpoint()
         results["tests"]["get_all_calls"] = self.test_get_all_calls()

@@ -304,14 +304,14 @@ function App() {
         steps: stepMessages,
       });
 
-      const { call_id, using_infobip } = response.data;
+      const { call_id, using_infobip, mode } = response.data;
       setCurrentCallId(call_id);
       setIsCallActive(true);
       setCallStatus("PENDING");
       
       subscribeToEvents(call_id);
       
-      toast.success(using_infobip ? "IVR call started via Infobip" : "IVR call started (simulation)");
+      toast.success(using_infobip ? "IVR call started via Infobip" : `IVR call started (${mode || "Simulation"})`);
     } catch (error) {
       console.error("Error starting call:", error);
       toast.error(error.response?.data?.detail || "Failed to start call");

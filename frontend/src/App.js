@@ -587,9 +587,10 @@ function App() {
           </div>
           
           {/* Decision Box - Accept/Deny */}
-          <AnimatePresence>
+          <AnimatePresence mode="wait">
             {showVerifyButtons && dtmfCode && (
               <motion.div
+                key={`decision-box-${dtmfCode}`}
                 initial={{ y: 50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: 50, opacity: 0 }}

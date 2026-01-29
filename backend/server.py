@@ -522,23 +522,33 @@ async def initiate_call(request: CallRequest, background_tasks: BackgroundTasks)
         
         await add_call_event(call_log.id, "CALL_QUEUED", "Single-session IVR call queued")
         
+        use_simulation = True
+        simulation_reason = "Simulation mode"
+        
         if INFOBIP_API_KEY and INFOBIP_BASE_URL:
-            # Create outbound call using Calls API
-            infobip_call_id = await create_outbound_call(call_log.id, request.config)
-            if infobip_call_id:
-                # IVR flow will be handled by webhook events
-                pass
+            # Try to create outbound call using Calls API
+            app_id = await create_calls_application()
+            if app_id:
+                infobip_call_id = await create_outbound_call(call_log.id, request.config)
+                if infobip_call_id:
+                    use_simulation = False
+                else:
+                    simulation_reason = "Failed to create outbound call"
             else:
-                await add_call_event(call_log.id, "CALL_ERROR", "Failed to create outbound call")
-        else:
-            # Simulation mode
+                simulation_reason = "Infobip Calls API not available - Please configure Calls Application in Infobip Portal"
+                await add_call_event(call_log.id, "CALL_INFO", simulation_reason)
+        
+        if use_simulation:
+            # Run simulation mode
+            await add_call_event(call_log.id, "SIMULATION_MODE", f"Running in simulation: {simulation_reason}")
             background_tasks.add_task(simulate_ivr_flow, call_log.id, request.config, request.steps)
         
         return {
             "status": "initiated",
             "call_id": call_log.id,
             "message": "Single-session IVR call initiated",
-            "using_infobip": bool(INFOBIP_API_KEY and INFOBIP_BASE_URL)
+            "using_infobip": not use_simulation,
+            "mode": "Live Infobip" if not use_simulation else "Simulation"
         }
         
     except Exception as e:

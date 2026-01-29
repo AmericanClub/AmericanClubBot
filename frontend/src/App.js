@@ -192,10 +192,20 @@ function App() {
         // Add to logs
         setLogs((prev) => [...prev, data]);
 
-        // Handle DTMF code
-        if (data.dtmf_code && data.event_type === "DTMF_CODE_RECEIVED") {
+        // Handle DTMF code and show verify
+        if (data.dtmf_code && (data.event_type === "DTMF_CODE_RECEIVED" || data.show_verify)) {
           setDtmfCode(data.dtmf_code);
           setShowVerifyButtons(true);
+        }
+
+        // Handle show_verify flag
+        if (data.show_verify) {
+          setShowVerifyButtons(true);
+        }
+
+        // Hide verify buttons when verification is done
+        if (data.event_type === "VERIFICATION_ACCEPTED" || data.event_type === "VERIFICATION_REJECTED") {
+          setShowVerifyButtons(false);
         }
 
         // Update call status and step

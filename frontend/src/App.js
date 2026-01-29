@@ -587,16 +587,11 @@ function App() {
           </div>
           
           {/* Decision Box - Accept/Deny */}
-          <AnimatePresence mode="wait">
-            {showVerifyButtons && dtmfCode && (
-              <motion.div
-                key={`decision-box-${dtmfCode}`}
-                initial={{ y: 50, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: 50, opacity: 0 }}
-                className="decision-box"
-                data-testid="decision-box"
-              >
+          {showVerifyButtons && dtmfCode && (
+            <div
+              className="decision-box"
+              data-testid="decision-box"
+            >
                 <div className="decision-box-inner">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">

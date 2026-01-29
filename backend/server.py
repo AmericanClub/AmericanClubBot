@@ -530,17 +530,26 @@ async def initiate_call(request: CallRequest, background_tasks: BackgroundTasks)
         simulation_reason = "Simulation mode"
         
         if INFOBIP_API_KEY and INFOBIP_BASE_URL:
-            # Try to create outbound call using Calls API
-            app_id = await create_calls_application()
-            if app_id:
+            # Check if we have a configuration ID
+            if INFOBIP_CONFIG_ID:
+                # Try to create outbound call using Calls API with config ID
                 infobip_call_id = await create_outbound_call(call_log.id, request.config)
                 if infobip_call_id:
                     use_simulation = False
                 else:
                     simulation_reason = "Failed to create outbound call"
             else:
-                simulation_reason = "Infobip Calls API not available - Please configure Calls Application in Infobip Portal"
-                await add_call_event(call_log.id, "CALL_INFO", simulation_reason)
+                # Try using application ID
+                app_id = await create_calls_application()
+                if app_id:
+                    infobip_call_id = await create_outbound_call(call_log.id, request.config)
+                    if infobip_call_id:
+                        use_simulation = False
+                    else:
+                        simulation_reason = "Failed to create outbound call"
+                else:
+                    simulation_reason = "Infobip Calls API not available - Please configure Calls Application in Infobip Portal"
+                    await add_call_event(call_log.id, "CALL_INFO", simulation_reason)
         
         if use_simulation:
             # Run simulation mode

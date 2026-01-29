@@ -204,15 +204,16 @@ function App() {
         // Add to logs
         setLogs((prev) => [...prev, data]);
 
-        // Handle DTMF code and show verify
-        if (data.dtmf_code && (data.event_type === "DTMF_CODE_RECEIVED" || data.show_verify)) {
+        // Handle DTMF code display
+        if (data.dtmf_code) {
           setDtmfCode(data.dtmf_code);
-          setShowVerifyButtons(true);
         }
-
-        // Handle show_verify flag
-        if (data.show_verify) {
+        
+        // Check for verify buttons trigger
+        if (data.show_verify || data.event_type === "AWAITING_VERIFICATION" || data.event_type === "CAPTURED_CODE") {
           setShowVerifyButtons(true);
+          // Scroll into view when verification is needed
+          logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
         }
 
         // Hide verify buttons when verification is done

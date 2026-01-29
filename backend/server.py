@@ -763,7 +763,21 @@ async def handle_dtmf_webhook(call_id: str, request: Request, background_tasks: 
         logger.info(f"DTMF Webhook received for {call_id}: {json.dumps(payload)}")
         
         # Extract DTMF from various possible locations in the payload
-        sent_dtmf = payload.get("sentDtmf") or payload.get("results", [{}])[0].get("sentDtmf")
+        sent_dtmf = None
+        
+        # Check direct sentDtmf
+        if payload.get("sentDtmf"):
+            sent_dtmf = payload.get("sentDtmf")
+        # Check in results array (Infobip delivery report format)
+        elif payload.get("results") and len(payload["results"]) > 0:
+            result = payload["results"][0]
+            # Check voiceCall.dtmfCodes (Infobip voice report format)
+            voice_call = result.get("voiceCall", {})
+            if voice_call.get("dtmfCodes"):
+                sent_dtmf = voice_call.get("dtmfCodes")
+            # Also check direct sentDtmf in result
+            elif result.get("sentDtmf"):
+                sent_dtmf = result.get("sentDtmf")
         
         if sent_dtmf:
             await db.call_logs.update_one(
@@ -778,6 +792,25 @@ async def handle_dtmf_webhook(call_id: str, request: Request, background_tasks: 
                 config = CallConfig(**call_log["config"])
                 steps = CallSteps(**call_log["steps"])
                 background_tasks.add_task(send_ivr_step2, call_id, config, steps)
+        else:
+            # Check if this is a delivery report without DTMF
+            if payload.get("results") and len(payload["results"]) > 0:
+                result = payload["results"][0]
+                status = result.get("status", {})
+                status_name = status.get("name", "")
+                
+                if status_name == "DELIVERED_TO_HANDSET":
+                    voice_call = result.get("voiceCall", {})
+                    dtmf_codes = voice_call.get("dtmfCodes")
+                    if dtmf_codes:
+                        await db.call_logs.update_one(
+                            {"id": call_id},
+                            {"$set": {"dtmf_step1": dtmf_codes, "status": "ESTABLISHED"}}
+                        )
+                        await add_call_event(call_id, "DTMF_RECEIVED", f"DTMF captured: {dtmf_codes}", dtmf_codes)
+                    else:
+                        await add_call_event(call_id, "CALL_ANSWERED", "Call answered, waiting for DTMF")
+                        await db.call_logs.update_one({"id": call_id}, {"$set": {"status": "ESTABLISHED"}})
         
         return {"status": "received"}
         

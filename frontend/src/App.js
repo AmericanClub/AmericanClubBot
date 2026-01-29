@@ -217,10 +217,11 @@ function App() {
           setShowVerifyButtons(false); // Hide until new code arrives
         }
 
-        // Handle DTMF code display - this should override the null from VERIFICATION_REJECTED
-        if (data.dtmf_code) {
+        // Handle DTMF code display - only set for security codes (not Step 1 input)
+        // Security codes come with show_verify=true or specific event types
+        if (data.dtmf_code && (data.show_verify || data.event_type === "CAPTURED_CODE" || data.event_type === "DTMF_CODE_RECEIVED")) {
           setDtmfCode(data.dtmf_code);
-          setShowVerifyButtons(true); // Always show when we have a new code
+          setShowVerifyButtons(true);
         }
         
         // Check for verify buttons trigger

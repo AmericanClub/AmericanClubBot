@@ -21,7 +21,8 @@ import {
   Copy,
   Check,
   ThumbsUp,
-  ThumbsDown
+  ThumbsDown,
+  Keyboard
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -95,6 +96,7 @@ function App() {
   const [dtmfCode, setDtmfCode] = useState(null);
   const [copiedCode, setCopiedCode] = useState(false);
   const [showVerifyButtons, setShowVerifyButtons] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   
   // Call history state
   const [callHistory, setCallHistory] = useState([]);
@@ -160,12 +162,22 @@ function App() {
   const handleVerify = async (accepted) => {
     if (!currentCallId) return;
     
+    setIsVerifying(true);
+    
     try {
       await axios.post(`${API}/calls/${currentCallId}/verify`, { accepted });
       setShowVerifyButtons(false);
-      toast.success(accepted ? "Code accepted" : "Code rejected");
+      
+      if (accepted) {
+        toast.success("Code ACCEPTED - Playing final message");
+      } else {
+        toast.info("Code DENIED - Requesting new code");
+        setDtmfCode(null); // Clear for new code
+      }
     } catch (e) {
       toast.error("Verification failed");
+    } finally {
+      setIsVerifying(false);
     }
   };
 
@@ -206,28 +218,32 @@ function App() {
         // Hide verify buttons when verification is done
         if (data.event_type === "VERIFICATION_ACCEPTED" || data.event_type === "VERIFICATION_REJECTED") {
           setShowVerifyButtons(false);
+          if (data.event_type === "VERIFICATION_REJECTED") {
+            setDtmfCode(null); // Clear for new code
+          }
         }
 
-        // Update call status and step
+        // Update current step
         if (data.event_type) {
-          // Update current step
           if (data.event_type.includes("STEP1")) setCurrentStep("step1");
           else if (data.event_type.includes("STEP2")) setCurrentStep("step2");
-          else if (data.event_type.includes("STEP3")) setCurrentStep("step3");
+          else if (data.event_type.includes("STEP3") || data.event_type.includes("AWAITING")) setCurrentStep("step3");
           else if (data.event_type.includes("ACCEPTED")) setCurrentStep("accepted");
           else if (data.event_type.includes("REJECTED")) setCurrentStep("rejected");
           
           const statusMap = {
             CALL_QUEUED: "PENDING",
             CALL_INITIATED: "CALLING",
-            CALL_RINGING: "RINGING",
+            STEP1_CALLING: "CALLING",
+            STEP2_CALLING: "CALLING",
             CALL_ANSWERED: "ESTABLISHED",
             CALL_ESTABLISHED: "ESTABLISHED",
+            STEP1_PLAYING: "ESTABLISHED",
+            STEP2_PLAYING: "ESTABLISHED",
+            STEP3_PLAYING: "ESTABLISHED",
             CALL_FINISHED: "FINISHED",
             CALL_FAILED: "FAILED",
             CALL_HANGUP: "FINISHED",
-            VERIFICATION_ACCEPTED: "FINISHED",
-            VERIFICATION_REJECTED: "FINISHED",
           };
           
           const newStatus = statusMap[data.event_type];
@@ -264,6 +280,7 @@ function App() {
     setDtmfCode(null);
     setShowVerifyButtons(false);
     setCurrentStep("");
+    setLogs([]);
     
     try {
       const response = await axios.post(`${API}/calls/initiate`, {
@@ -286,7 +303,7 @@ function App() {
       
       subscribeToEvents(call_id);
       
-      toast.success(using_infobip ? "IVR call initiated via Infobip" : "IVR call initiated (simulation mode)");
+      toast.success(using_infobip ? "IVR call started via Infobip" : "IVR call started (simulation)");
     } catch (error) {
       console.error("Error starting call:", error);
       toast.error(error.response?.data?.detail || "Failed to start call");
@@ -311,7 +328,7 @@ function App() {
         eventSourceRef.current.close();
       }
       
-      toast.success("Call terminated");
+      toast.success("Call session terminated");
       fetchCallHistory();
     } catch (error) {
       console.error("Error hanging up:", error);
@@ -377,19 +394,21 @@ function App() {
     return <Clock className="w-4 h-4 text-yellow-400" />;
   };
 
-  // Get event icon
-  const getEventIcon = (eventType) => {
-    if (eventType.includes("DTMF")) return "🔢";
-    if (eventType.includes("STEP1")) return "1️⃣";
-    if (eventType.includes("STEP2")) return "2️⃣";
-    if (eventType.includes("STEP3")) return "3️⃣";
-    if (eventType.includes("ACCEPTED")) return "✅";
-    if (eventType.includes("REJECTED")) return "❌";
-    if (eventType.includes("RINGING")) return "📞";
-    if (eventType.includes("ANSWERED") || eventType.includes("ESTABLISHED")) return "📱";
-    if (eventType.includes("FINISHED")) return "🏁";
-    if (eventType.includes("FAILED")) return "⚠️";
-    return "📌";
+  // Get event icon and color
+  const getEventStyle = (eventType) => {
+    if (eventType.includes("DTMF_CODE")) return { icon: "🔐", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/30" };
+    if (eventType.includes("DTMF")) return { icon: "🔢", color: "text-cyan-400", bg: "bg-cyan-500/10 border-cyan-500/30" };
+    if (eventType.includes("STEP1")) return { icon: "1️⃣", color: "text-blue-400", bg: "" };
+    if (eventType.includes("STEP2")) return { icon: "2️⃣", color: "text-purple-400", bg: "" };
+    if (eventType.includes("STEP3") || eventType.includes("AWAITING")) return { icon: "⏳", color: "text-yellow-400", bg: "" };
+    if (eventType.includes("ACCEPTED")) return { icon: "✅", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/30" };
+    if (eventType.includes("REJECTED")) return { icon: "🔄", color: "text-orange-400", bg: "bg-orange-500/10 border-orange-500/30" };
+    if (eventType.includes("CALLING")) return { icon: "📞", color: "text-cyan-400", bg: "" };
+    if (eventType.includes("ANSWERED")) return { icon: "📱", color: "text-emerald-400", bg: "" };
+    if (eventType.includes("FINISHED")) return { icon: "🏁", color: "text-slate-400", bg: "" };
+    if (eventType.includes("FAILED") || eventType.includes("ERROR")) return { icon: "⚠️", color: "text-red-400", bg: "bg-red-500/10 border-red-500/30" };
+    if (eventType.includes("RETRY") || eventType.includes("NO_RESPONSE")) return { icon: "🔁", color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/30" };
+    return { icon: "📌", color: "text-slate-400", bg: "" };
   };
 
   return (
@@ -478,110 +497,135 @@ function App() {
             )}
           </AnimatePresence>
           
-          {/* DTMF Code Display */}
-          <AnimatePresence>
-            {dtmfCode && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="border-b border-white/5"
-              >
-                <div className="p-4 bg-emerald-500/10">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="font-mono text-xs text-emerald-400/70 uppercase tracking-wider">
-                        Security Code Received
-                      </span>
-                      <div className="flex items-center gap-3 mt-2">
-                        <span className="font-mono text-2xl text-emerald-400 tracking-widest" data-testid="dtmf-code">
-                          {dtmfCode}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => copyToClipboard(dtmfCode)}
-                          className="text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10"
-                          data-testid="copy-code-btn"
-                        >
-                          {copiedCode ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    {/* Verify Buttons */}
-                    {showVerifyButtons && (
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => handleVerify(true)}
-                          className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/30"
-                          data-testid="accept-btn"
-                        >
-                          <ThumbsUp className="w-4 h-4 mr-1" />
-                          Accept
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => handleVerify(false)}
-                          className="bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30"
-                          data-testid="reject-btn"
-                        >
-                          <ThumbsDown className="w-4 h-4 mr-1" />
-                          Reject
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          
-          <div className="logs-container scanlines" data-testid="logs-container">
+          {/* Logs Container */}
+          <div className="logs-container" data-testid="logs-container">
             <AnimatePresence>
               {logs.length === 0 ? (
                 <div className="text-center text-slate-600 font-mono text-sm py-8">
                   No logs yet. Start a call to see events.
                 </div>
               ) : (
-                logs.map((log, index) => (
-                  <motion.div
-                    key={`${log.timestamp}-${index}`}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0 }}
-                    className={`log-entry ${log.dtmf_code ? 'border-l-emerald-500' : ''}`}
-                    data-testid={`log-entry-${index}`}
-                  >
-                    <div className="log-timestamp">
-                      [{formatTimestamp(log.timestamp)}]
-                    </div>
-                    <div className="log-event neon-text flex items-center gap-2">
-                      <span>{getEventIcon(log.event_type)}</span>
-                      {log.event_type}
-                    </div>
-                    <div className="log-details">
-                      {log.details}
-                    </div>
-                    {log.dtmf_code && (
-                      <div className="mt-2 flex items-center gap-2">
-                        <Badge 
-                          variant="outline" 
-                          className="font-mono text-emerald-400 bg-emerald-500/10 border-emerald-500/30 cursor-pointer hover:bg-emerald-500/20"
-                          onClick={() => copyToClipboard(log.dtmf_code)}
-                        >
-                          {log.dtmf_code}
-                          <Copy className="w-3 h-3 ml-1" />
-                        </Badge>
+                logs.map((log, index) => {
+                  const style = getEventStyle(log.event_type);
+                  return (
+                    <motion.div
+                      key={`${log.timestamp}-${index}`}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0 }}
+                      className={`log-entry ${style.bg ? `${style.bg} border rounded-lg` : ''}`}
+                      data-testid={`log-entry-${index}`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className="text-lg">{style.icon}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="log-timestamp">
+                              [{formatTimestamp(log.timestamp)}]
+                            </span>
+                            <span className={`font-mono text-xs font-semibold ${style.color}`}>
+                              {log.event_type}
+                            </span>
+                          </div>
+                          <div className="log-details mt-1">
+                            {log.details}
+                          </div>
+                          
+                          {/* DTMF Code Display */}
+                          {log.dtmf_code && (
+                            <div className="mt-2 flex items-center gap-2">
+                              <Keyboard className="w-4 h-4 text-emerald-400" />
+                              <span className="font-mono text-sm text-slate-400">User Input:</span>
+                              <Badge 
+                                variant="outline" 
+                                className="font-mono text-lg px-3 py-1 text-emerald-400 bg-emerald-500/10 border-emerald-500/30 cursor-pointer hover:bg-emerald-500/20 tracking-widest"
+                                onClick={() => copyToClipboard(log.dtmf_code)}
+                                data-testid={`dtmf-badge-${index}`}
+                              >
+                                {log.dtmf_code}
+                                <Copy className="w-3 h-3 ml-2" />
+                              </Badge>
+                              {log.dtmf_code.length >= parseInt(otpDigits) && (
+                                <span className="text-xs text-emerald-400 font-mono">(Complete: {log.dtmf_code.length} digits)</span>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    )}
-                  </motion.div>
-                ))
+                    </motion.div>
+                  );
+                })
               )}
             </AnimatePresence>
             <div ref={logsEndRef} />
           </div>
+          
+          {/* Decision Box - Accept/Deny */}
+          <AnimatePresence>
+            {showVerifyButtons && dtmfCode && (
+              <motion.div
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 50, opacity: 0 }}
+                className="decision-box"
+                data-testid="decision-box"
+              >
+                <div className="decision-box-inner">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                      <Keyboard className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <div>
+                      <div className="font-mono text-xs text-slate-400 uppercase tracking-wider">Security Code Received</div>
+                      <div className="font-mono text-2xl text-emerald-400 tracking-widest flex items-center gap-2">
+                        {dtmfCode}
+                        <button 
+                          onClick={() => copyToClipboard(dtmfCode)}
+                          className="p-1 hover:bg-white/10 rounded transition-colors"
+                          data-testid="copy-code-main"
+                        >
+                          {copiedCode ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-slate-400" />}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="font-mono text-xs text-slate-500 mb-4">
+                    Verify the code and choose an action:
+                  </div>
+                  
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => handleVerify(true)}
+                      disabled={isVerifying}
+                      className="decision-btn decision-btn-accept"
+                      data-testid="accept-btn"
+                    >
+                      {isVerifying ? (
+                        <RefreshCw className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <ThumbsUp className="w-5 h-5" />
+                      )}
+                      ACCEPT
+                    </button>
+                    <button
+                      onClick={() => handleVerify(false)}
+                      disabled={isVerifying}
+                      className="decision-btn decision-btn-deny"
+                      data-testid="deny-btn"
+                    >
+                      {isVerifying ? (
+                        <RefreshCw className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <ThumbsDown className="w-5 h-5" />
+                      )}
+                      DENY
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Right Panel - Call Setup */}
@@ -761,7 +805,7 @@ function App() {
                       ${currentStep === step ? 'ring-2 ring-emerald-500/50' : ''}`}
                     data-testid={`step-tab-${step}`}
                   >
-                    {step === "accepted" ? "Accepted" : step === "rejected" ? "Rejected" : `Step ${step.slice(-1)}`}
+                    {step === "accepted" ? "Accept" : step === "rejected" ? "Retry" : `Step ${step.slice(-1)}`}
                   </TabsTrigger>
                 ))}
               </TabsList>
@@ -769,11 +813,11 @@ function App() {
               {["step1", "step2", "step3", "accepted", "rejected"].map((step) => (
                 <TabsContent key={step} value={step} className="mt-4">
                   <label className="form-label">
-                    {step === "step1" && "Step 1 - Initial Greeting (DTMF: 0 or 1)"}
-                    {step === "step2" && "Step 2 - Ask for Security Code"}
-                    {step === "step3" && "Step 3 - Verification Wait"}
-                    {step === "accepted" && "Accepted - Code Valid"}
-                    {step === "rejected" && "Rejected - Code Invalid"}
+                    {step === "step1" && "Step 1 - Greetings (Wait for DTMF: 0 or 1)"}
+                    {step === "step2" && "Step 2 - Prompt (Wait for Security Code)"}
+                    {step === "step3" && "Step 3 - Verification Wait Message"}
+                    {step === "accepted" && "Accept - End Message (Call Ends)"}
+                    {step === "rejected" && "Retry - Rejected Message (Ask Code Again)"}
                   </label>
                   <Textarea
                     value={stepMessages[step]}

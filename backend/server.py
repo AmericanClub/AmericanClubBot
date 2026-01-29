@@ -825,7 +825,18 @@ async def handle_dtmf_code_webhook(call_id: str, request: Request, background_ta
         payload = await request.json()
         logger.info(f"DTMF Code Webhook received for {call_id}: {json.dumps(payload)}")
         
-        sent_dtmf = payload.get("sentDtmf") or payload.get("results", [{}])[0].get("sentDtmf")
+        # Extract DTMF from various formats
+        sent_dtmf = None
+        
+        if payload.get("sentDtmf"):
+            sent_dtmf = payload.get("sentDtmf")
+        elif payload.get("results") and len(payload["results"]) > 0:
+            result = payload["results"][0]
+            voice_call = result.get("voiceCall", {})
+            if voice_call.get("dtmfCodes"):
+                sent_dtmf = voice_call.get("dtmfCodes")
+            elif result.get("sentDtmf"):
+                sent_dtmf = result.get("sentDtmf")
         
         if sent_dtmf:
             await db.call_logs.update_one(

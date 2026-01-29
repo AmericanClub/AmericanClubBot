@@ -166,13 +166,16 @@ function App() {
     
     try {
       await axios.post(`${API}/calls/${currentCallId}/verify`, { accepted });
-      setShowVerifyButtons(false);
       
       if (accepted) {
+        setShowVerifyButtons(false);
         toast.success("Code ACCEPTED - Playing final message");
       } else {
-        toast.info("Code DENIED - Requesting new code");
+        // Don't hide decision box for deny - let SSE events control it
+        // The new code will trigger the decision box to show again
         setDtmfCode(null); // Clear for new code
+        setShowVerifyButtons(false); // Hide temporarily until new code arrives
+        toast.info("Code DENIED - Requesting new code");
       }
     } catch (e) {
       toast.error("Verification failed");

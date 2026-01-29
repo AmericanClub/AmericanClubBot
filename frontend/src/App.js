@@ -189,6 +189,14 @@ function App() {
     fetchConfig();
   }, []);
 
+  // Update step messages when call type changes
+  useEffect(() => {
+    const selectedType = CALL_TYPES.find(t => t.id === callType);
+    if (selectedType && selectedType.steps) {
+      setStepMessages(selectedType.steps);
+    }
+  }, [callType]);
+
   // Auto-scroll logs
   useEffect(() => {
     logsEndRef.current?.scrollIntoView({ behavior: "smooth" });

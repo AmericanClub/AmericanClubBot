@@ -210,22 +210,26 @@ function App() {
         // Handle verification result - check this FIRST before setting new code
         if (data.event_type === "VERIFICATION_ACCEPTED" || data.event_type === "ACCEPTED_PLAYING") {
           setShowVerifyButtons(false);
+          console.log("Setting showVerifyButtons to false (accepted)");
         }
         
         if (data.event_type === "VERIFICATION_REJECTED") {
           setDtmfCode(null); // Clear for new code
           setShowVerifyButtons(false); // Hide until new code arrives
+          console.log("Setting dtmfCode to null and showVerifyButtons to false (rejected)");
         }
 
         // Handle DTMF code display - only set for security codes (not Step 1 input)
         // Security codes come with show_verify=true or specific event types
         if (data.dtmf_code && (data.show_verify || data.event_type === "CAPTURED_CODE" || data.event_type === "DTMF_CODE_RECEIVED")) {
+          console.log(`Setting dtmfCode to ${data.dtmf_code} and showVerifyButtons to true`);
           setDtmfCode(data.dtmf_code);
           setShowVerifyButtons(true);
         }
         
         // Check for verify buttons trigger
         if (data.show_verify || data.event_type === "AWAITING_VERIFICATION" || data.event_type === "CAPTURED_CODE" || data.event_type === "DTMF_CODE_RECEIVED") {
+          console.log(`Setting showVerifyButtons to true (event: ${data.event_type})`);
           setShowVerifyButtons(true);
           // Scroll into view when verification is needed
           logsEndRef.current?.scrollIntoView({ behavior: "smooth" });

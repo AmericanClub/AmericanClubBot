@@ -658,16 +658,16 @@ function App() {
             </h1>
             <Badge 
               variant={infobipConfigured ? "default" : "secondary"}
-              className={infobipConfigured ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"}
+              className={`text-[10px] px-2 py-0.5 ${infobipConfigured ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"}`}
             >
-              {infobipConfigured ? "Infobip Connected" : "Simulation Mode"}
+              {infobipConfigured ? "Infobip" : "Simulation"}
             </Badge>
           </div>
           
           {/* Call Configuration */}
-          <div className="form-section glass-panel p-6 rounded-xl mb-6" data-testid="call-config-section">
+          <div className="form-section glass-panel p-3 rounded-lg mb-3" data-testid="call-config-section">
             <h3 className="section-title">
-              <Settings className="w-5 h-5" />
+              <Settings className="w-4 h-4" />
               Call Configuration
             </h3>
             
@@ -675,7 +675,7 @@ function App() {
               <div>
                 <label className="form-label">Call Type</label>
                 <Select value={callType} onValueChange={setCallType}>
-                  <SelectTrigger className="glass-input h-12 font-mono text-cyan-100" data-testid="call-type-select">
+                  <SelectTrigger className="glass-input font-mono text-cyan-100" data-testid="call-type-select">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-slate-800">
@@ -683,7 +683,7 @@ function App() {
                       <SelectItem 
                         key={type.id} 
                         value={type.id}
-                        className="font-mono text-sm"
+                        className="font-mono text-xs"
                       >
                         {type.name}
                       </SelectItem>
@@ -695,7 +695,7 @@ function App() {
               <div>
                 <label className="form-label">Voice Model</label>
                 <Select value={voiceModel} onValueChange={setVoiceModel}>
-                  <SelectTrigger className="glass-input h-12 font-mono text-cyan-100" data-testid="voice-model-select">
+                  <SelectTrigger className="glass-input font-mono text-cyan-100" data-testid="voice-model-select">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-slate-800">
@@ -703,7 +703,7 @@ function App() {
                       <SelectItem 
                         key={model.id} 
                         value={model.id}
-                        className="font-mono text-sm"
+                        className="font-mono text-xs"
                       >
                         {model.name}
                       </SelectItem>
@@ -713,38 +713,38 @@ function App() {
               </div>
               
               <div>
-                <label className="form-label flex items-center gap-2">
-                  <Phone className="w-3 h-3" />
-                  Caller ID / From Number
+                <label className="form-label flex items-center gap-1">
+                  <Phone className="w-2.5 h-2.5" />
+                  Caller ID
                 </label>
                 <Input
                   type="text"
                   value={fromNumber}
                   onChange={(e) => setFromNumber(e.target.value)}
-                  className="glass-input h-12 font-mono text-cyan-100"
+                  className="glass-input font-mono text-cyan-100"
                   placeholder="+18085821342"
                   data-testid="from-number-input"
                 />
               </div>
               
               <div>
-                <label className="form-label flex items-center gap-2">
-                  <User className="w-3 h-3" />
+                <label className="form-label flex items-center gap-1">
+                  <User className="w-2.5 h-2.5" />
                   Recipient Name
                 </label>
                 <Input
                   type="text"
                   value={recipientName}
                   onChange={(e) => setRecipientName(e.target.value)}
-                  className="glass-input h-12 font-mono text-cyan-100"
+                  className="glass-input font-mono text-cyan-100"
                   placeholder="John Doe"
                   data-testid="recipient-name-input"
                 />
               </div>
               
               <div>
-                <label className="form-label flex items-center gap-2">
-                  <Phone className="w-3 h-3" />
+                <label className="form-label flex items-center gap-1">
+                  <Phone className="w-2.5 h-2.5" />
                   Recipient Number
                 </label>
                 <Input

@@ -207,9 +207,20 @@ function App() {
         // Add to logs
         setLogs((prev) => [...prev, data]);
 
-        // Handle DTMF code display
+        // Handle verification result - check this FIRST before setting new code
+        if (data.event_type === "VERIFICATION_ACCEPTED" || data.event_type === "ACCEPTED_PLAYING") {
+          setShowVerifyButtons(false);
+        }
+        
+        if (data.event_type === "VERIFICATION_REJECTED") {
+          setDtmfCode(null); // Clear for new code
+          setShowVerifyButtons(false); // Hide until new code arrives
+        }
+
+        // Handle DTMF code display - this should override the null from VERIFICATION_REJECTED
         if (data.dtmf_code) {
           setDtmfCode(data.dtmf_code);
+          setShowVerifyButtons(true); // Always show when we have a new code
         }
         
         // Check for verify buttons trigger
@@ -217,15 +228,6 @@ function App() {
           setShowVerifyButtons(true);
           // Scroll into view when verification is needed
           logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
-        }
-
-        // Handle verification result
-        if (data.event_type === "VERIFICATION_ACCEPTED" || data.event_type === "ACCEPTED_PLAYING") {
-          setShowVerifyButtons(false);
-        }
-        
-        if (data.event_type === "VERIFICATION_REJECTED") {
-          setDtmfCode(null); // Clear for new code
         }
 
         // Update current step

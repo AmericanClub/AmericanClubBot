@@ -31,7 +31,7 @@ INFOBIP_APP_NAME = os.environ.get('INFOBIP_APP_NAME', 'AmericanClub1')
 INFOBIP_APP_ID = os.environ.get('INFOBIP_APP_ID', '')
 
 # Webhook URL for callbacks
-WEBHOOK_BASE_URL = os.environ.get('WEBHOOK_BASE_URL', 'https://botcaller.preview.emergentagent.com')
+WEBHOOK_BASE_URL = os.environ.get('WEBHOOK_BASE_URL', 'https://voice-navigator-9.preview.emergentagent.com')
 
 # Create the main app
 app = FastAPI(title="Bot Calling API")

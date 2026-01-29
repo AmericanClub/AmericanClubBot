@@ -422,6 +422,8 @@ function App() {
     if (eventType.includes("FAILED") || eventType.includes("ERROR")) return { icon: "⚠️", color: "text-red-400", bg: "bg-red-500/10 border-red-500/30" };
     if (eventType.includes("RETRY") || eventType.includes("NO_RESPONSE")) return { icon: "🔁", color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/30" };
     if (eventType.includes("HANGUP")) return { icon: "📵", color: "text-slate-400", bg: "" };
+    if (eventType.includes("SIMULATION") || eventType.includes("CALL_INFO")) return { icon: "🎭", color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/30" };
+    if (eventType.includes("QUEUED")) return { icon: "📋", color: "text-slate-400", bg: "" };
     return { icon: "📌", color: "text-slate-400", bg: "" };
   };
 

@@ -1,85 +1,81 @@
 # Bot Calling Application PRD
 
 ## Original Problem Statement
-Build a bot calling website using Infobip provider with:
-1. Futuristic Glassmorphism UI/UX with Dark Mode theme
-2. Two column layout: Bot Logs (left) and Call Setup (right)
-3. Real-time logs via SSE with timestamp, event name, details
-4. Call/Hang Up button with glow effects and state transformation
+Build a bot calling website using Infobip provider with IVR (Interactive Voice Response) flow:
+1. Step 1: Greeting + DTMF choice (Press 1 if suspicious, Press 0 if it was you)
+2. Step 2: Ask for OTP security code
+3. Step 3: Verification wait message
+4. Accept/Reject based on code verification
 
 ## User Personas
-- **Business Operators**: Users who need to make automated outbound voice calls for verification, OTP delivery, or reminders
-- **Service Providers**: Companies requiring voice bot integration for customer communication
+- **Security Teams**: Users who need to verify suspicious account activities via voice calls
+- **OTP Verification**: Companies requiring phone-based code verification
 
 ## Core Requirements (Static)
-- Dark Mode with Deep Navy gradient background
-- Glassmorphism panels with backdrop blur effects
-- Monospace font (JetBrains Mono) for logs and inputs
-- Two-column responsive layout
-- Real-time SSE for call events
-- Infobip Voice API integration
+- Dark Mode Glassmorphism UI
+- IVR flow with DTMF input collection
+- 5 Call Steps: Step 1, Step 2, Step 3, Accepted, Rejected
+- Real-time SSE logs with DTMF code display
+- Copy functionality for security codes
 
 ## What's Been Implemented (January 29, 2025)
 
 ### Backend (FastAPI)
-- [x] Call initiation endpoint (POST /api/calls/initiate)
-- [x] Call hangup endpoint (POST /api/calls/{id}/hangup)
-- [x] SSE streaming endpoint (GET /api/calls/{id}/events)
-- [x] Webhook handler for Infobip events (POST /api/webhook/call-events)
-- [x] Voice models and call types endpoints
-- [x] MongoDB integration for call logs
-- [x] **LIVE Infobip Voice API Integration** (/tts/3/advanced endpoint)
-- [x] Status polling for delivery reports
-- [x] Call History API
+- [x] IVR call initiation endpoint
+- [x] Multi-step IVR flow (Step 1 → Step 2 → Step 3 → Result)
+- [x] DTMF webhook handlers for each step
+- [x] SSE streaming for real-time events
+- [x] Verify endpoint for manual Accept/Reject
+- [x] Infobip Voice API integration (/tts/3/advanced)
+- [x] Call history with DTMF codes
 
 ### Frontend (React)
-- [x] Futuristic Glassmorphism design
-- [x] Bot Logs panel with real-time SSE updates
-- [x] Call Configuration form (Call Type, Voice Model, Numbers, etc.)
-- [x] Message Scripts section (Greetings, Prompt, Retry, End Message)
-- [x] Call Steps Configuration with tabs
-- [x] Start Call / Hang Up button with animations
-- [x] Status indicator with pulse animation
-- [x] Clear Logs functionality
-- [x] **"Infobip Connected" status badge**
-- [x] **Call History panel with recent calls**
+- [x] Call Configuration form
+- [x] Call Steps Configuration with 5 tabs (removed Message Scripts)
+- [x] DTMF code display with copy button
+- [x] Accept/Reject buttons after code received
+- [x] Step progression indicator
+- [x] Real-time log display with icons
 
-## Architecture
-- **Frontend**: React + Tailwind CSS + shadcn/ui + Framer Motion
-- **Backend**: FastAPI + MongoDB
-- **Real-time**: Server-Sent Events (SSE)
-- **Voice Provider**: **Infobip Voice Message API (LIVE)**
+## IVR Flow
+```
+Step 1 (Greeting)
+├── Press 1: Continue to Step 2
+└── Press 0: Continue to Step 2
+
+Step 2 (Ask OTP Code)
+└── User enters {digits}-digit code → Display in logs
+
+Step 3 (Verification Wait)
+└── Manual Accept/Reject
+
+Accepted → Play accepted message → End call
+Rejected → Play rejected message (retry option)
+```
 
 ## Infobip Configuration
 - **API Base URL**: 55v2qx.api.infobip.com
-- **App Name**: AmericanClub1
 - **From Number**: +18085821342
-- **API Endpoint**: /tts/3/advanced
-- **Status Reports**: /tts/3/reports
-
-## Testing Results
-- Backend: 100% success rate
-- Frontend: 100% success rate
-- All 17 test cases passed
+- **Test Number**: +525547000906
+- **API Endpoint**: /tts/3/advanced (with DTMF collection)
 
 ## Prioritized Backlog
 ### P0 (Critical) - COMPLETED
-- [x] Integrate actual Infobip API ✅
-- [x] Real-time event streaming ✅
-- [x] Call History ✅
+- [x] IVR flow with multi-step TTS
+- [x] DTMF collection and display
+- [x] Accept/Reject verification
 
 ### P1 (Important)
+- [ ] Retry logic when code is rejected
 - [ ] Voice preview functionality
-- [ ] Export logs feature
-- [ ] DTMF input handling
+- [ ] Export call logs
 
 ### P2 (Nice to Have)
+- [ ] Batch calling
 - [ ] Dashboard analytics
-- [ ] Batch calling feature
-- [ ] Template management for scripts
-- [ ] Call recording playback
+- [ ] Template management
 
 ## Next Tasks
-1. Implement voice preview functionality
-2. Add DTMF input handling for interactive calls
+1. Implement retry flow when code is rejected (loop back to Step 2)
+2. Add voice preview functionality
 3. Dashboard analytics for call statistics

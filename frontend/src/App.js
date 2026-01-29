@@ -139,7 +139,7 @@ function App() {
   const [infobipConfigured, setInfobipConfigured] = useState(false);
   
   // Call configuration state
-  const [callType, setCallType] = useState("login_verification");
+  const [callType, setCallType] = useState("password_change_1");
   const [voiceModel, setVoiceModel] = useState("hera");
   const [fromNumber, setFromNumber] = useState("+18085821342");
   const [recipientNumber, setRecipientNumber] = useState("+525547000906");

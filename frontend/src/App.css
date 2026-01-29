@@ -74,18 +74,21 @@
     height: 100vh;
     overflow-y: auto;
     padding: 2rem;
+    padding-bottom: 4rem;
 }
 
 @media (max-width: 1023px) {
     .setup-panel {
         height: auto;
         min-height: 60vh;
+        padding-bottom: 6rem;
     }
 }
 
 @media (min-width: 1024px) {
     .setup-panel {
         padding: 3rem;
+        padding-bottom: 4rem;
     }
 }
 

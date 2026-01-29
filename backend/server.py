@@ -148,12 +148,12 @@ async def add_call_event(call_id: str, event_type: str, details: str):
     
     return event
 
-# Voice name mapping for Infobip
+# Voice name mapping for Infobip (using available voices)
 VOICE_MAP = {
-    "hera": {"name": "Salli", "language": "en"},
-    "aria": {"name": "Kimberly", "language": "en"},
-    "apollo": {"name": "Matthew", "language": "en"},
-    "zeus": {"name": "Joey", "language": "en"},
+    "hera": {"name": "Joanna", "language": "en", "gender": "female"},
+    "aria": {"name": "Kendra", "language": "en", "gender": "female"},
+    "apollo": {"name": "Matthew", "language": "en", "gender": "male"},
+    "zeus": {"name": "Joey", "language": "en", "gender": "male"},
 }
 
 async def send_voice_message_infobip(call_id: str, config: CallConfig, messages: CallMessages):
@@ -168,21 +168,25 @@ async def send_voice_message_infobip(call_id: str, config: CallConfig, messages:
         # Prepare the full message
         full_message = f"{messages.greetings} {messages.prompt}"
         
-        # Infobip Voice Message API payload
+        # Clean phone numbers
+        from_num = config.from_number.replace("+", "").replace(" ", "").replace("-", "")
+        to_num = config.recipient_number.replace("+", "").replace(" ", "").replace("-", "")
+        
+        # Infobip Voice Message API payload (advanced endpoint)
         payload = {
             "messages": [
                 {
-                    "from": config.from_number,
+                    "from": from_num,
                     "destinations": [
                         {
-                            "to": config.recipient_number.replace("+", "").replace(" ", "").replace("-", "")
+                            "to": to_num
                         }
                     ],
                     "text": full_message,
                     "language": voice_settings["language"],
                     "voice": {
                         "name": voice_settings["name"],
-                        "gender": "female" if voice_id in ["hera", "aria"] else "male"
+                        "gender": voice_settings["gender"]
                     }
                 }
             ]
@@ -190,8 +194,8 @@ async def send_voice_message_infobip(call_id: str, config: CallConfig, messages:
         
         logger.info(f"Sending voice message to Infobip: {json.dumps(payload)}")
         
-        # Send request to Infobip Voice Message API
-        response = await client.post("/tts/3/messages", json=payload)
+        # Send request to Infobip Voice Message API (advanced endpoint)
+        response = await client.post("/tts/3/advanced", json=payload)
         
         logger.info(f"Infobip response status: {response.status_code}")
         logger.info(f"Infobip response: {response.text}")

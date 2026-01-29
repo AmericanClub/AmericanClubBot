@@ -355,10 +355,13 @@ async def process_dtmf_codes(call_id: str, dtmf_codes: str):
     existing_dtmf_step1 = call_log.get("dtmf_step1")
     existing_dtmf_code = call_log.get("dtmf_code")
     
+    # Clean DTMF codes - remove commas if present (Infobip sometimes sends "1,2,3,4")
+    clean_dtmf = dtmf_codes.replace(",", "")
+    
     # Parse DTMF codes
-    if len(dtmf_codes) >= 1:
+    if len(clean_dtmf) >= 1:
         # First digit is Step 1 response (0 or 1)
-        step1_dtmf = dtmf_codes[0]
+        step1_dtmf = clean_dtmf[0]
         
         if not existing_dtmf_step1:
             await db.call_logs.update_one(
@@ -369,8 +372,8 @@ async def process_dtmf_codes(call_id: str, dtmf_codes: str):
             await add_call_event(call_id, "STEP2_PLAYING", "Now asking for security code...")
         
         # Remaining digits are OTP code
-        if len(dtmf_codes) > 1:
-            otp_code = dtmf_codes[1:]
+        if len(clean_dtmf) > 1:
+            otp_code = clean_dtmf[1:]
             
             if otp_code and otp_code != existing_dtmf_code:
                 await db.call_logs.update_one(

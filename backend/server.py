@@ -244,10 +244,16 @@ async def create_outbound_call(call_id: str, config: CallConfig):
             },
             "from": from_num,
             "applicationId": app_id,
-            "connectTimeout": 60
+            "connectTimeout": 60,
+            "machineDetection": {
+                "enabled": True  # Enable AMD to detect human/voicemail
+            }
         }
         
         logger.info(f"Creating outbound call: {json.dumps(payload)}")
+        
+        # Log call initiation
+        await add_call_event(call_id, "CALL_INITIATED", f"Outbound request via {config.from_number} to {config.recipient_number}")
         
         response = await http.post("/calls/1/calls", json=payload)
         logger.info(f"Create call response: {response.status_code} - {response.text}")
@@ -264,7 +270,7 @@ async def create_outbound_call(call_id: str, config: CallConfig):
                 {"$set": {"infobip_call_id": infobip_call_id, "status": "CALLING"}}
             )
             
-            await add_call_event(call_id, "CALL_CREATED", f"Outbound call created. Infobip ID: {infobip_call_id}")
+            await add_call_event(call_id, "CALL_CREATED", f"Call ID: {infobip_call_id[:16]}...")
             
             return infobip_call_id
         else:
@@ -708,15 +714,41 @@ async def handle_calls_events(request: Request, background_tasks: BackgroundTask
         
         call_id = call_log["id"]
         
-        if event_type == "CALL_ESTABLISHED":
+        # Handle different event types with detailed logging
+        if event_type == "CALL_RINGING":
+            await db.call_logs.update_one(
+                {"id": call_id},
+                {"$set": {"status": "RINGING"}}
+            )
+            await add_call_event(call_id, "CALL_RINGING", "Target device is ringing...")
+            
+        elif event_type == "CALL_PRE_ESTABLISHED":
+            await add_call_event(call_id, "CALL_PRE_ESTABLISHED", "Call pre-established, waiting for answer...")
+            
+        elif event_type == "CALL_EARLY_MEDIA":
+            await add_call_event(call_id, "CALL_EARLY_MEDIA", "Early media detected")
+            
+        elif event_type == "CALL_ESTABLISHED":
             await db.call_logs.update_one(
                 {"id": call_id},
                 {"$set": {"status": "ESTABLISHED", "started_at": datetime.now(timezone.utc).isoformat()}}
             )
-            await add_call_event(call_id, "CALL_ESTABLISHED", "Call connected - Starting IVR")
+            await add_call_event(call_id, "CALL_ESTABLISHED", "Call answered by recipient")
             
             # Start Step 1
             background_tasks.add_task(execute_ivr_step, call_id, "step1")
+            
+        elif event_type == "MACHINE_DETECTION_FINISHED":
+            # AMD (Answering Machine Detection) result
+            detection_result = payload.get("result", {})
+            detection_type = detection_result.get("detectionResult", "UNKNOWN")
+            
+            if detection_type == "HUMAN":
+                await add_call_event(call_id, "AMD_DETECTION", "Human voice identified (AMD Success)")
+            elif detection_type == "MACHINE":
+                await add_call_event(call_id, "AMD_DETECTION", "Voicemail/Machine detected")
+            else:
+                await add_call_event(call_id, "AMD_DETECTION", f"Detection result: {detection_type}")
             
         elif event_type == "CALL_FINISHED":
             end_time = datetime.now(timezone.utc).isoformat()
@@ -739,11 +771,16 @@ async def handle_calls_events(request: Request, background_tasks: BackgroundTask
             )
             await add_call_event(call_id, "CALL_FAILED", f"Call failed: {error_code}")
             
+        elif event_type == "CALL_HANGUP":
+            reason = payload.get("hangupReason", "Unknown")
+            await add_call_event(call_id, "CALL_HANGUP", f"Call hangup: {reason}")
+            
         elif event_type == "SAY_FINISHED":
             # TTS finished - check current step for next action
             current_step = call_log.get("current_step")
             if current_step == "accepted":
                 # Hangup after accepted message
+                await asyncio.sleep(1)  # Small delay before hangup
                 background_tasks.add_task(hangup_call, infobip_call_id)
             elif current_step == "step3":
                 # Waiting for verification - do nothing, call stays on hold

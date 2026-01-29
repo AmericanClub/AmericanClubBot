@@ -210,7 +210,7 @@ function App() {
         }
         
         // Check for verify buttons trigger
-        if (data.show_verify || data.event_type === "AWAITING_VERIFICATION" || data.event_type === "CAPTURED_CODE") {
+        if (data.show_verify || data.event_type === "AWAITING_VERIFICATION" || data.event_type === "CAPTURED_CODE" || data.event_type === "DTMF_CODE_RECEIVED") {
           setShowVerifyButtons(true);
           // Scroll into view when verification is needed
           logsEndRef.current?.scrollIntoView({ behavior: "smooth" });

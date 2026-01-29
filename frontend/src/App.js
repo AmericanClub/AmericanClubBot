@@ -165,16 +165,20 @@ function App() {
     setIsVerifying(true);
     
     try {
+      // For deny, hide the decision box BEFORE the API call
+      // The SSE events will show it again with the new code
+      if (!accepted) {
+        setDtmfCode(null);
+        setShowVerifyButtons(false);
+      }
+      
       await axios.post(`${API}/calls/${currentCallId}/verify`, { accepted });
       
       if (accepted) {
         setShowVerifyButtons(false);
         toast.success("Code ACCEPTED - Playing final message");
       } else {
-        // Don't hide decision box for deny - let SSE events control it
-        // The new code will trigger the decision box to show again
-        setDtmfCode(null); // Clear for new code
-        setShowVerifyButtons(false); // Hide temporarily until new code arrives
+        // Don't set state here - let SSE events control it
         toast.info("Code DENIED - Requesting new code");
       }
     } catch (e) {

@@ -216,12 +216,13 @@ function App() {
           logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
         }
 
-        // Hide verify buttons when verification is done
-        if (data.event_type === "VERIFICATION_ACCEPTED" || data.event_type === "VERIFICATION_REJECTED") {
+        // Handle verification result
+        if (data.event_type === "VERIFICATION_ACCEPTED" || data.event_type === "ACCEPTED_PLAYING") {
           setShowVerifyButtons(false);
-          if (data.event_type === "VERIFICATION_REJECTED") {
-            setDtmfCode(null); // Clear for new code
-          }
+        }
+        
+        if (data.event_type === "VERIFICATION_REJECTED") {
+          setDtmfCode(null); // Clear for new code
         }
 
         // Update current step

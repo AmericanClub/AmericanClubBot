@@ -22,6 +22,13 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
+# Infobip configuration
+INFOBIP_BASE_URL = os.environ.get('INFOBIP_BASE_URL', '')
+INFOBIP_API_KEY = os.environ.get('INFOBIP_API_KEY', '')
+INFOBIP_FROM_NUMBER = os.environ.get('INFOBIP_FROM_NUMBER', '+18085821342')
+INFOBIP_NUMBER_ID = os.environ.get('INFOBIP_NUMBER_ID', '')
+INFOBIP_APP_NAME = os.environ.get('INFOBIP_APP_NAME', 'AmericanClub1')
+
 # Create the main app
 app = FastAPI(title="Bot Calling API")
 
@@ -38,6 +45,23 @@ logger = logging.getLogger(__name__)
 # SSE connections storage
 sse_connections: Dict[str, asyncio.Queue] = {}
 
+# HTTP client for Infobip
+http_client: Optional[httpx.AsyncClient] = None
+
+async def get_http_client() -> httpx.AsyncClient:
+    global http_client
+    if http_client is None:
+        http_client = httpx.AsyncClient(
+            base_url=INFOBIP_BASE_URL,
+            headers={
+                "Authorization": f"App {INFOBIP_API_KEY}",
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            timeout=30.0
+        )
+    return http_client
+
 # ===================
 # Pydantic Models
 # ===================
@@ -45,7 +69,7 @@ sse_connections: Dict[str, asyncio.Queue] = {}
 class CallConfig(BaseModel):
     call_type: str = "Login Verification"
     voice_model: str = "Hera (Female, Mature)"
-    from_number: str = "+18085821342"
+    from_number: str = INFOBIP_FROM_NUMBER
     recipient_number: str
     recipient_name: Optional[str] = None
     service_name: Optional[str] = None
@@ -78,6 +102,7 @@ class CallLog(BaseModel):
     steps: Optional[CallSteps] = None
     status: str = "PENDING"
     infobip_call_id: Optional[str] = None
+    infobip_message_id: Optional[str] = None
     started_at: Optional[str] = None
     ended_at: Optional[str] = None
     duration_seconds: int = 0
@@ -123,18 +148,192 @@ async def add_call_event(call_id: str, event_type: str, details: str):
     
     return event
 
+# Voice name mapping for Infobip
+VOICE_MAP = {
+    "hera": {"name": "Salli", "language": "en"},
+    "aria": {"name": "Kimberly", "language": "en"},
+    "apollo": {"name": "Matthew", "language": "en"},
+    "zeus": {"name": "Joey", "language": "en"},
+}
+
+async def send_voice_message_infobip(call_id: str, config: CallConfig, messages: CallMessages):
+    """Send voice message using Infobip Voice Message API"""
+    try:
+        client = await get_http_client()
+        
+        # Get voice settings
+        voice_id = config.voice_model.split()[0].lower() if config.voice_model else "hera"
+        voice_settings = VOICE_MAP.get(voice_id, VOICE_MAP["hera"])
+        
+        # Prepare the full message
+        full_message = f"{messages.greetings} {messages.prompt}"
+        
+        # Infobip Voice Message API payload
+        payload = {
+            "messages": [
+                {
+                    "from": config.from_number,
+                    "destinations": [
+                        {
+                            "to": config.recipient_number.replace("+", "").replace(" ", "").replace("-", "")
+                        }
+                    ],
+                    "text": full_message,
+                    "language": voice_settings["language"],
+                    "voice": {
+                        "name": voice_settings["name"],
+                        "gender": "female" if voice_id in ["hera", "aria"] else "male"
+                    }
+                }
+            ]
+        }
+        
+        logger.info(f"Sending voice message to Infobip: {json.dumps(payload)}")
+        
+        # Send request to Infobip Voice Message API
+        response = await client.post("/tts/3/messages", json=payload)
+        
+        logger.info(f"Infobip response status: {response.status_code}")
+        logger.info(f"Infobip response: {response.text}")
+        
+        if response.status_code in [200, 201, 202]:
+            result = response.json()
+            
+            # Extract message details
+            if result.get("messages") and len(result["messages"]) > 0:
+                msg = result["messages"][0]
+                message_id = msg.get("messageId")
+                status_name = msg.get("status", {}).get("name", "PENDING")
+                status_desc = msg.get("status", {}).get("description", "")
+                
+                # Update call log with Infobip message ID
+                await db.call_logs.update_one(
+                    {"id": call_id},
+                    {"$set": {
+                        "infobip_message_id": message_id,
+                        "status": "CALLING",
+                        "started_at": datetime.now(timezone.utc).isoformat()
+                    }}
+                )
+                
+                await add_call_event(call_id, "CALL_INITIATED", f"Voice message sent. Message ID: {message_id}")
+                await add_call_event(call_id, "INFOBIP_STATUS", f"Status: {status_name} - {status_desc}")
+                
+                # Start polling for status updates
+                asyncio.create_task(poll_message_status(call_id, message_id))
+                
+                return {"success": True, "message_id": message_id}
+            else:
+                await add_call_event(call_id, "CALL_ERROR", "No message in Infobip response")
+                await db.call_logs.update_one(
+                    {"id": call_id},
+                    {"$set": {"status": "FAILED", "error_message": "No message in response"}}
+                )
+                return {"success": False, "error": "No message in response"}
+        else:
+            error_msg = f"Infobip API error: {response.status_code} - {response.text}"
+            logger.error(error_msg)
+            await add_call_event(call_id, "CALL_FAILED", error_msg)
+            await db.call_logs.update_one(
+                {"id": call_id},
+                {"$set": {"status": "FAILED", "error_message": error_msg}}
+            )
+            return {"success": False, "error": error_msg}
+            
+    except Exception as e:
+        error_msg = f"Error sending voice message: {str(e)}"
+        logger.error(error_msg)
+        await add_call_event(call_id, "CALL_FAILED", error_msg)
+        await db.call_logs.update_one(
+            {"id": call_id},
+            {"$set": {"status": "FAILED", "error_message": error_msg}}
+        )
+        return {"success": False, "error": str(e)}
+
+async def poll_message_status(call_id: str, message_id: str):
+    """Poll Infobip for message delivery status"""
+    try:
+        client = await get_http_client()
+        max_polls = 30  # Poll for up to 5 minutes (30 * 10 seconds)
+        poll_count = 0
+        
+        while poll_count < max_polls:
+            await asyncio.sleep(10)  # Wait 10 seconds between polls
+            poll_count += 1
+            
+            try:
+                # Get message status from Infobip
+                response = await client.get(f"/tts/3/reports?messageId={message_id}")
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    
+                    if result.get("results") and len(result["results"]) > 0:
+                        report = result["results"][0]
+                        status = report.get("status", {})
+                        status_name = status.get("name", "UNKNOWN")
+                        status_desc = status.get("description", "")
+                        
+                        # Map Infobip status to our status
+                        status_mapping = {
+                            "PENDING_ENROUTE": "CALLING",
+                            "PENDING_ACCEPTED": "CALLING",
+                            "DELIVERED_TO_OPERATOR": "RINGING",
+                            "DELIVERED_TO_HANDSET": "ESTABLISHED",
+                            "DELIVERED": "FINISHED",
+                            "REJECTED": "FAILED",
+                            "UNDELIVERABLE": "FAILED",
+                            "EXPIRED": "FAILED",
+                        }
+                        
+                        new_status = status_mapping.get(status_name, "CALLING")
+                        
+                        # Update status
+                        await db.call_logs.update_one(
+                            {"id": call_id},
+                            {"$set": {"status": new_status}}
+                        )
+                        
+                        await add_call_event(call_id, f"STATUS_{status_name}", status_desc)
+                        
+                        # Stop polling if call is finished or failed
+                        if new_status in ["FINISHED", "FAILED"]:
+                            await db.call_logs.update_one(
+                                {"id": call_id},
+                                {"$set": {"ended_at": datetime.now(timezone.utc).isoformat()}}
+                            )
+                            await add_call_event(call_id, "CALL_FINISHED", f"Call completed with status: {status_name}")
+                            break
+                            
+            except Exception as poll_error:
+                logger.warning(f"Poll error: {poll_error}")
+                
+        # If we exhausted polls, mark as finished
+        if poll_count >= max_polls:
+            await db.call_logs.update_one(
+                {"id": call_id},
+                {"$set": {
+                    "status": "FINISHED",
+                    "ended_at": datetime.now(timezone.utc).isoformat()
+                }}
+            )
+            await add_call_event(call_id, "CALL_FINISHED", "Status polling completed")
+            
+    except Exception as e:
+        logger.error(f"Error in status polling: {e}")
+
 async def simulate_call_flow(call_id: str, config: CallConfig, messages: CallMessages):
-    """Simulate call flow for demo (replace with actual Infobip integration)"""
+    """Simulate call flow for demo (fallback when Infobip is unavailable)"""
     try:
         # PENDING -> CALLING
         await asyncio.sleep(1)
         await db.call_logs.update_one({"id": call_id}, {"$set": {"status": "CALLING"}})
-        await add_call_event(call_id, "CALL_INITIATED", f"Calling {config.recipient_number}...")
+        await add_call_event(call_id, "CALL_INITIATED", f"[SIMULATION] Calling {config.recipient_number}...")
         
         # CALLING -> RINGING
         await asyncio.sleep(2)
         await db.call_logs.update_one({"id": call_id}, {"$set": {"status": "RINGING"}})
-        await add_call_event(call_id, "CALL_RINGING", f"Phone is ringing for {config.recipient_name or config.recipient_number}")
+        await add_call_event(call_id, "CALL_RINGING", f"[SIMULATION] Phone is ringing for {config.recipient_name or config.recipient_number}")
         
         # RINGING -> ESTABLISHED
         await asyncio.sleep(3)
@@ -142,17 +341,17 @@ async def simulate_call_flow(call_id: str, config: CallConfig, messages: CallMes
             {"id": call_id}, 
             {"$set": {"status": "ESTABLISHED", "started_at": datetime.now(timezone.utc).isoformat()}}
         )
-        await add_call_event(call_id, "CALL_ESTABLISHED", "Call connected")
+        await add_call_event(call_id, "CALL_ESTABLISHED", "[SIMULATION] Call connected")
         
         # Playing TTS messages
         await asyncio.sleep(1)
-        await add_call_event(call_id, "TTS_PLAYING", f"Playing greetings: {messages.greetings[:50]}...")
+        await add_call_event(call_id, "TTS_PLAYING", f"[SIMULATION] Playing greetings: {messages.greetings[:50]}...")
         
         await asyncio.sleep(3)
-        await add_call_event(call_id, "TTS_PLAYING", f"Playing prompt: {messages.prompt[:50]}...")
+        await add_call_event(call_id, "TTS_PLAYING", f"[SIMULATION] Playing prompt: {messages.prompt[:50]}...")
         
         await asyncio.sleep(5)
-        await add_call_event(call_id, "DTMF_RECEIVED", "User input received: ******")
+        await add_call_event(call_id, "DTMF_RECEIVED", "[SIMULATION] User input received: ******")
         
         # ESTABLISHED -> FINISHED
         await asyncio.sleep(2)
@@ -161,7 +360,7 @@ async def simulate_call_flow(call_id: str, config: CallConfig, messages: CallMes
             {"id": call_id}, 
             {"$set": {"status": "FINISHED", "ended_at": end_time, "duration_seconds": 15}}
         )
-        await add_call_event(call_id, "CALL_FINISHED", f"Call completed. Duration: 15 seconds")
+        await add_call_event(call_id, "CALL_FINISHED", "[SIMULATION] Call completed. Duration: 15 seconds")
         
     except Exception as e:
         logger.error(f"Error in call simulation: {e}")
@@ -177,11 +376,24 @@ async def simulate_call_flow(call_id: str, config: CallConfig, messages: CallMes
 
 @api_router.get("/")
 async def root():
-    return {"message": "Bot Calling API", "status": "running"}
+    return {
+        "message": "Bot Calling API",
+        "status": "running",
+        "infobip_configured": bool(INFOBIP_API_KEY and INFOBIP_BASE_URL)
+    }
+
+@api_router.get("/config")
+async def get_config():
+    """Get current Infobip configuration status"""
+    return {
+        "infobip_configured": bool(INFOBIP_API_KEY and INFOBIP_BASE_URL),
+        "from_number": INFOBIP_FROM_NUMBER,
+        "app_name": INFOBIP_APP_NAME
+    }
 
 @api_router.post("/calls/initiate", response_model=Dict)
 async def initiate_call(request: CallRequest, background_tasks: BackgroundTasks):
-    """Initiate a new outbound call"""
+    """Initiate a new outbound voice call"""
     try:
         # Create call log
         call_log = CallLog(
@@ -197,18 +409,29 @@ async def initiate_call(request: CallRequest, background_tasks: BackgroundTasks)
         # Add initial event
         await add_call_event(call_log.id, "CALL_QUEUED", "Call queued for processing")
         
-        # Start call simulation in background (replace with Infobip API call)
-        background_tasks.add_task(
-            simulate_call_flow, 
-            call_log.id, 
-            request.config, 
-            request.messages
-        )
+        # Check if Infobip is configured
+        if INFOBIP_API_KEY and INFOBIP_BASE_URL:
+            # Use real Infobip API
+            background_tasks.add_task(
+                send_voice_message_infobip, 
+                call_log.id, 
+                request.config, 
+                request.messages
+            )
+        else:
+            # Use simulation
+            background_tasks.add_task(
+                simulate_call_flow, 
+                call_log.id, 
+                request.config, 
+                request.messages
+            )
         
         return {
             "status": "initiated",
             "call_id": call_log.id,
-            "message": "Call initiated successfully"
+            "message": "Call initiated successfully",
+            "using_infobip": bool(INFOBIP_API_KEY and INFOBIP_BASE_URL)
         }
         
     except Exception as e:
@@ -323,34 +546,36 @@ async def handle_infobip_webhook(request: Request):
         payload = await request.json()
         logger.info(f"Webhook received: {json.dumps(payload)}")
         
-        call_id = payload.get("callId")
-        event_type = payload.get("eventType", "UNKNOWN")
-        
-        if call_id:
-            # Find call by infobip_call_id
-            call_log = await db.call_logs.find_one({"infobip_call_id": call_id}, {"_id": 0})
-            
-            if call_log:
-                # Map Infobip events to our status
-                status_map = {
-                    "CALL_RINGING": "RINGING",
-                    "CALL_ESTABLISHED": "ESTABLISHED",
-                    "CALL_FINISHED": "FINISHED",
-                    "CALL_FAILED": "FAILED",
-                }
+        # Handle delivery reports
+        if "results" in payload:
+            for result in payload["results"]:
+                message_id = result.get("messageId")
+                status = result.get("status", {})
+                status_name = status.get("name", "UNKNOWN")
                 
-                new_status = status_map.get(event_type)
-                if new_status:
-                    await db.call_logs.update_one(
-                        {"id": call_log["id"]},
-                        {"$set": {"status": new_status}}
+                # Find call by message ID
+                call_log = await db.call_logs.find_one({"infobip_message_id": message_id}, {"_id": 0})
+                
+                if call_log:
+                    # Map status
+                    status_mapping = {
+                        "DELIVERED": "FINISHED",
+                        "REJECTED": "FAILED",
+                        "UNDELIVERABLE": "FAILED",
+                    }
+                    
+                    new_status = status_mapping.get(status_name)
+                    if new_status:
+                        await db.call_logs.update_one(
+                            {"id": call_log["id"]},
+                            {"$set": {"status": new_status}}
+                        )
+                    
+                    await add_call_event(
+                        call_log["id"],
+                        f"WEBHOOK_{status_name}",
+                        json.dumps(status)
                     )
-                
-                await add_call_event(
-                    call_log["id"],
-                    event_type,
-                    json.dumps(payload.get("details", {}))
-                )
         
         return {"status": "received"}
         
@@ -362,10 +587,10 @@ async def handle_infobip_webhook(request: Request):
 async def get_voice_models():
     """Get available voice models"""
     return [
-        {"id": "hera", "name": "Hera (Female, Mature)", "gender": "female"},
-        {"id": "aria", "name": "Aria (Female, Young)", "gender": "female"},
-        {"id": "apollo", "name": "Apollo (Male, Mature)", "gender": "male"},
-        {"id": "zeus", "name": "Zeus (Male, Deep)", "gender": "male"},
+        {"id": "hera", "name": "Hera (Female, Mature)", "gender": "female", "infobip_voice": "Salli"},
+        {"id": "aria", "name": "Aria (Female, Young)", "gender": "female", "infobip_voice": "Kimberly"},
+        {"id": "apollo", "name": "Apollo (Male, Mature)", "gender": "male", "infobip_voice": "Matthew"},
+        {"id": "zeus", "name": "Zeus (Male, Deep)", "gender": "male", "infobip_voice": "Joey"},
     ]
 
 @api_router.get("/call-types")
@@ -391,5 +616,8 @@ app.add_middleware(
 )
 
 @app.on_event("shutdown")
-async def shutdown_db_client():
+async def shutdown():
+    global http_client
+    if http_client:
+        await http_client.aclose()
     client.close()

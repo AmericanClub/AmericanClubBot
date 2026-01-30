@@ -406,17 +406,17 @@ export default function AdminDashboard({ user, token, onLogout }) {
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="text-sm font-mono text-cyan-400">{u.credits}</span>
+                        <span className="text-sm font-mono text-cyan-400 neon-text">{u.credits}</span>
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium rounded-full ${
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium rounded-full status-glow ${
                           u.is_active ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400"
                         }`}>
                           {u.is_active ? "Active" : "Disabled"}
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="text-xs font-mono text-gray-500">{u.invite_code_used || "-"}</span>
+                        <span className="text-xs font-mono text-white/50">{u.invite_code_used || "-"}</span>
                       </td>
                       <td className="px-4 py-3 text-right">
                         {u.role !== "admin" && (
@@ -425,7 +425,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
                               variant="ghost"
                               size="sm"
                               onClick={() => openEditUser(u)}
-                              className="text-gray-500 hover:text-gray-800"
+                              className="text-white/60 hover:text-white hover:bg-white/10"
                               title="Edit User"
                             >
                               <Edit className="w-4 h-4" />
@@ -437,7 +437,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
                                 setSelectedUser(u);
                                 setShowAddCredits(true);
                               }}
-                              className="text-cyan-400 hover:text-cyan-300"
+                              className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10"
                               title="Add Credits"
                             >
                               <Coins className="w-4 h-4" />

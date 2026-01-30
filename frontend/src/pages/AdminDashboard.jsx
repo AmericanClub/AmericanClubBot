@@ -1272,7 +1272,7 @@ function ProvidersTab({ authHeaders }) {
                 />
               </div>
               <p className="text-xs text-white/40">
-                Note: Add phone numbers after saving credentials using the "Add Number" button.
+                Note: Add phone numbers after saving credentials using the &quot;Add Number&quot; button.
               </p>
               <Button
                 onClick={handleSaveSignalWire}
@@ -1325,7 +1325,7 @@ function ProvidersTab({ authHeaders }) {
                 />
               </div>
               <p className="text-xs text-white/40">
-                Note: Add phone numbers after saving credentials using the "Add Number" button.
+                Note: Add phone numbers after saving credentials using the &quot;Add Number&quot; button.
               </p>
               <Button
                 onClick={handleSaveInfobip}

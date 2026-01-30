@@ -570,28 +570,28 @@ export default function AdminDashboard({ user, token, onLogout }) {
           <Modal onClose={() => setShowCreateCode(false)} title="Create Invite Code">
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-medium text-gray-500 uppercase">Credits</label>
+                <label className="text-xs font-medium text-white/70 uppercase">Credits</label>
                 <Input
                   type="number"
                   value={newCodeCredits}
                   onChange={(e) => setNewCodeCredits(parseInt(e.target.value) || 0)}
-                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
+                  className="mt-1 glass-input"
                   min={0}
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-500 uppercase">Notes (optional)</label>
+                <label className="text-xs font-medium text-white/70 uppercase">Notes (optional)</label>
                 <Input
                   value={newCodeNotes}
                   onChange={(e) => setNewCodeNotes(e.target.value)}
-                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
+                  className="mt-1 glass-input"
                   placeholder="e.g., For new employee"
                 />
               </div>
               <Button
                 onClick={handleCreateCode}
                 disabled={isLoading}
-                className="w-full bg-cyan-500 hover:bg-cyan-600"
+                className="w-full glow-button text-white"
               >
                 {isLoading ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : null}
                 Generate Code

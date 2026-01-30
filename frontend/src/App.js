@@ -893,20 +893,19 @@ function UserCallPanel({ user, token, onLogout }) {
             </div>
             <div>
               <h1 className="font-bold text-white text-sm" style={{ textShadow: '0 0 20px rgba(167, 139, 250, 0.3)' }}>American Club</h1>
-              <p className="text-[10px] text-purple-400/70">IVR Call System</p>
+              <p className="text-[10px] text-blue-400/70">IVR Call System</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
             {/* Credits Display */}
-            <div className="flex items-center gap-2 rounded-xl px-4 py-2"
+            <div className="flex items-center gap-2 rounded-lg px-4 py-2"
               style={{
-                background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.1))',
-                border: '1px solid rgba(251, 191, 36, 0.3)',
-                boxShadow: '0 0 20px rgba(251, 191, 36, 0.2)'
+                background: 'rgba(251, 191, 36, 0.1)',
+                border: '1px solid rgba(251, 191, 36, 0.25)'
               }}>
-              <Coins className="w-4 h-4 text-yellow-400" style={{ filter: 'drop-shadow(0 0 8px rgba(251, 191, 36, 0.5))' }} />
+              <Coins className="w-4 h-4 text-yellow-400" />
               <div>
-                <span className="font-mono text-lg font-bold text-yellow-400" data-testid="user-credits" style={{ textShadow: '0 0 15px rgba(251, 191, 36, 0.5)' }}>{userCredits}</span>
+                <span className="font-mono text-lg font-bold text-yellow-400" data-testid="user-credits">{userCredits}</span>
                 <span className="text-[10px] text-yellow-500/70 ml-1">credits</span>
               </div>
             </div>
@@ -914,20 +913,16 @@ function UserCallPanel({ user, token, onLogout }) {
             <div className="flex items-center gap-3">
               <div className="text-right">
                 <p className="text-sm font-semibold text-white">{user?.name}</p>
-                <p className="text-[10px] text-white/50">{user?.email}</p>
+                <p className="text-[10px] text-slate-500">{user?.email}</p>
               </div>
-              <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold"
-                style={{
-                  background: 'linear-gradient(135deg, #8b5cf6, #a855f7)',
-                  boxShadow: '0 0 20px rgba(139, 92, 246, 0.4)'
-                }}>
+              <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold bg-blue-600">
                 {user?.name?.charAt(0)?.toUpperCase() || "U"}
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onLogout}
-                className="text-white/50 hover:text-red-400 hover:bg-red-500/10"
+                className="text-slate-500 hover:text-red-400 hover:bg-red-500/10"
                 data-testid="logout-btn"
               >
                 <LogOut className="w-4 h-4" />
@@ -946,8 +941,8 @@ function UserCallPanel({ user, token, onLogout }) {
               <h2 className="font-heading text-sm font-semibold text-white">
                 Bot Logs
               </h2>
-              <span className="font-mono text-[10px] text-purple-400 uppercase px-2 py-0.5 rounded"
-                style={{ background: 'rgba(139, 92, 246, 0.2)', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
+              <span className="font-mono text-[10px] text-blue-400 uppercase px-2 py-0.5 rounded"
+                style={{ background: 'rgba(59, 130, 246, 0.15)', border: '1px solid rgba(59, 130, 246, 0.25)' }}>
                 {callStatus}
               </span>
             </div>

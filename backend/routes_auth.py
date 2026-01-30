@@ -419,6 +419,33 @@ async def get_user_transactions(user_id: str, current_admin: dict = Depends(get_
     return {"transactions": transactions}
 
 
+@admin_router.delete("/users/{user_id}")
+async def delete_user(user_id: str, current_admin: dict = Depends(get_current_admin)):
+    """Delete a user (admin cannot delete themselves)"""
+    from server import db
+    
+    # Check if trying to delete self
+    if user_id == current_admin["id"]:
+        raise HTTPException(status_code=400, detail="Cannot delete your own account")
+    
+    # Check if user exists
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Cannot delete admin users
+    if user.get("role") == "admin":
+        raise HTTPException(status_code=400, detail="Cannot delete admin users")
+    
+    # Delete user
+    await db.users.delete_one({"id": user_id})
+    
+    # Also delete user's credit transactions
+    await db.credit_transactions.delete_many({"user_id": user_id})
+    
+    return {"message": f"User {user['email']} deleted successfully"}
+
+
 # ==================
 # Admin Routes - Invite Codes
 # ==================

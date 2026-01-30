@@ -792,9 +792,51 @@ function UserCallPanel({ user, token, onLogout }) {
 
   return (
     <div className="app-container" data-testid="app-container">
-      <Toaster theme="dark" position="top-right" />
+      {/* User Header Bar */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-xl border-b border-white/10 px-4 py-2">
+        <div className="max-w-[1800px] mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center">
+              <Phone className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <h1 className="font-bold text-white text-sm">Voice Bot Control</h1>
+              <p className="text-[10px] text-slate-400">IVR Call System</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            {/* Credits Display */}
+            <div className="flex items-center gap-2 bg-slate-800/50 rounded-lg px-3 py-1.5 border border-white/10">
+              <Coins className="w-4 h-4 text-yellow-400" />
+              <div>
+                <span className="font-mono text-lg font-bold text-white" data-testid="user-credits">{user?.credits || 0}</span>
+                <span className="text-[10px] text-slate-400 ml-1">credits</span>
+              </div>
+            </div>
+            {/* User Info */}
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <p className="text-sm font-medium text-white">{user?.name}</p>
+                <p className="text-[10px] text-slate-400">{user?.email}</p>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                {user?.name?.charAt(0)?.toUpperCase() || "U"}
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onLogout}
+                className="text-slate-400 hover:text-red-400 hover:bg-red-500/10"
+                data-testid="logout-btn"
+              >
+                <LogOut className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
       
-      <div className="main-grid">
+      <div className="main-grid pt-14">
         {/* Left Panel - Bot Logs */}
         <div className="logs-panel glass-panel" data-testid="logs-panel">
           <div className="logs-header">

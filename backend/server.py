@@ -126,6 +126,7 @@ class CallLog(BaseModel):
     recording_url: Optional[str] = None
     recording_sid: Optional[str] = None
     recording_duration: Optional[int] = None
+    answered_by: Optional[str] = None  # human, machine_start, machine_end_beep, etc.
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     events: List[Dict] = Field(default_factory=list)
 

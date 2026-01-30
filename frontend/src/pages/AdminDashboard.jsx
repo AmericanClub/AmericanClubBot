@@ -1330,7 +1330,11 @@ function ProvidersTab({ authHeaders }) {
               <Button
                 onClick={handleSaveInfobip}
                 disabled={isLoading || !ibApiKey}
-                className="w-full bg-orange-500 hover:bg-orange-600"
+                className="w-full text-white"
+                style={{
+                  background: 'linear-gradient(135deg, #f97316, #ea580c)',
+                  boxShadow: '0 0 20px rgba(249, 115, 22, 0.3)'
+                }}
               >
                 {isLoading ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : null}
                 Save Configuration

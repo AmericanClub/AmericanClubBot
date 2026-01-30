@@ -1,50 +1,37 @@
-/* Bot Calling App Styles - Dark Glassmorphism Theme */
+/* Bot Calling App Styles - Dark Navy Modern Theme */
 
-/* Main app container with animated background */
+/* Main app container with gradient accent */
 .app-container {
     height: 100vh;
     max-height: 100vh;
     overflow: hidden;
-    background: linear-gradient(-45deg, #0f0a1e, #1e1145, #2d1b69, #1a1333);
-    background-size: 400% 400%;
-    animation: gradientShift 15s ease infinite;
+    background: var(--bg-primary);
     position: relative;
 }
 
+/* Blue gradient accent on the left */
 .app-container::before {
     content: '';
     position: absolute;
-    top: -50%;
-    right: -20%;
-    width: 80%;
-    height: 80%;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
-    border-radius: 50%;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background: radial-gradient(ellipse at 0% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 60%);
     pointer-events: none;
-    animation: float 10s ease-in-out infinite;
 }
 
+/* Subtle glow at top */
 .app-container::after {
     content: '';
     position: absolute;
-    bottom: -30%;
-    left: -10%;
-    width: 60%;
-    height: 60%;
-    background: radial-gradient(circle, rgba(34, 211, 238, 0.1) 0%, transparent 70%);
+    top: -20%;
+    right: 10%;
+    width: 40%;
+    height: 40%;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.08) 0%, transparent 70%);
     border-radius: 50%;
     pointer-events: none;
-    animation: float 8s ease-in-out infinite reverse;
-}
-
-@keyframes gradientShift {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-30px) scale(1.05); }
 }
 
 /* Two column layout */
@@ -70,10 +57,10 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    background: rgba(139, 92, 246, 0.05);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-right: 1px solid rgba(139, 92, 246, 0.15);
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-right: 1px solid var(--border-color);
 }
 
 @media (max-width: 1023px) {

@@ -112,6 +112,8 @@ class CallLog(BaseModel):
     step1_retry_count: int = 0
     step2_retry_count: int = 0
     infobip_call_id: Optional[str] = None
+    signalwire_call_sid: Optional[str] = None
+    provider: str = "infobip"
     dtmf_step1: Optional[str] = None
     dtmf_code: Optional[str] = None
     dtmf_codes_history: List[str] = Field(default_factory=list)

@@ -1508,6 +1508,9 @@ async def signalwire_status_webhook(request: Request):
                     {"$set": {"status": "FINISHED", "ended_at": datetime.now(timezone.utc).isoformat(), "duration_seconds": duration}}
                 )
                 await add_call_event(call_id, "CALL_FINISHED", f"Call ended. Duration: {duration}s")
+                
+                # Deduct credits after call ends
+                await deduct_user_credits(call_id, duration)
             
             elif call_status == "busy":
                 await db.call_logs.update_one(

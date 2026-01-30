@@ -533,12 +533,14 @@ function App() {
     setShowVerifyButtons(false);
     setCurrentStep("");
     setLogs([]);
+    setRecordingUrl(null);
+    setRecordingDuration(null);
     
     try {
       const response = await axios.post(`${API}/calls/initiate`, {
         config: {
           call_type: callType,
-          voice_model: VOICE_MODELS.find(v => v.id === voiceModel)?.name || voiceModel,
+          voice_model: voiceModel, // Send the voice ID directly (e.g., "Polly.Joanna-Neural")
           from_number: fromNumber,
           recipient_number: recipientNumber,
           recipient_name: recipientName,

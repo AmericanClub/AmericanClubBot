@@ -67,7 +67,7 @@ class TestProviderPhoneNumbersAdmin:
         })
         if response.status_code != 200:
             pytest.skip("Admin authentication failed")
-        self.token = response.json()["token"]
+        self.token = response.json()["access_token"]
         self.headers = {"Authorization": f"Bearer {self.token}"}
     
     def test_get_providers(self):
@@ -305,7 +305,7 @@ class TestAdminDashboard:
         })
         if response.status_code != 200:
             pytest.skip("Admin authentication failed")
-        self.token = response.json()["token"]
+        self.token = response.json()["access_token"]
         self.headers = {"Authorization": f"Bearer {self.token}"}
     
     def test_get_dashboard_stats(self):

@@ -65,6 +65,12 @@ export default function AdminDashboard({ user, token, onLogout }) {
   const [newAdminEmail, setNewAdminEmail] = useState("");
   const [newAdminPassword, setNewAdminPassword] = useState("");
   
+  // Change password modal state
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  
   const authHeaders = { Authorization: `Bearer ${token}` };
 
   // Fetch dashboard stats
@@ -121,6 +127,38 @@ export default function AdminDashboard({ user, token, onLogout }) {
       fetchUsers();
     } catch (error) {
       toast.error(error.response?.data?.detail || "Failed to create admin");
+    }
+    setIsLoading(false);
+  };
+
+  // Change password (for Super Admin)
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast.error("All fields are required");
+      return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
+    
+    if (newPassword.length < 4) {
+      toast.error("Password must be at least 4 characters");
+      return;
+    }
+    
+    setIsLoading(true);
+    try {
+      await axios.put(`${API}/auth/change-password?old_password=${encodeURIComponent(currentPassword)}&new_password=${encodeURIComponent(newPassword)}`, {}, { headers: authHeaders });
+      
+      toast.success("Password changed successfully!");
+      setShowChangePassword(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to change password");
     }
     setIsLoading(false);
   };

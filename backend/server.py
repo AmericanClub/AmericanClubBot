@@ -700,11 +700,13 @@ async def verify_code(call_id: str, request: Request, background_tasks: Backgrou
                     
                     steps = call_log.get("steps", {})
                     config = call_log.get("config", {})
+                    voice = config.get("voice_model", "Polly.Joanna-Neural")
+                    voice_attr = get_voice_attribute(voice)
                     message = format_tts_message(steps.get("accepted", "Thank you. Goodbye."), config)
                     
                     laml = f'''<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Say>{message}</Say>
+    <Say voice="{voice_attr}">{message}</Say>
     <Hangup/>
 </Response>'''
                     
@@ -758,12 +760,14 @@ async def verify_code(call_id: str, request: Request, background_tasks: Backgrou
                     
                     steps = call_log.get("steps", {})
                     config = call_log.get("config", {})
+                    voice = config.get("voice_model", "Polly.Joanna-Neural")
+                    voice_attr = get_voice_attribute(voice)
                     message = format_tts_message(steps.get("rejected", "Please enter the code again."), config)
                     
                     laml = f'''<?xml version="1.0" encoding="UTF-8"?>
 <Response>
     <Gather numDigits="{config.get('otp_digits', 6)}" action="{WEBHOOK_BASE_URL}/api/signalwire-webhook/voice" timeout="10">
-        <Say>{message}</Say>
+        <Say voice="{voice_attr}">{message}</Say>
     </Gather>
 </Response>'''
                     

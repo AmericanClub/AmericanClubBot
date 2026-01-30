@@ -1088,15 +1088,6 @@ function ProvidersTab({ authHeaders }) {
                   placeholder="+1234567890"
                 />
               </div>
-              <div>
-                <label className="text-xs font-medium text-slate-400 uppercase">Label</label>
-                <Input
-                  value={newPhoneLabel}
-                  onChange={(e) => setNewPhoneLabel(e.target.value)}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
-                  placeholder="Main, Backup, Sales, etc."
-                />
-              </div>
               <Button
                 onClick={handleAddPhoneNumber}
                 disabled={isLoading || !newPhoneNumber}
@@ -1122,15 +1113,6 @@ function ProvidersTab({ authHeaders }) {
                   onChange={(e) => setNewPhoneNumber(e.target.value)}
                   className="mt-1 bg-slate-800 border-slate-700 text-white"
                   placeholder="+1234567890"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-slate-400 uppercase">Label</label>
-                <Input
-                  value={newPhoneLabel}
-                  onChange={(e) => setNewPhoneLabel(e.target.value)}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
-                  placeholder="Main, Backup, Sales, etc."
                 />
               </div>
               <Button

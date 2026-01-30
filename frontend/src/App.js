@@ -796,11 +796,11 @@ function UserCallPanel({ user, token, onLogout }) {
       <div className="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-xl border-b border-white/10 px-4 py-2">
         <div className="max-w-[1800px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center">
-              <Phone className="w-4 h-4 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center overflow-hidden">
+              <img src="/logo.png" alt="American Club" className="w-8 h-8 object-contain" />
             </div>
             <div>
-              <h1 className="font-bold text-white text-sm">Voice Bot Control</h1>
+              <h1 className="font-bold text-white text-sm">American Club</h1>
               <p className="text-[10px] text-slate-400">IVR Call System</p>
             </div>
           </div>

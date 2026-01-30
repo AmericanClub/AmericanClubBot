@@ -4,6 +4,7 @@ Authentication Routes - Login, Signup, Logout, User Management
 from fastapi import APIRouter, HTTPException, status, Request, Depends, BackgroundTasks
 from datetime import datetime, timezone
 from typing import Optional
+from pydantic import BaseModel, EmailStr
 import uuid
 
 from auth import (
@@ -16,6 +17,13 @@ from auth import (
 
 auth_router = APIRouter(prefix="/auth", tags=["Authentication"])
 admin_router = APIRouter(prefix="/admin", tags=["Admin"])
+
+
+# Additional Pydantic models for admin user edit
+class UserEditRequest(BaseModel):
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    new_password: Optional[str] = None
 
 
 # ==================

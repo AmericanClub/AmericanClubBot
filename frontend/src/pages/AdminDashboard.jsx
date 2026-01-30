@@ -495,16 +495,16 @@ export default function AdminDashboard({ user, token, onLogout }) {
                         <span className="text-xs text-slate-400">{code.notes || "-"}</span>
                       </td>
                       <td className="px-4 py-3 text-right">
-                        {!code.is_used && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteCode(code.id)}
-                            className="text-red-400 hover:text-red-300"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteCode(code.id)}
+                          className="text-red-400 hover:text-red-300"
+                          disabled={code.is_used}
+                          title={code.is_used ? "Cannot delete used code" : "Delete Code"}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </td>
                     </tr>
                   ))}

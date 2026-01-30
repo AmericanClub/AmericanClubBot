@@ -1286,6 +1286,80 @@ async def signalwire_status_webhook(request: Request):
         logger.error(f"SignalWire status webhook error: {e}")
         return {"status": "error"}
 
+@api_router.post("/signalwire-webhook/recording")
+async def signalwire_recording_webhook(request: Request):
+    """Handle SignalWire recording status webhook"""
+    try:
+        form_data = await request.form()
+        data = dict(form_data)
+        logger.info(f"SignalWire Recording Webhook: {json.dumps(data)}")
+        
+        call_sid = data.get("CallSid", "")
+        recording_sid = data.get("RecordingSid", "")
+        recording_url = data.get("RecordingUrl", "")
+        recording_status = data.get("RecordingStatus", "")
+        recording_duration = int(data.get("RecordingDuration", 0))
+        
+        if not call_sid:
+            return {"status": "no call sid"}
+        
+        # Find call by SignalWire call SID
+        call_log = await db.call_logs.find_one({"signalwire_call_sid": call_sid}, {"_id": 0})
+        
+        if call_log:
+            call_id = call_log["id"]
+            
+            if recording_status == "completed" and recording_url:
+                # SignalWire recording URLs are publicly accessible
+                # Add .mp3 extension for direct playback
+                if not recording_url.endswith(".mp3"):
+                    recording_url = f"{recording_url}.mp3"
+                
+                await db.call_logs.update_one(
+                    {"id": call_id},
+                    {"$set": {
+                        "recording_url": recording_url,
+                        "recording_sid": recording_sid,
+                        "recording_duration": recording_duration
+                    }}
+                )
+                
+                await add_call_event(
+                    call_id, 
+                    "RECORDING_AVAILABLE", 
+                    f"Call recording available ({recording_duration}s)",
+                    show_verify=False
+                )
+                
+                # Also add recording URL to the event for frontend
+                await db.call_logs.update_one(
+                    {"id": call_id},
+                    {"$push": {"events": {
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                        "event_type": "RECORDING_URL",
+                        "details": recording_url,
+                        "call_id": call_id,
+                        "recording_duration": recording_duration
+                    }}}
+                )
+                
+                # Broadcast to SSE
+                await broadcast_event(call_id, {
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "event_type": "RECORDING_URL",
+                    "details": recording_url,
+                    "recording_duration": recording_duration,
+                    "call_id": call_id
+                })
+                
+                logger.info(f"Recording saved for call {call_id}: {recording_url}")
+        
+        return {"status": "received"}
+        
+    except Exception as e:
+        logger.error(f"SignalWire recording webhook error: {e}")
+        return {"status": "error"}
+
 @api_router.post("/signalwire-webhook/continue/{call_id}")
 async def signalwire_continue_call(call_id: str, action: str = "accepted"):
     """Continue SignalWire call after Accept/Deny decision"""

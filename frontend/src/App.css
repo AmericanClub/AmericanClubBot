@@ -349,14 +349,14 @@
     padding: 0.625rem 0.75rem;
     margin-bottom: 0.5rem;
     border-left: 3px solid #a78bfa;
-    background: rgba(167, 139, 250, 0.05);
+    background: rgba(139, 92, 246, 0.1);
     backdrop-filter: blur(5px);
     border-radius: 0 0.5rem 0.5rem 0;
     transition: all 0.2s ease;
 }
 
 .log-entry:hover {
-    background: rgba(167, 139, 250, 0.1);
+    background: rgba(139, 92, 246, 0.18);
     border-left-color: #c4b5fd;
     transform: translateX(4px);
 }

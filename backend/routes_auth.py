@@ -309,8 +309,16 @@ async def toggle_user_active(user_id: str, current_admin: dict = Depends(get_cur
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
+    # Cannot toggle your own account
+    if user_id == current_admin["id"]:
+        raise HTTPException(status_code=400, detail="Cannot disable your own account")
+    
+    # For admin accounts: only super admin can toggle, and cannot toggle other super admins
     if user["role"] == "admin":
-        raise HTTPException(status_code=400, detail="Cannot disable admin account")
+        if not current_admin.get("is_super_admin"):
+            raise HTTPException(status_code=403, detail="Only Super Admin can disable other admins")
+        if user.get("is_super_admin"):
+            raise HTTPException(status_code=403, detail="Cannot disable Super Admin account")
     
     new_status = not user.get("is_active", True)
     

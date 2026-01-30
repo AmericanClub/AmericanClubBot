@@ -1108,6 +1108,26 @@ function UserCallPanel({ user, token, onLogout }) {
 
         {/* Right Panel - Call Setup */}
         <div className="setup-panel" data-testid="setup-panel">
+          {/* Main Header - Voice Bot Control */}
+          <div className="flex items-center justify-between mb-3">
+            <h1 className="font-heading text-xl font-bold text-white">
+              Voice Bot Control
+            </h1>
+            <Badge 
+              variant="default"
+              className={`text-[10px] px-2 py-0.5 ${
+                selectedProvider === "signalwire" 
+                  ? (signalwireConfigured ? "bg-purple-500/20 text-purple-400 border-purple-500/30" : "bg-yellow-500/20 text-yellow-400 border-yellow-500/30")
+                  : (infobipConfigured ? "bg-cyan-500/20 text-cyan-400 border-cyan-500/30" : "bg-yellow-500/20 text-yellow-400 border-yellow-500/30")
+              }`}
+            >
+              {selectedProvider === "signalwire" 
+                ? (signalwireConfigured ? "SignalWire" : "Simulation")
+                : (infobipConfigured ? "Infobip" : "Simulation")
+              }
+            </Badge>
+          </div>
+
           {/* Provider Tabs */}
           <div className="flex items-center gap-2 mb-3" data-testid="provider-tabs">
             <button
@@ -1134,26 +1154,6 @@ function UserCallPanel({ user, token, onLogout }) {
               <span className={`w-2 h-2 rounded-full ${signalwireConfigured ? "bg-emerald-400" : "bg-yellow-400"}`} />
               CH: 2 (SignalWire)
             </button>
-          </div>
-
-          {/* Header */}
-          <div className="flex items-center justify-between mb-3">
-            <h1 className="font-heading text-lg font-bold text-white">
-              Call Panel
-            </h1>
-            <Badge 
-              variant="default"
-              className={`text-[10px] px-2 py-0.5 ${
-                selectedProvider === "signalwire" 
-                  ? (signalwireConfigured ? "bg-purple-500/20 text-purple-400 border-purple-500/30" : "bg-yellow-500/20 text-yellow-400 border-yellow-500/30")
-                  : (infobipConfigured ? "bg-cyan-500/20 text-cyan-400 border-cyan-500/30" : "bg-yellow-500/20 text-yellow-400 border-yellow-500/30")
-              }`}
-            >
-              {selectedProvider === "signalwire" 
-                ? (signalwireConfigured ? "SignalWire" : "Simulation")
-                : (infobipConfigured ? "Infobip" : "Simulation")
-              }
-            </Badge>
           </div>
           
           {/* Call Configuration */}

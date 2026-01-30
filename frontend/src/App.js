@@ -157,6 +157,49 @@ function AppWrapper() {
   const [token, setToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Inject dark dropdown styles for Radix UI portals
+  useEffect(() => {
+    const styleId = 'radix-dropdown-dark-theme';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = `
+        [data-radix-popper-content-wrapper] {
+          z-index: 9999 !important;
+        }
+        [data-radix-select-content],
+        [role="listbox"] {
+          background: rgba(15, 10, 30, 0.98) !important;
+          backdrop-filter: blur(20px) !important;
+          -webkit-backdrop-filter: blur(20px) !important;
+          border: 1px solid rgba(139, 92, 246, 0.3) !important;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 30px rgba(139, 92, 246, 0.2) !important;
+          border-radius: 0.75rem !important;
+        }
+        [data-radix-select-viewport] {
+          background: transparent !important;
+        }
+        [role="option"] {
+          color: rgba(226, 232, 240, 0.9) !important;
+          cursor: pointer !important;
+          padding: 0.5rem 0.75rem !important;
+          border-radius: 0.375rem !important;
+          transition: all 0.15s ease !important;
+        }
+        [role="option"]:hover,
+        [role="option"][data-highlighted] {
+          background: rgba(139, 92, 246, 0.25) !important;
+          color: #f3e8ff !important;
+        }
+        [role="option"][data-state="checked"] {
+          background: rgba(139, 92, 246, 0.3) !important;
+          color: #c4b5fd !important;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
+
   // Check for existing session on mount
   useEffect(() => {
     const checkAuth = async () => {

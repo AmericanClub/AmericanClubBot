@@ -135,7 +135,7 @@ async def signup(user_data: UserCreate, request: Request):
     )
 
 
-@auth_router.post("/login", response_model=TokenResponse)
+@auth_router.post("/login")
 async def login(user_data: UserLogin, request: Request):
     """Login user - invalidates previous sessions (single device)"""
     from server import db
@@ -187,19 +187,27 @@ async def login(user_data: UserLogin, request: Request):
         }}
     )
     
-    return TokenResponse(
-        access_token=token,
-        user=UserResponse(
-            id=user["id"],
-            email=user["email"],
-            name=user["name"],
-            role=user["role"],
-            credits=user.get("credits", 0),
-            is_active=user["is_active"],
-            created_at=user["created_at"],
-            last_login=now
-        )
-    )
+    # Build user response with is_super_admin for admins
+    user_response = {
+        "id": user["id"],
+        "email": user["email"],
+        "name": user["name"],
+        "role": user["role"],
+        "credits": user.get("credits", 0),
+        "is_active": user["is_active"],
+        "created_at": user["created_at"],
+        "last_login": now
+    }
+    
+    # Add is_super_admin for admin users
+    if user.get("role") == "admin":
+        user_response["is_super_admin"] = user.get("is_super_admin", False)
+    
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user": user_response
+    }
 
 
 @auth_router.post("/logout")

@@ -1209,7 +1209,7 @@ function UserCallPanel({ user, token, onLogout }) {
                   Caller ID
                 </label>
                 {availablePhoneNumbers.filter(n => n.provider_id === selectedProvider).length > 0 ? (
-                  <Select value={fromNumber} onValueChange={setFromNumber}>
+                  <Select key={selectedProvider} value={fromNumber} onValueChange={setFromNumber}>
                     <SelectTrigger className="glass-input font-mono text-cyan-100" data-testid="from-number-select">
                       <SelectValue placeholder="Select Caller ID" />
                     </SelectTrigger>

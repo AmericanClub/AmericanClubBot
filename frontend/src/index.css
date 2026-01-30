@@ -151,9 +151,9 @@ body {
 
 .glass-card:hover {
     background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(167, 139, 250, 0.2);
+    border-color: rgba(96, 165, 250, 0.2);
     box-shadow: 
-        0 8px 32px rgba(139, 92, 246, 0.15),
+        0 8px 32px rgba(59, 130, 246, 0.15),
         inset 0 1px 0 rgba(255, 255, 255, 0.08);
     transform: translateY(-2px);
 }
@@ -177,8 +177,8 @@ body {
 }
 
 .glass-input:focus {
-    border-color: rgba(167, 139, 250, 0.5) !important;
-    box-shadow: 0 0 20px rgba(167, 139, 250, 0.2) !important;
+    border-color: rgba(96, 165, 250, 0.5) !important;
+    box-shadow: 0 0 20px rgba(96, 165, 250, 0.2) !important;
     background: rgba(255, 255, 255, 0.08) !important;
 }
 
@@ -188,29 +188,29 @@ body {
 
 /* Glowing button */
 .glow-button {
-    background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #8b5cf6 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #3b82f6 50%, #3b82f6 100%);
     background-size: 200% 200%;
     border: none;
     box-shadow: 
-        0 4px 15px rgba(139, 92, 246, 0.4),
-        0 0 30px rgba(139, 92, 246, 0.2);
+        0 4px 15px rgba(59, 130, 246, 0.4),
+        0 0 30px rgba(59, 130, 246, 0.2);
     transition: all 0.3s ease;
 }
 
 .glow-button:hover {
     background-position: 100% 50%;
     box-shadow: 
-        0 6px 25px rgba(139, 92, 246, 0.5),
-        0 0 50px rgba(139, 92, 246, 0.3);
+        0 6px 25px rgba(59, 130, 246, 0.5),
+        0 0 50px rgba(59, 130, 246, 0.3);
     transform: translateY(-2px);
 }
 
 /* Neon text effect */
 .neon-text {
     text-shadow: 
-        0 0 10px rgba(167, 139, 250, 0.5),
-        0 0 20px rgba(167, 139, 250, 0.3),
-        0 0 40px rgba(167, 139, 250, 0.2);
+        0 0 10px rgba(96, 165, 250, 0.5),
+        0 0 20px rgba(96, 165, 250, 0.3),
+        0 0 40px rgba(96, 165, 250, 0.2);
 }
 
 /* Status pulse animation */
@@ -250,7 +250,7 @@ body {
 }
 
 .glass-table-header {
-    background: rgba(139, 92, 246, 0.1);
+    background: rgba(59, 130, 246, 0.1);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -260,7 +260,7 @@ body {
 }
 
 .glass-table-row:hover {
-    background: rgba(139, 92, 246, 0.05);
+    background: rgba(59, 130, 246, 0.05);
 }
 
 /* Badge styles */
@@ -270,7 +270,7 @@ body {
 
 /* Custom selection */
 ::selection {
-    background: rgba(167, 139, 250, 0.3);
+    background: rgba(96, 165, 250, 0.3);
     color: white;
 }
 

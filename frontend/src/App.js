@@ -844,7 +844,7 @@ function UserCallPanel({ user, token, onLogout }) {
     if (eventType.includes("INPUT_STREAM")) return { icon: "🔢", color: "text-teal-600", bg: "bg-cyan-500/10 border-cyan-500/30" };
     if (eventType.includes("DTMF")) return { icon: "🔢", color: "text-teal-600", bg: "bg-cyan-500/10 border-cyan-500/30" };
     if (eventType.includes("STEP1")) return { icon: "1️⃣", color: "text-blue-400", bg: "" };
-    if (eventType.includes("STEP2")) return { icon: "2️⃣", color: "text-purple-600", bg: "" };
+    if (eventType.includes("STEP2")) return { icon: "2️⃣", color: "text-blue-600", bg: "" };
     if (eventType.includes("STEP3") || eventType.includes("AWAITING")) return { icon: "⏳", color: "text-amber-600", bg: "" };
     if (eventType.includes("ACCEPTED")) return { icon: "✅", color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-200" };
     if (eventType.includes("REJECTED")) return { icon: "🔄", color: "text-orange-600", bg: "bg-orange-50 border-orange-200" };
@@ -861,7 +861,7 @@ function UserCallPanel({ user, token, onLogout }) {
     if (eventType.includes("BUSY")) return { icon: "📵", color: "text-red-600", bg: "bg-red-50 border-red-200" };
     if (eventType.includes("NO_ANSWER")) return { icon: "📵", color: "text-orange-600", bg: "bg-orange-50 border-orange-200" };
     if (eventType.includes("CANCELED")) return { icon: "🚫", color: "text-gray-500", bg: "bg-gray-100 border-gray-200" };
-    if (eventType.includes("RECORDING")) return { icon: "🎙️", color: "text-purple-600", bg: "bg-purple-50 border-purple-200" };
+    if (eventType.includes("RECORDING")) return { icon: "🎙️", color: "text-blue-600", bg: "bg-blue-50 border-blue-200" };
     if (eventType.includes("FINISHED")) return { icon: "🏁", color: "text-gray-500", bg: "" };
     if (eventType.includes("FAILED") || eventType.includes("ERROR")) return { icon: "⚠️", color: "text-red-600", bg: "bg-red-50 border-red-200" };
     if (eventType.includes("RETRY") || eventType.includes("NO_RESPONSE")) return { icon: "🔁", color: "text-amber-600", bg: "bg-amber-50 border-amber-200" };
@@ -885,14 +885,14 @@ function UserCallPanel({ user, token, onLogout }) {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden"
               style={{
-                background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(168, 85, 247, 0.2))',
-                border: '1px solid rgba(167, 139, 250, 0.3)',
-                boxShadow: '0 0 20px rgba(139, 92, 246, 0.3)'
+                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.2))',
+                border: '1px solid rgba(96, 165, 250, 0.3)',
+                boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)'
               }}>
               <img src="/logo.png" alt="American Club" className="w-7 h-7 object-contain" />
             </div>
             <div>
-              <h1 className="font-bold text-white text-sm" style={{ textShadow: '0 0 20px rgba(167, 139, 250, 0.3)' }}>American Club</h1>
+              <h1 className="font-bold text-white text-sm" style={{ textShadow: '0 0 20px rgba(96, 165, 250, 0.3)' }}>American Club</h1>
               <p className="text-[10px] text-blue-400/70">IVR Call System</p>
             </div>
           </div>
@@ -951,7 +951,7 @@ function UserCallPanel({ user, token, onLogout }) {
                 variant="ghost"
                 size="sm"
                 onClick={() => { setShowHistory(!showHistory); fetchCallHistory(); }}
-                className="text-white/50 hover:text-purple-400 hover:bg-purple-500/10 h-7 px-2 text-xs"
+                className="text-white/50 hover:text-blue-400 hover:bg-blue-500/10 h-7 px-2 text-xs"
                 data-testid="history-btn"
               >
                 <History className="w-3 h-3 mr-1" />
@@ -961,7 +961,7 @@ function UserCallPanel({ user, token, onLogout }) {
                 variant="ghost"
                 size="sm"
                 onClick={handleClearLogs}
-                className="text-white/50 hover:text-purple-400 hover:bg-purple-500/10 h-7 px-2 text-xs"
+                className="text-white/50 hover:text-blue-400 hover:bg-blue-500/10 h-7 px-2 text-xs"
                 data-testid="clear-logs-btn"
               >
                 <Trash2 className="w-3 h-3 mr-1" />
@@ -1160,15 +1160,15 @@ function UserCallPanel({ user, token, onLogout }) {
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-4 p-4 rounded-lg bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-purple-500/30"
+                className="mt-4 p-4 rounded-lg bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-blue-500/30"
                 data-testid="recording-player"
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
-                    <Play className="w-5 h-5 text-purple-600" />
+                  <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
+                    <Play className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
-                    <div className="font-mono text-xs text-purple-600 uppercase tracking-wider">Call Recording</div>
+                    <div className="font-mono text-xs text-blue-600 uppercase tracking-wider">Call Recording</div>
                     <div className="font-mono text-sm text-slate-300">
                       Duration: {recordingDuration ? `${recordingDuration}s` : "Available"}
                     </div>
@@ -1194,22 +1194,22 @@ function UserCallPanel({ user, token, onLogout }) {
           {/* Main Header - Voice Bot Control */}
           <div className="mb-4">
             <div className="flex items-center justify-between mb-3">
-              <h1 className="font-heading text-xl font-bold text-white" style={{ textShadow: '0 0 30px rgba(167, 139, 250, 0.4)' }}>
+              <h1 className="font-heading text-xl font-bold text-white" style={{ textShadow: '0 0 30px rgba(96, 165, 250, 0.4)' }}>
                 Voice Bot Control
               </h1>
               <div className={`text-[10px] px-3 py-1.5 rounded-full font-medium`}
                 style={{
                   background: selectedProvider === "signalwire"
-                    ? (signalwireConfigured ? 'rgba(139, 92, 246, 0.2)' : 'rgba(251, 191, 36, 0.2)')
+                    ? (signalwireConfigured ? 'rgba(59, 130, 246, 0.2)' : 'rgba(251, 191, 36, 0.2)')
                     : (infobipConfigured ? 'rgba(34, 211, 238, 0.2)' : 'rgba(251, 191, 36, 0.2)'),
                   border: `1px solid ${selectedProvider === "signalwire"
-                    ? (signalwireConfigured ? 'rgba(139, 92, 246, 0.4)' : 'rgba(251, 191, 36, 0.4)')
+                    ? (signalwireConfigured ? 'rgba(59, 130, 246, 0.4)' : 'rgba(251, 191, 36, 0.4)')
                     : (infobipConfigured ? 'rgba(34, 211, 238, 0.4)' : 'rgba(251, 191, 36, 0.4)')}`,
                   color: selectedProvider === "signalwire"
-                    ? (signalwireConfigured ? '#a78bfa' : '#fbbf24')
+                    ? (signalwireConfigured ? '#60a5fa' : '#fbbf24')
                     : (infobipConfigured ? '#22d3ee' : '#fbbf24'),
                   boxShadow: `0 0 15px ${selectedProvider === "signalwire"
-                    ? (signalwireConfigured ? 'rgba(139, 92, 246, 0.3)' : 'rgba(251, 191, 36, 0.3)')
+                    ? (signalwireConfigured ? 'rgba(59, 130, 246, 0.3)' : 'rgba(251, 191, 36, 0.3)')
                     : (infobipConfigured ? 'rgba(34, 211, 238, 0.3)' : 'rgba(251, 191, 36, 0.3)')}`
                 }}
               >
@@ -1228,9 +1228,9 @@ function UserCallPanel({ user, token, onLogout }) {
                 style={{
                   background: selectedProvider === "infobip"
                     ? 'linear-gradient(135deg, rgba(34, 211, 238, 0.2), rgba(6, 182, 212, 0.1))'
-                    : 'rgba(139, 92, 246, 0.08)',
-                  border: `1px solid ${selectedProvider === "infobip" ? 'rgba(34, 211, 238, 0.5)' : 'rgba(139, 92, 246, 0.2)'}`,
-                  color: selectedProvider === "infobip" ? '#22d3ee' : '#a78bfa',
+                    : 'rgba(59, 130, 246, 0.08)',
+                  border: `1px solid ${selectedProvider === "infobip" ? 'rgba(34, 211, 238, 0.5)' : 'rgba(59, 130, 246, 0.2)'}`,
+                  color: selectedProvider === "infobip" ? '#22d3ee' : '#60a5fa',
                   boxShadow: selectedProvider === "infobip" ? '0 0 25px rgba(34, 211, 238, 0.3), inset 0 0 20px rgba(34, 211, 238, 0.1)' : 'none'
                 }}
                 data-testid="provider-ch1"
@@ -1246,11 +1246,11 @@ function UserCallPanel({ user, token, onLogout }) {
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-xs uppercase tracking-wide transition-all duration-300`}
                 style={{
                   background: selectedProvider === "signalwire"
-                    ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.1))'
-                    : 'rgba(139, 92, 246, 0.08)',
-                  border: `1px solid ${selectedProvider === "signalwire" ? 'rgba(139, 92, 246, 0.5)' : 'rgba(139, 92, 246, 0.2)'}`,
-                  color: selectedProvider === "signalwire" ? '#a78bfa' : '#a78bfa',
-                  boxShadow: selectedProvider === "signalwire" ? '0 0 25px rgba(139, 92, 246, 0.3), inset 0 0 20px rgba(139, 92, 246, 0.1)' : 'none'
+                    ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1))'
+                    : 'rgba(59, 130, 246, 0.08)',
+                  border: `1px solid ${selectedProvider === "signalwire" ? 'rgba(59, 130, 246, 0.5)' : 'rgba(59, 130, 246, 0.2)'}`,
+                  color: selectedProvider === "signalwire" ? '#60a5fa' : '#60a5fa',
+                  boxShadow: selectedProvider === "signalwire" ? '0 0 25px rgba(59, 130, 246, 0.3), inset 0 0 20px rgba(59, 130, 246, 0.1)' : 'none'
                 }}
                 data-testid="provider-ch2"
               >
@@ -1443,8 +1443,8 @@ function UserCallPanel({ user, token, onLogout }) {
             <Tabs value={activeStep} onValueChange={setActiveStep} className="w-full">
               <TabsList className="w-full p-1 rounded-lg h-auto flex gap-1" 
                 style={{
-                  background: 'rgba(139, 92, 246, 0.08)',
-                  border: '1px solid rgba(139, 92, 246, 0.2)'
+                  background: 'rgba(59, 130, 246, 0.08)',
+                  border: '1px solid rgba(59, 130, 246, 0.2)'
                 }}
                 data-testid="call-steps-tabs"
               >
@@ -1455,14 +1455,14 @@ function UserCallPanel({ user, token, onLogout }) {
                     className="flex-1 font-mono text-[10px] uppercase tracking-wider py-2 px-2 rounded-md transition-all duration-300"
                     style={{
                       background: activeStep === step 
-                        ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.35), rgba(168, 85, 247, 0.25))' 
-                        : 'rgba(139, 92, 246, 0.08)',
+                        ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.35), rgba(59, 130, 246, 0.25))' 
+                        : 'rgba(59, 130, 246, 0.08)',
                       border: activeStep === step 
-                        ? '1px solid rgba(167, 139, 250, 0.5)' 
-                        : '1px solid rgba(139, 92, 246, 0.15)',
-                      color: activeStep === step ? '#e9d5ff' : '#a78bfa',
+                        ? '1px solid rgba(96, 165, 250, 0.5)' 
+                        : '1px solid rgba(59, 130, 246, 0.15)',
+                      color: activeStep === step ? '#e9d5ff' : '#60a5fa',
                       boxShadow: activeStep === step 
-                        ? '0 0 20px rgba(139, 92, 246, 0.4)' 
+                        ? '0 0 20px rgba(59, 130, 246, 0.4)' 
                         : 'none',
                       ...(currentStep === step ? { boxShadow: '0 0 15px rgba(16, 185, 129, 0.5), inset 0 0 10px rgba(16, 185, 129, 0.2)' } : {})
                     }}
@@ -1490,7 +1490,7 @@ function UserCallPanel({ user, token, onLogout }) {
                     rows={2}
                     data-testid={`step-message-${step}`}
                   />
-                  <div className="mt-1 text-[9px] text-purple-300/60 font-mono">
+                  <div className="mt-1 text-[9px] text-blue-300/60 font-mono">
                     Variables: {"{name}"}, {"{service}"}, {"{digits}"}
                   </div>
                 </TabsContent>

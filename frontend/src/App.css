@@ -213,47 +213,45 @@
     line-height: 1.5;
 }
 
-/* Glass panel */
+/* Glass panel - Dark Navy Style */
 .glass-panel {
-    background: rgba(139, 92, 246, 0.08);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(139, 92, 246, 0.2);
-    box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    border-radius: 1rem;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+    border-radius: 0.75rem;
     transition: all 0.3s ease;
 }
 
 .glass-panel:hover {
-    background: rgba(139, 92, 246, 0.12);
-    border-color: rgba(139, 92, 246, 0.3);
+    background: rgba(22, 33, 56, 0.8);
+    border-color: var(--border-color-light);
 }
 
-/* Glass input */
+/* Glass input - Dark Navy Style */
 .glass-input {
-    background: rgba(139, 92, 246, 0.1) !important;
+    background: rgba(15, 23, 42, 0.6) !important;
     backdrop-filter: blur(10px) !important;
-    border: 1px solid rgba(139, 92, 246, 0.25) !important;
+    border: 1px solid var(--border-color) !important;
     height: 2.5rem !important;
     font-size: 0.875rem !important;
-    color: #f8fafc !important;
-    border-radius: 0.625rem !important;
-    transition: all 0.3s ease !important;
+    color: var(--text-primary) !important;
+    border-radius: 0.5rem !important;
+    transition: all 0.2s ease !important;
 }
 
 .glass-input:focus {
-    border-color: rgba(167, 139, 250, 0.6) !important;
-    box-shadow: 0 0 20px rgba(167, 139, 250, 0.25) !important;
-    background: rgba(139, 92, 246, 0.15) !important;
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+    background: rgba(22, 33, 56, 0.8) !important;
 }
 
-/* Call button */
+/* Call button - Dark Navy Style */
 .call-button {
     width: 100%;
     height: 3rem;
-    border-radius: 0.75rem;
+    border-radius: 0.5rem;
     font-family: 'Inter', sans-serif;
     font-size: 0.875rem;
     font-weight: 600;
@@ -262,42 +260,32 @@
     justify-content: center;
     gap: 0.5rem;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 .call-button-start {
-    background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #8b5cf6 100%);
-    background-size: 200% 200%;
+    background: var(--color-primary);
     border: none;
     color: white;
-    box-shadow: 
-        0 4px 20px rgba(139, 92, 246, 0.4),
-        0 0 40px rgba(139, 92, 246, 0.2);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .call-button-start:hover {
-    background-position: 100% 50%;
-    box-shadow: 
-        0 6px 30px rgba(139, 92, 246, 0.5),
-        0 0 60px rgba(139, 92, 246, 0.3);
-    transform: translateY(-2px);
+    background: var(--color-primary-dark);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    transform: translateY(-1px);
 }
 
 .call-button-stop {
-    background: linear-gradient(135deg, #ef4444 0%, #f43f5e 50%, #ef4444 100%);
-    background-size: 200% 200%;
+    background: var(--color-danger);
     border: none;
     color: white;
-    box-shadow: 
-        0 4px 20px rgba(239, 68, 68, 0.4),
-        0 0 40px rgba(239, 68, 68, 0.2);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 .call-button-stop:hover {
-    background-position: 100% 50%;
-    box-shadow: 
-        0 6px 30px rgba(239, 68, 68, 0.5),
-        0 0 60px rgba(239, 68, 68, 0.3);
+    background: #dc2626;
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
     transform: translateY(-2px);
 }
 

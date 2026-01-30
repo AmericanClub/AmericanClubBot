@@ -836,7 +836,7 @@ function UserCallPanel({ user, token, onLogout }) {
             <div className="flex items-center gap-2 bg-slate-800/50 rounded-lg px-3 py-1.5 border border-white/10">
               <Coins className="w-4 h-4 text-yellow-400" />
               <div>
-                <span className="font-mono text-lg font-bold text-white" data-testid="user-credits">{user?.credits || 0}</span>
+                <span className="font-mono text-lg font-bold text-white" data-testid="user-credits">{userCredits}</span>
                 <span className="text-[10px] text-slate-400 ml-1">credits</span>
               </div>
             </div>

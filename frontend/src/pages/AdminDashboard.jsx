@@ -138,6 +138,20 @@ export default function AdminDashboard({ user, token, onLogout }) {
     }
   };
 
+  // Delete user
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
+    
+    try {
+      const response = await axios.delete(`${API}/admin/users/${userId}`, { headers: authHeaders });
+      toast.success(response.data.message);
+      fetchUsers();
+      fetchStats();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to delete user");
+    }
+  };
+
   // Add credits to user
   const handleAddCredits = async () => {
     if (!selectedUser) return;

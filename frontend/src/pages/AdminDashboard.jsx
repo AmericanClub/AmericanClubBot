@@ -567,8 +567,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
                           size="sm"
                           onClick={() => handleDeleteCode(code.id)}
                           className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                          disabled={code.is_used}
-                          title={code.is_used ? "Cannot delete used code" : "Delete Code"}
+                          title="Delete Code"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>

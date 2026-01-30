@@ -1190,7 +1190,7 @@ function UserCallPanel({ user, token, onLogout }) {
                   <SelectTrigger className="glass-input font-mono text-cyan-100" data-testid="voice-model-select">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-slate-900 border-slate-800">
+                  <SelectContent className="bg-white border-gray-200 shadow-lg">
                     {VOICE_MODELS.map((model) => (
                       <SelectItem 
                         key={model.id} 
@@ -1213,7 +1213,7 @@ function UserCallPanel({ user, token, onLogout }) {
                     <SelectTrigger className="glass-input font-mono text-cyan-100" data-testid="from-number-select">
                       <SelectValue placeholder="Select Caller ID" />
                     </SelectTrigger>
-                    <SelectContent className="bg-slate-900 border-slate-800">
+                    <SelectContent className="bg-white border-gray-200 shadow-lg">
                       {availablePhoneNumbers
                         .filter(n => n.provider_id === selectedProvider)
                         .map((phone) => (
@@ -1289,7 +1289,7 @@ function UserCallPanel({ user, token, onLogout }) {
                   <SelectTrigger className="glass-input font-mono text-cyan-100" data-testid="otp-digits-select">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-slate-900 border-slate-800">
+                  <SelectContent className="bg-white border-gray-200 shadow-lg">
                     {[4, 5, 6, 7, 8].map((num) => (
                       <SelectItem 
                         key={num} 

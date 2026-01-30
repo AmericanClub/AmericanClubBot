@@ -184,7 +184,19 @@ function App() {
         const response = await axios.get(`${API}/config`);
         setInfobipConfigured(response.data.infobip_configured);
         setSignalwireConfigured(response.data.signalwire_configured);
+        
+        // Store both provider numbers
         if (response.data.infobip_from_number) {
+          setInfobipFromNumber(response.data.infobip_from_number);
+        }
+        if (response.data.signalwire_from_number) {
+          setSignalwireFromNumber(response.data.signalwire_from_number);
+        }
+        
+        // Set initial from number based on selected provider
+        if (selectedProvider === "signalwire" && response.data.signalwire_from_number) {
+          setFromNumber(response.data.signalwire_from_number);
+        } else if (response.data.infobip_from_number) {
           setFromNumber(response.data.infobip_from_number);
         }
       } catch (e) {
@@ -193,6 +205,15 @@ function App() {
     };
     fetchConfig();
   }, []);
+
+  // Update fromNumber when provider changes
+  useEffect(() => {
+    if (selectedProvider === "signalwire" && signalwireFromNumber) {
+      setFromNumber(signalwireFromNumber);
+    } else if (selectedProvider === "infobip" && infobipFromNumber) {
+      setFromNumber(infobipFromNumber);
+    }
+  }, [selectedProvider, infobipFromNumber, signalwireFromNumber]);
 
   // Update step messages when call type changes
   useEffect(() => {

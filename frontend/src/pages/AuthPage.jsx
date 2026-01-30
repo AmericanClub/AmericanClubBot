@@ -57,44 +57,20 @@ export default function AuthPage({ onLogin }) {
   return (
     <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4"
       style={{
-        background: 'linear-gradient(-45deg, #0f0a1e, #1e1145, #2d1b69, #1a1333)',
-        backgroundSize: '400% 400%',
-        animation: 'gradientShift 15s ease infinite'
+        background: '#0a0e1a'
       }}>
       
-      {/* Animated background orbs */}
+      {/* Blue gradient accent on left */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 right-1/4 w-[600px] h-[600px] rounded-full opacity-30"
+        <div className="absolute top-0 left-0 w-1/2 h-full"
           style={{
-            background: 'radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, transparent 70%)',
-            animation: 'float 10s ease-in-out infinite'
+            background: 'radial-gradient(ellipse at 0% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 60%)'
           }} />
-        <div className="absolute bottom-1/4 left-1/4 w-[500px] h-[500px] rounded-full opacity-20"
+        <div className="absolute top-0 right-0 w-1/3 h-1/2"
           style={{
-            background: 'radial-gradient(circle, rgba(34, 211, 238, 0.4) 0%, transparent 70%)',
-            animation: 'float 8s ease-in-out infinite reverse'
-          }} />
-        <div className="absolute top-1/2 left-1/2 w-[300px] h-[300px] rounded-full opacity-20"
-          style={{
-            background: 'radial-gradient(circle, rgba(244, 114, 182, 0.4) 0%, transparent 70%)',
-            animation: 'float 12s ease-in-out infinite',
-            transform: 'translate(-50%, -50%)'
+            background: 'radial-gradient(circle at 100% 0%, rgba(6, 182, 212, 0.1) 0%, transparent 50%)'
           }} />
       </div>
-
-      {/* Floating particles */}
-      {[...Array(20)].map((_, i) => (
-        <div
-          key={i}
-          className="absolute w-1 h-1 rounded-full bg-purple-400/30"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animation: `float ${5 + Math.random() * 10}s ease-in-out infinite`,
-            animationDelay: `${Math.random() * 5}s`
-          }}
-        />
-      ))}
 
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -110,35 +86,35 @@ export default function AuthPage({ onLogin }) {
             transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
             className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-4 overflow-hidden relative"
             style={{
-              background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(168, 85, 247, 0.2))',
-              border: '1px solid rgba(167, 139, 250, 0.3)',
-              boxShadow: '0 0 40px rgba(139, 92, 246, 0.4), inset 0 0 20px rgba(139, 92, 246, 0.1)'
+              background: 'rgba(59, 130, 246, 0.15)',
+              border: '1px solid rgba(59, 130, 246, 0.3)',
+              boxShadow: '0 0 30px rgba(59, 130, 246, 0.2)'
             }}
           >
             <img src="/logo.png" alt="American Club Bot" className="w-12 h-12 object-contain relative z-10" />
           </motion.div>
-          <h1 className="text-2xl font-bold text-white" style={{ textShadow: '0 0 30px rgba(167, 139, 250, 0.5)' }}>
+          <h1 className="text-2xl font-bold text-white">
             American Club Bot
           </h1>
-          <p className="text-purple-300/70 text-sm mt-1 flex items-center justify-center gap-2">
-            <Sparkles className="w-4 h-4" />
+          <p className="text-slate-400 text-sm mt-1 flex items-center justify-center gap-2">
+            <Sparkles className="w-4 h-4 text-blue-400" />
             {isLogin ? "Sign in to your account" : "Create your account"}
-            <Sparkles className="w-4 h-4" />
+            <Sparkles className="w-4 h-4 text-blue-400" />
           </p>
         </div>
 
-        {/* Form Card with Glass Effect */}
+        {/* Form Card */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="p-6 rounded-2xl"
+          className="p-6 rounded-xl"
           style={{
-            background: 'rgba(255, 255, 255, 0.03)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+            background: 'rgba(15, 23, 42, 0.8)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            border: '1px solid rgba(59, 130, 246, 0.15)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
           }}
         >
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -146,17 +122,17 @@ export default function AuthPage({ onLogin }) {
               <>
                 {/* Invite Code */}
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold text-purple-300/70 uppercase tracking-wider">
+                  <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
                     Invite Code *
                   </label>
                   <div className="relative">
-                    <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-400/50" />
+                    <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400/50" />
                     <Input
                       type="text"
                       placeholder="Enter invite code"
                       value={inviteCode}
                       onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
-                      className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-purple-500/50 focus:ring-purple-500/20 rounded-xl h-11 backdrop-blur-sm"
+                      className="pl-10 bg-slate-900/50 border-slate-700/50 text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-blue-500/20 rounded-lg h-11"
                       required={!isLogin}
                       data-testid="invite-code-input"
                     />

@@ -392,18 +392,20 @@ function App() {
           recipient_name: recipientName,
           service_name: serviceName,
           otp_digits: parseInt(otpDigits),
+          provider: selectedProvider,
         },
         steps: stepMessages,
       });
 
-      const { call_id, using_infobip, mode } = response.data;
+      const { call_id, provider, using_live, mode } = response.data;
       setCurrentCallId(call_id);
       setIsCallActive(true);
       setCallStatus("PENDING");
       
       subscribeToEvents(call_id);
       
-      toast.success(using_infobip ? "IVR call started via Infobip" : `IVR call started (${mode || "Simulation"})`);
+      const providerName = provider === "signalwire" ? "SignalWire" : "Infobip";
+      toast.success(using_live ? `IVR call started via ${providerName}` : `IVR call started (${mode || "Simulation"})`);
     } catch (error) {
       console.error("Error starting call:", error);
       toast.error(error.response?.data?.detail || "Failed to start call");

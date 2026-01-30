@@ -588,11 +588,30 @@ async def create_signalwire_call(call_id: str, config: CallConfig, steps: CallSt
                 timeout=30.0
             )
             
-            logger.info(f"SignalWire response: {response.status_code} - {response.text}")
+            logger.info(f"SignalWire response: {response.status_code} - {response.text[:500] if response.text else 'EMPTY'}")
             
             if response.status_code in [200, 201]:
-                result = response.json()
+                # Handle empty response body
+                if not response.text or response.text.strip() == "":
+                    error_msg = "SignalWire returned empty response - call may have been rate limited or invalid"
+                    logger.error(error_msg)
+                    await add_call_event(call_id, "CALL_ERROR", error_msg)
+                    return None
+                
+                try:
+                    result = response.json()
+                except Exception as json_err:
+                    error_msg = f"Failed to parse SignalWire response: {str(json_err)}"
+                    logger.error(error_msg)
+                    await add_call_event(call_id, "CALL_ERROR", error_msg)
+                    return None
+                    
                 call_sid = result.get("sid")
+                
+                if not call_sid:
+                    error_msg = "SignalWire response missing call SID"
+                    await add_call_event(call_id, "CALL_ERROR", error_msg)
+                    return None
                 
                 await db.call_logs.update_one(
                     {"id": call_id},

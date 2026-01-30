@@ -370,15 +370,28 @@ export default function AdminDashboard({ user, token, onLogout }) {
               <p className="text-[10px] text-slate-500 truncate">{user.email}</p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onLogout}
-            className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/20"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Logout
-          </Button>
+          <div className="space-y-2">
+            {isSuperAdmin && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowChangePassword(true)}
+                className="w-full justify-start text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 border border-blue-500/20"
+              >
+                <Lock className="w-4 h-4 mr-2" />
+                Change Password
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onLogout}
+              className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/20"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </Button>
+          </div>
         </div>
       </div>
 

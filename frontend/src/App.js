@@ -1131,48 +1131,74 @@ function UserCallPanel({ user, token, onLogout }) {
         <div className="setup-panel" data-testid="setup-panel">
           {/* Main Header - Voice Bot Control */}
           <div className="flex items-center justify-between mb-4">
-            <h1 className="font-heading text-xl font-bold text-gray-800">
+            <h1 className="font-heading text-xl font-bold text-white" style={{ textShadow: '0 0 30px rgba(167, 139, 250, 0.4)' }}>
               Voice Bot Control
             </h1>
-            <Badge 
-              variant="default"
-              className={`text-[10px] px-3 py-1 rounded-full font-medium ${
+            <div className={`text-[10px] px-3 py-1.5 rounded-full font-medium ${
                 selectedProvider === "signalwire" 
-                  ? (signalwireConfigured ? "bg-purple-100 text-purple-600 border border-purple-200" : "bg-amber-100 text-amber-600 border border-amber-200")
-                  : (infobipConfigured ? "bg-teal-100 text-teal-600 border border-teal-200" : "bg-amber-100 text-amber-600 border border-amber-200")
+                  ? (signalwireConfigured ? "" : "")
+                  : (infobipConfigured ? "" : "")
               }`}
+              style={{
+                background: selectedProvider === "signalwire"
+                  ? (signalwireConfigured ? 'rgba(139, 92, 246, 0.2)' : 'rgba(251, 191, 36, 0.2)')
+                  : (infobipConfigured ? 'rgba(34, 211, 238, 0.2)' : 'rgba(251, 191, 36, 0.2)'),
+                border: `1px solid ${selectedProvider === "signalwire"
+                  ? (signalwireConfigured ? 'rgba(139, 92, 246, 0.4)' : 'rgba(251, 191, 36, 0.4)')
+                  : (infobipConfigured ? 'rgba(34, 211, 238, 0.4)' : 'rgba(251, 191, 36, 0.4)')}`,
+                color: selectedProvider === "signalwire"
+                  ? (signalwireConfigured ? '#a78bfa' : '#fbbf24')
+                  : (infobipConfigured ? '#22d3ee' : '#fbbf24'),
+                boxShadow: `0 0 15px ${selectedProvider === "signalwire"
+                  ? (signalwireConfigured ? 'rgba(139, 92, 246, 0.3)' : 'rgba(251, 191, 36, 0.3)')
+                  : (infobipConfigured ? 'rgba(34, 211, 238, 0.3)' : 'rgba(251, 191, 36, 0.3)')}`
+              }}
             >
               {selectedProvider === "signalwire" 
                 ? (signalwireConfigured ? "SignalWire" : "Simulation")
                 : (infobipConfigured ? "Infobip" : "Simulation")
               }
-            </Badge>
+            </div>
           </div>
 
-          {/* Provider Tabs */}
-          <div className="flex items-center gap-2 mb-4" data-testid="provider-tabs">
+          {/* Provider Tabs with Neon Effect */}
+          <div className="flex items-center gap-3 mb-4" data-testid="provider-tabs">
             <button
               onClick={() => setSelectedProvider("infobip")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-xs uppercase tracking-wide transition-all ${
-                selectedProvider === "infobip"
-                  ? "bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-lg shadow-teal-200"
-                  : "bg-white text-gray-500 border border-gray-200 hover:border-teal-300 hover:bg-teal-50"
-              }`}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-xs uppercase tracking-wide transition-all duration-300`}
+              style={{
+                background: selectedProvider === "infobip"
+                  ? 'linear-gradient(135deg, rgba(34, 211, 238, 0.2), rgba(6, 182, 212, 0.1))'
+                  : 'rgba(255, 255, 255, 0.03)',
+                border: `1px solid ${selectedProvider === "infobip" ? 'rgba(34, 211, 238, 0.5)' : 'rgba(255, 255, 255, 0.08)'}`,
+                color: selectedProvider === "infobip" ? '#22d3ee' : '#94a3b8',
+                boxShadow: selectedProvider === "infobip" ? '0 0 25px rgba(34, 211, 238, 0.3), inset 0 0 20px rgba(34, 211, 238, 0.1)' : 'none'
+              }}
               data-testid="provider-ch1"
             >
-              <span className={`w-2 h-2 rounded-full ${infobipConfigured ? "bg-emerald-400" : "bg-amber-400"}`} />
+              <span className={`w-2 h-2 rounded-full`} style={{
+                background: infobipConfigured ? '#10b981' : '#fbbf24',
+                boxShadow: `0 0 8px ${infobipConfigured ? '#10b981' : '#fbbf24'}`
+              }} />
               CH: 1 (Infobip)
             </button>
             <button
               onClick={() => setSelectedProvider("signalwire")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-xs uppercase tracking-wide transition-all ${
-                selectedProvider === "signalwire"
-                  ? "bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg shadow-violet-200"
-                  : "bg-white text-gray-500 border border-gray-200 hover:border-violet-300 hover:bg-violet-50"
-              }`}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-xs uppercase tracking-wide transition-all duration-300`}
+              style={{
+                background: selectedProvider === "signalwire"
+                  ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.1))'
+                  : 'rgba(255, 255, 255, 0.03)',
+                border: `1px solid ${selectedProvider === "signalwire" ? 'rgba(139, 92, 246, 0.5)' : 'rgba(255, 255, 255, 0.08)'}`,
+                color: selectedProvider === "signalwire" ? '#a78bfa' : '#94a3b8',
+                boxShadow: selectedProvider === "signalwire" ? '0 0 25px rgba(139, 92, 246, 0.3), inset 0 0 20px rgba(139, 92, 246, 0.1)' : 'none'
+              }}
               data-testid="provider-ch2"
             >
-              <span className={`w-2 h-2 rounded-full ${signalwireConfigured ? "bg-emerald-400" : "bg-amber-400"}`} />
+              <span className={`w-2 h-2 rounded-full`} style={{
+                background: signalwireConfigured ? '#10b981' : '#fbbf24',
+                boxShadow: `0 0 8px ${signalwireConfigured ? '#10b981' : '#fbbf24'}`
+              }} />
               CH: 2 (SignalWire)
             </button>
           </div>

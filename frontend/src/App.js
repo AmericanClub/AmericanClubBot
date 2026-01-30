@@ -1336,15 +1336,15 @@ function UserCallPanel({ user, token, onLogout }) {
                   OTP Digits
                 </label>
                 <Select value={otpDigits} onValueChange={setOtpDigits}>
-                  <SelectTrigger className="glass-input text-gray-700" data-testid="otp-digits-select">
+                  <SelectTrigger className="glass-input" data-testid="otp-digits-select">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border-gray-200 shadow-lg">
+                  <SelectContent className="glass-dropdown">
                     {[4, 5, 6, 7, 8].map((num) => (
                       <SelectItem 
                         key={num} 
                         value={num.toString()}
-                        className="font-mono text-xs"
+                        className="dropdown-item font-mono"
                       >
                         {num}
                       </SelectItem>

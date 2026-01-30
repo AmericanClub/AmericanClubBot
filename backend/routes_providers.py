@@ -362,3 +362,35 @@ async def get_provider_credentials(provider_id: str) -> dict:
         "credentials": provider.get("credentials", {}),
         "phone_numbers": provider.get("phone_numbers", [])
     }
+
+
+# User endpoint to get available phone numbers
+user_provider_router = APIRouter(prefix="/user/providers", tags=["User Providers"])
+
+
+@user_provider_router.get("/phone-numbers")
+async def get_available_phone_numbers(provider: str = None):
+    """Get available phone numbers for users to select as Caller ID"""
+    from server import db
+    from auth import get_current_active_user
+    
+    query = {"is_enabled": True}
+    if provider:
+        query["id"] = provider
+    
+    providers = await db.providers.find(query, {"_id": 0}).to_list(10)
+    
+    result = []
+    for p in providers:
+        phone_numbers = p.get("phone_numbers", [])
+        for pn in phone_numbers:
+            if pn.get("is_active", True):
+                result.append({
+                    "provider_id": p["id"],
+                    "provider_name": p.get("name", p["id"].title()),
+                    "number": pn.get("number"),
+                    "label": pn.get("label", "Main"),
+                    "id": pn.get("id")
+                })
+    
+    return {"phone_numbers": result}

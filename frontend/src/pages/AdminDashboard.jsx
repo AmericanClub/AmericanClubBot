@@ -369,11 +369,21 @@ export default function AdminDashboard({ user, token, onLogout }) {
                             <Button
                               variant="ghost"
                               size="sm"
+                              onClick={() => openEditUser(u)}
+                              className="text-slate-400 hover:text-white"
+                              title="Edit User"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               onClick={() => {
                                 setSelectedUser(u);
                                 setShowAddCredits(true);
                               }}
                               className="text-cyan-400 hover:text-cyan-300"
+                              title="Add Credits"
                             >
                               <Coins className="w-4 h-4" />
                             </Button>
@@ -382,6 +392,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
                               size="sm"
                               onClick={() => handleToggleUser(u.id)}
                               className={u.is_active ? "text-red-400 hover:text-red-300" : "text-emerald-400 hover:text-emerald-300"}
+                              title={u.is_active ? "Disable User" : "Enable User"}
                             >
                               {u.is_active ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
                             </Button>

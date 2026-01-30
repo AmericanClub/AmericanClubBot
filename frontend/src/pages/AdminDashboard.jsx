@@ -218,11 +218,11 @@ export default function AdminDashboard({ user, token, onLogout }) {
       <div className="fixed left-0 top-0 h-full w-64 bg-slate-900/80 backdrop-blur-xl border-r border-white/10 p-4 flex flex-col">
         {/* Logo */}
         <div className="flex items-center gap-3 mb-8 px-2">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center">
-            <Phone className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center overflow-hidden">
+            <img src="/logo.png" alt="American Club" className="w-8 h-8 object-contain" />
           </div>
           <div>
-            <h1 className="font-bold text-white text-sm">Voice Bot</h1>
+            <h1 className="font-bold text-white text-sm">American Club</h1>
             <p className="text-[10px] text-cyan-400 font-mono">ADMIN PANEL</p>
           </div>
         </div>

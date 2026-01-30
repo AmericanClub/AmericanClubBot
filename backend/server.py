@@ -716,6 +716,200 @@ async def initiate_call(
         logger.error(f"Error initiating call: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
+# Minimum credits required to start a call
+MIN_CREDITS_FOR_CALL = 2
+
+
+@api_router.post("/user/calls/initiate", response_model=Dict)
+async def initiate_user_call(request: CallRequest, background_tasks: BackgroundTasks, req: Request):
+    """Initiate call with credit check for authenticated users"""
+    from auth import get_current_active_user, security
+    from fastapi.security import HTTPAuthorizationCredentials
+    
+    try:
+        # Get token from header
+        auth_header = req.headers.get("Authorization", "")
+        if not auth_header.startswith("Bearer "):
+            raise HTTPException(status_code=401, detail="Authentication required")
+        
+        token = auth_header.replace("Bearer ", "")
+        
+        # Verify user
+        from auth import decode_token
+        payload = decode_token(token)
+        if not payload:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        
+        user_id = payload.get("sub")
+        user = await db.users.find_one({"id": user_id}, {"_id": 0})
+        
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+        
+        if not user.get("is_active"):
+            raise HTTPException(status_code=403, detail="Account is disabled")
+        
+        # Check credits
+        current_credits = user.get("credits", 0)
+        if current_credits < MIN_CREDITS_FOR_CALL:
+            raise HTTPException(
+                status_code=402,
+                detail=f"Insufficient credits. You need at least {MIN_CREDITS_FOR_CALL} credits to start a call. Current balance: {current_credits}"
+            )
+        
+        provider = request.config.provider
+        
+        call_log = CallLog(
+            config=request.config,
+            steps=request.steps,
+            provider=provider
+        )
+        
+        doc = call_log.model_dump()
+        doc["user_id"] = user_id
+        doc["user_credits_at_start"] = current_credits
+        
+        await db.call_logs.insert_one(doc)
+        
+        await add_call_event(call_log.id, "CALL_QUEUED", f"Call queued ({provider.upper()}) - Credits: {current_credits}")
+        
+        use_simulation = True
+        simulation_reason = "Simulation mode"
+        
+        if provider == "signalwire":
+            if SIGNALWIRE_PROJECT_ID and SIGNALWIRE_AUTH_TOKEN and SIGNALWIRE_SPACE_URL:
+                call_sid = await create_signalwire_call(call_log.id, request.config, request.steps)
+                if call_sid:
+                    use_simulation = False
+                else:
+                    simulation_reason = "Failed to create SignalWire call"
+            else:
+                simulation_reason = "SignalWire not configured"
+        else:
+            if INFOBIP_API_KEY and INFOBIP_BASE_URL and INFOBIP_CONFIG_ID:
+                infobip_call_id = await create_outbound_call(call_log.id, request.config)
+                if infobip_call_id:
+                    use_simulation = False
+                else:
+                    simulation_reason = "Failed to create Infobip call"
+            else:
+                simulation_reason = "Infobip not configured"
+        
+        if use_simulation:
+            await add_call_event(call_log.id, "SIMULATION_MODE", f"Using simulation: {simulation_reason}")
+            background_tasks.add_task(run_call_simulation, call_log.id)
+        
+        return {
+            "status": "initiated",
+            "call_id": call_log.id,
+            "message": f"Call initiated via {provider.upper()}",
+            "provider": provider,
+            "using_live": not use_simulation,
+            "mode": f"Live {provider.upper()}" if not use_simulation else "Simulation",
+            "user_credits": current_credits
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error initiating user call: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+async def deduct_user_credits(call_id: str, duration_seconds: int):
+    """Deduct credits from user after call ends"""
+    try:
+        call_log = await db.call_logs.find_one({"id": call_id}, {"_id": 0})
+        if not call_log:
+            return
+        
+        user_id = call_log.get("user_id")
+        if not user_id:
+            return
+        
+        # Calculate credits to deduct (1 credit per minute, rounded up)
+        import math
+        minutes = math.ceil(duration_seconds / 60) if duration_seconds > 0 else 1
+        credits_to_deduct = minutes
+        
+        # Get user
+        user = await db.users.find_one({"id": user_id}, {"_id": 0})
+        if not user:
+            return
+        
+        current_credits = user.get("credits", 0)
+        new_credits = max(0, current_credits - credits_to_deduct)
+        
+        # Update user credits
+        await db.users.update_one(
+            {"id": user_id},
+            {
+                "$set": {"credits": new_credits},
+                "$inc": {"total_credits_used": credits_to_deduct}
+            }
+        )
+        
+        # Update call log with credits used
+        await db.call_logs.update_one(
+            {"id": call_id},
+            {"$set": {"credits_used": credits_to_deduct}}
+        )
+        
+        # Add credit transaction
+        await db.credit_transactions.insert_one({
+            "id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "type": "call_deduction",
+            "amount": -credits_to_deduct,
+            "balance_after": new_credits,
+            "reason": f"Call duration: {duration_seconds}s ({minutes} min)",
+            "call_id": call_id,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
+        
+        # Broadcast credit update via SSE
+        await broadcast_event(call_id, {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "event_type": "CREDITS_DEDUCTED",
+            "details": f"Credits deducted: {credits_to_deduct} (Remaining: {new_credits})",
+            "credits_deducted": credits_to_deduct,
+            "credits_remaining": new_credits,
+            "call_id": call_id
+        })
+        
+        logger.info(f"Deducted {credits_to_deduct} credits from user {user_id}. Remaining: {new_credits}")
+        
+    except Exception as e:
+        logger.error(f"Error deducting credits: {e}")
+
+
+@api_router.get("/user/credits")
+async def get_user_credits(req: Request):
+    """Get current user's credit balance"""
+    from auth import decode_token
+    
+    auth_header = req.headers.get("Authorization", "")
+    if not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
+    token = auth_header.replace("Bearer ", "")
+    payload = decode_token(token)
+    
+    if not payload:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    user_id = payload.get("sub")
+    user = await db.users.find_one({"id": user_id}, {"_id": 0, "password": 0})
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {
+        "credits": user.get("credits", 0),
+        "total_used": user.get("total_credits_used", 0)
+    }
+
 @api_router.post("/calls/{call_id}/verify")
 async def verify_code(call_id: str, request: Request, background_tasks: BackgroundTasks):
     """Accept or Deny the entered code - triggers next IVR step"""

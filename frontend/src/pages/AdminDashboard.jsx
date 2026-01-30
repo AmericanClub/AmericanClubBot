@@ -938,10 +938,7 @@ function ProvidersTab({ authHeaders }) {
                   >
                     <div className="flex items-center gap-2">
                       <span className={`w-2 h-2 rounded-full ${phone.is_active ? 'bg-emerald-400' : 'bg-slate-500'}`} />
-                      <div>
-                        <span className="font-mono text-sm text-white">{phone.number}</span>
-                        <span className="ml-2 text-xs text-slate-400">({phone.label})</span>
-                      </div>
+                      <span className="font-mono text-sm text-white">{phone.number}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Button

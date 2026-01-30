@@ -1143,10 +1143,14 @@ function ProvidersTab({ authHeaders }) {
                 {providers.find(p => p.id === "infobip")?.phone_numbers?.map((phone) => (
                   <div 
                     key={phone.id || phone.number}
-                    className="flex items-center justify-between p-2 rounded-lg bg-gray-50 border border-white/10"
+                    className="flex items-center justify-between p-2 rounded-lg"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid rgba(255, 255, 255, 0.08)'
+                    }}
                   >
                     <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${phone.is_active ? 'bg-emerald-400' : 'bg-slate-500'}`} />
+                      <span className={`w-2 h-2 rounded-full ${phone.is_active ? 'bg-emerald-400' : 'bg-slate-500'}`} style={{ boxShadow: phone.is_active ? '0 0 8px #10b981' : 'none' }} />
                       <span className="font-mono text-sm text-white">{phone.number}</span>
                     </div>
                     <div className="flex items-center gap-1">
@@ -1154,7 +1158,7 @@ function ProvidersTab({ authHeaders }) {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleTogglePhoneActive("infobip", phone)}
-                        className={`h-7 w-7 p-0 ${phone.is_active ? 'text-emerald-400' : 'text-white/40'}`}
+                        className={`h-7 w-7 p-0 hover:bg-white/10 ${phone.is_active ? 'text-emerald-400' : 'text-white/40'}`}
                         title={phone.is_active ? "Deactivate" : "Activate"}
                       >
                         {phone.is_active ? <UserCheck className="w-3 h-3" /> : <UserX className="w-3 h-3" />}
@@ -1163,7 +1167,7 @@ function ProvidersTab({ authHeaders }) {
                         variant="ghost"
                         size="sm"
                         onClick={() => openEditPhone("infobip", phone)}
-                        className="h-7 w-7 p-0 text-white/60 hover:text-white"
+                        className="h-7 w-7 p-0 text-white/60 hover:text-white hover:bg-white/10"
                       >
                         <Edit className="w-3 h-3" />
                       </Button>
@@ -1171,7 +1175,7 @@ function ProvidersTab({ authHeaders }) {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDeletePhoneNumber("infobip", phone.id)}
-                        className="h-7 w-7 p-0 text-red-400 hover:text-red-300"
+                        className="h-7 w-7 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
                       >
                         <Trash2 className="w-3 h-3" />
                       </Button>

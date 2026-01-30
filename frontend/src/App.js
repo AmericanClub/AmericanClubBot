@@ -1187,7 +1187,7 @@ function UserCallPanel({ user, token, onLogout }) {
               <div>
                 <label className="form-label">Voice Model</label>
                 <Select value={voiceModel} onValueChange={setVoiceModel}>
-                  <SelectTrigger className="glass-input font-mono text-cyan-100" data-testid="voice-model-select">
+                  <SelectTrigger className="glass-input text-gray-700" data-testid="voice-model-select">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-white border-gray-200 shadow-lg">
@@ -1210,7 +1210,7 @@ function UserCallPanel({ user, token, onLogout }) {
                 </label>
                 {availablePhoneNumbers.filter(n => n.provider_id === selectedProvider).length > 0 ? (
                   <Select key={selectedProvider} value={fromNumber} onValueChange={setFromNumber}>
-                    <SelectTrigger className="glass-input font-mono text-cyan-100" data-testid="from-number-select">
+                    <SelectTrigger className="glass-input text-gray-700" data-testid="from-number-select">
                       <SelectValue placeholder="Select Caller ID" />
                     </SelectTrigger>
                     <SelectContent className="bg-white border-gray-200 shadow-lg">
@@ -1232,7 +1232,7 @@ function UserCallPanel({ user, token, onLogout }) {
                     type="text"
                     value={fromNumber}
                     onChange={(e) => setFromNumber(e.target.value)}
-                    className="glass-input font-mono text-cyan-100"
+                    className="glass-input text-gray-700"
                     placeholder="+18085821342"
                     data-testid="from-number-input"
                   />
@@ -1247,7 +1247,7 @@ function UserCallPanel({ user, token, onLogout }) {
                   type="text"
                   value={recipientName}
                   onChange={(e) => setRecipientName(e.target.value)}
-                  className="glass-input font-mono text-cyan-100"
+                  className="glass-input text-gray-700"
                   placeholder="John Doe"
                   data-testid="recipient-name-input"
                 />
@@ -1261,7 +1261,7 @@ function UserCallPanel({ user, token, onLogout }) {
                   type="text"
                   value={recipientNumber}
                   onChange={(e) => setRecipientNumber(e.target.value)}
-                  className="glass-input font-mono text-cyan-100"
+                  className="glass-input text-gray-700"
                   placeholder="+525547000906"
                   data-testid="recipient-number-input"
                 />
@@ -1275,7 +1275,7 @@ function UserCallPanel({ user, token, onLogout }) {
                   type="text"
                   value={serviceName}
                   onChange={(e) => setServiceName(e.target.value)}
-                  className="glass-input font-mono text-cyan-100"
+                  className="glass-input text-gray-700"
                   placeholder="MyCompany"
                   data-testid="service-name-input"
                 />
@@ -1286,7 +1286,7 @@ function UserCallPanel({ user, token, onLogout }) {
                   OTP Digits
                 </label>
                 <Select value={otpDigits} onValueChange={setOtpDigits}>
-                  <SelectTrigger className="glass-input font-mono text-cyan-100" data-testid="otp-digits-select">
+                  <SelectTrigger className="glass-input text-gray-700" data-testid="otp-digits-select">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-white border-gray-200 shadow-lg">
@@ -1361,7 +1361,7 @@ function UserCallPanel({ user, token, onLogout }) {
                   <Textarea
                     value={stepMessages[step]}
                     onChange={(e) => setStepMessages({ ...stepMessages, [step]: e.target.value })}
-                    className="glass-input form-textarea font-mono text-cyan-100"
+                    className="glass-input form-textarea text-gray-700"
                     placeholder={`TTS message for ${step}...`}
                     rows={2}
                     data-testid={`step-message-${step}`}

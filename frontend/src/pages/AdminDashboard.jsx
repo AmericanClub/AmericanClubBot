@@ -89,7 +89,6 @@ export default function AdminDashboard({ user, token, onLogout }) {
     try {
       const response = await axios.get(`${API}/admin/users`, { headers: authHeaders });
       setUsers(response.data.users);
-      setIsSuperAdmin(response.data.current_admin_is_super || false);
     } catch (error) {
       console.error("Error fetching users:", error);
     }

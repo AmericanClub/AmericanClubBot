@@ -1337,12 +1337,22 @@ def format_tts_message(message: str, config: dict) -> str:
         "{digits}", str(config.get("otp_digits", 6))
     )
 
-def create_laml_response(message: str, hangup: bool = False, pause: int = 0, loop: bool = False) -> str:
+def get_voice_attribute(voice_model: str) -> str:
+    """Get the voice attribute for SignalWire Say verb"""
+    # If it's already in correct format (Polly.xxx or Polly.xxx-Neural)
+    if voice_model and (voice_model.startswith("Polly.") or voice_model in ["man", "woman"]):
+        return voice_model
+    # Default to most natural voice
+    return "Polly.Joanna-Neural"
+
+def create_laml_response(message: str, hangup: bool = False, pause: int = 0, loop: bool = False, voice: str = "Polly.Joanna-Neural") -> str:
     """Create LaML/XML response for SignalWire"""
     from fastapi.responses import Response
     
+    voice_attr = get_voice_attribute(voice)
+    
     laml = '<?xml version="1.0" encoding="UTF-8"?>\n<Response>\n'
-    laml += f'    <Say>{message}</Say>\n'
+    laml += f'    <Say voice="{voice_attr}">{message}</Say>\n'
     
     if pause > 0:
         if loop:
@@ -1358,16 +1368,18 @@ def create_laml_response(message: str, hangup: bool = False, pause: int = 0, loo
     
     return Response(content=laml, media_type="application/xml")
 
-def create_laml_gather(message: str, num_digits: int, action: str) -> str:
+def create_laml_gather(message: str, num_digits: int, action: str, voice: str = "Polly.Joanna-Neural") -> str:
     """Create LaML/XML Gather response for SignalWire"""
     from fastapi.responses import Response
+    
+    voice_attr = get_voice_attribute(voice)
     
     laml = f'''<?xml version="1.0" encoding="UTF-8"?>
 <Response>
     <Gather numDigits="{num_digits}" action="{action}" timeout="10">
-        <Say>{message}</Say>
+        <Say voice="{voice_attr}">{message}</Say>
     </Gather>
-    <Say>We did not receive any input. Goodbye.</Say>
+    <Say voice="{voice_attr}">We did not receive any input. Goodbye.</Say>
     <Hangup/>
 </Response>'''
     

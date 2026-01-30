@@ -372,9 +372,8 @@ user_provider_router = APIRouter(prefix="/user/providers", tags=["User Providers
 async def get_available_phone_numbers(provider: str = None):
     """Get available phone numbers for users to select as Caller ID"""
     from server import db
-    from auth import get_current_active_user
     
-    query = {"is_enabled": True}
+    query = {}
     if provider:
         query["id"] = provider
     

@@ -817,49 +817,49 @@ function UserCallPanel({ user, token, onLogout }) {
     if (eventType.includes("FINISHED")) return { icon: "🏁", color: "text-slate-400", bg: "" };
     if (eventType.includes("FAILED") || eventType.includes("ERROR")) return { icon: "⚠️", color: "text-red-400", bg: "bg-red-500/10 border-red-500/30" };
     if (eventType.includes("RETRY") || eventType.includes("NO_RESPONSE")) return { icon: "🔁", color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/30" };
-    if (eventType.includes("HANGUP")) return { icon: "📵", color: "text-slate-400", bg: "" };
-    if (eventType.includes("SIMULATION") || eventType.includes("CALL_INFO")) return { icon: "🎭", color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/30" };
-    if (eventType.includes("QUEUED")) return { icon: "📋", color: "text-slate-400", bg: "" };
-    return { icon: "📌", color: "text-slate-400", bg: "" };
+    if (eventType.includes("HANGUP")) return { icon: "📵", color: "text-gray-500", bg: "" };
+    if (eventType.includes("SIMULATION") || eventType.includes("CALL_INFO")) return { icon: "🎭", color: "text-blue-600", bg: "bg-blue-50 border-blue-200" };
+    if (eventType.includes("QUEUED")) return { icon: "📋", color: "text-gray-500", bg: "" };
+    return { icon: "📌", color: "text-gray-500", bg: "" };
   };
 
   return (
     <div className="app-container" data-testid="app-container">
       {/* User Header Bar */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-xl border-b border-white/10 px-4 py-2">
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200 px-4 py-2 shadow-sm">
         <div className="max-w-[1800px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center overflow-hidden">
-              <img src="/logo.png" alt="American Club" className="w-8 h-8 object-contain" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center overflow-hidden shadow-md shadow-violet-200">
+              <img src="/logo.png" alt="American Club" className="w-7 h-7 object-contain" />
             </div>
             <div>
-              <h1 className="font-bold text-white text-sm">American Club</h1>
-              <p className="text-[10px] text-slate-400">IVR Call System</p>
+              <h1 className="font-bold text-gray-800 text-sm">American Club</h1>
+              <p className="text-[10px] text-gray-500">IVR Call System</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
             {/* Credits Display */}
-            <div className="flex items-center gap-2 bg-slate-800/50 rounded-lg px-3 py-1.5 border border-white/10">
-              <Coins className="w-4 h-4 text-yellow-400" />
+            <div className="flex items-center gap-2 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl px-4 py-2 border border-amber-200">
+              <Coins className="w-4 h-4 text-amber-500" />
               <div>
-                <span className="font-mono text-lg font-bold text-white" data-testid="user-credits">{userCredits}</span>
-                <span className="text-[10px] text-slate-400 ml-1">credits</span>
+                <span className="font-mono text-lg font-bold text-amber-600" data-testid="user-credits">{userCredits}</span>
+                <span className="text-[10px] text-amber-500 ml-1">credits</span>
               </div>
             </div>
             {/* User Info */}
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <p className="text-sm font-medium text-white">{user?.name}</p>
-                <p className="text-[10px] text-slate-400">{user?.email}</p>
+                <p className="text-sm font-semibold text-gray-800">{user?.name}</p>
+                <p className="text-[10px] text-gray-500">{user?.email}</p>
               </div>
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-md shadow-violet-200">
                 {user?.name?.charAt(0)?.toUpperCase() || "U"}
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onLogout}
-                className="text-slate-400 hover:text-red-400 hover:bg-red-500/10"
+                className="text-gray-400 hover:text-red-500 hover:bg-red-50"
                 data-testid="logout-btn"
               >
                 <LogOut className="w-4 h-4" />
@@ -871,14 +871,14 @@ function UserCallPanel({ user, token, onLogout }) {
       
       <div className="main-grid pt-14">
         {/* Left Panel - Bot Logs */}
-        <div className="logs-panel glass-panel" data-testid="logs-panel">
+        <div className="logs-panel" data-testid="logs-panel">
           <div className="logs-header">
             <div className="flex items-center gap-2">
               <div className={`status-indicator ${getStatusClass(callStatus)}`} data-testid="status-indicator" />
-              <h2 className="font-heading text-sm font-semibold text-white">
+              <h2 className="font-heading text-sm font-semibold text-gray-800">
                 Bot Logs
               </h2>
-              <span className="font-mono text-[10px] text-slate-500 uppercase">
+              <span className="font-mono text-[10px] text-gray-400 uppercase bg-gray-100 px-2 py-0.5 rounded">
                 {callStatus}
               </span>
             </div>
@@ -887,7 +887,7 @@ function UserCallPanel({ user, token, onLogout }) {
                 variant="ghost"
                 size="sm"
                 onClick={() => { setShowHistory(!showHistory); fetchCallHistory(); }}
-                className="text-slate-400 hover:text-white hover:bg-white/5 h-7 px-2 text-xs"
+                className="text-gray-500 hover:text-violet-600 hover:bg-violet-50 h-7 px-2 text-xs"
                 data-testid="history-btn"
               >
                 <History className="w-3 h-3 mr-1" />
@@ -897,7 +897,7 @@ function UserCallPanel({ user, token, onLogout }) {
                 variant="ghost"
                 size="sm"
                 onClick={handleClearLogs}
-                className="text-slate-400 hover:text-white hover:bg-white/5 h-7 px-2 text-xs"
+                className="text-gray-500 hover:text-violet-600 hover:bg-violet-50 h-7 px-2 text-xs"
                 data-testid="clear-logs-btn"
               >
                 <Trash2 className="w-3 h-3 mr-1" />

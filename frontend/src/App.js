@@ -791,32 +791,32 @@ function UserCallPanel({ user, token, onLogout }) {
 
   // Get event icon and color
   const getEventStyle = (eventType) => {
-    if (eventType.includes("CAPTURED_CODE")) return { icon: "🔐", color: "text-emerald-600", bg: "bg-emerald-500/10 border-emerald-500/30" };
-    if (eventType.includes("DTMF_CODE")) return { icon: "🔐", color: "text-emerald-600", bg: "bg-emerald-500/10 border-emerald-500/30" };
+    if (eventType.includes("CAPTURED_CODE")) return { icon: "🔐", color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-200" };
+    if (eventType.includes("DTMF_CODE")) return { icon: "🔐", color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-200" };
     if (eventType.includes("INPUT_STREAM")) return { icon: "🔢", color: "text-teal-600", bg: "bg-cyan-500/10 border-cyan-500/30" };
     if (eventType.includes("DTMF")) return { icon: "🔢", color: "text-teal-600", bg: "bg-cyan-500/10 border-cyan-500/30" };
     if (eventType.includes("STEP1")) return { icon: "1️⃣", color: "text-blue-400", bg: "" };
     if (eventType.includes("STEP2")) return { icon: "2️⃣", color: "text-purple-600", bg: "" };
     if (eventType.includes("STEP3") || eventType.includes("AWAITING")) return { icon: "⏳", color: "text-amber-600", bg: "" };
-    if (eventType.includes("ACCEPTED")) return { icon: "✅", color: "text-emerald-600", bg: "bg-emerald-500/10 border-emerald-500/30" };
-    if (eventType.includes("REJECTED")) return { icon: "🔄", color: "text-orange-600", bg: "bg-orange-500/10 border-orange-500/30" };
+    if (eventType.includes("ACCEPTED")) return { icon: "✅", color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-200" };
+    if (eventType.includes("REJECTED")) return { icon: "🔄", color: "text-orange-600", bg: "bg-orange-50 border-orange-200" };
     if (eventType.includes("INITIATED")) return { icon: "📤", color: "text-teal-600", bg: "" };
     if (eventType.includes("CREATED")) return { icon: "📞", color: "text-teal-600", bg: "" };
     if (eventType.includes("RINGING")) return { icon: "🔔", color: "text-amber-600", bg: "" };
-    if (eventType.includes("ESTABLISHED") || eventType.includes("ANSWERED")) return { icon: "📱", color: "text-emerald-600", bg: "bg-emerald-500/10 border-emerald-500/30" };
+    if (eventType.includes("ESTABLISHED") || eventType.includes("ANSWERED")) return { icon: "📱", color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-200" };
     // AMD Detection styles
-    if (eventType.includes("AMD_HUMAN")) return { icon: "👤", color: "text-emerald-600", bg: "bg-emerald-500/10 border-emerald-500/30" };
-    if (eventType.includes("AMD_VOICEMAIL") || eventType.includes("VOICEMAIL")) return { icon: "📧", color: "text-orange-600", bg: "bg-orange-500/10 border-orange-500/30" };
-    if (eventType.includes("AMD_FAX")) return { icon: "📠", color: "text-amber-600", bg: "bg-yellow-500/10 border-yellow-500/30" };
+    if (eventType.includes("AMD_HUMAN")) return { icon: "👤", color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-200" };
+    if (eventType.includes("AMD_VOICEMAIL") || eventType.includes("VOICEMAIL")) return { icon: "📧", color: "text-orange-600", bg: "bg-orange-50 border-orange-200" };
+    if (eventType.includes("AMD_FAX")) return { icon: "📠", color: "text-amber-600", bg: "bg-amber-50 border-amber-200" };
     if (eventType.includes("AMD_UNKNOWN")) return { icon: "❓", color: "text-gray-500", bg: "" };
     // Call status styles
-    if (eventType.includes("BUSY")) return { icon: "📵", color: "text-red-600", bg: "bg-red-500/10 border-red-500/30" };
-    if (eventType.includes("NO_ANSWER")) return { icon: "📵", color: "text-orange-600", bg: "bg-orange-500/10 border-orange-500/30" };
-    if (eventType.includes("CANCELED")) return { icon: "🚫", color: "text-gray-500", bg: "bg-slate-500/10 border-slate-500/30" };
-    if (eventType.includes("RECORDING")) return { icon: "🎙️", color: "text-purple-600", bg: "bg-purple-500/10 border-purple-500/30" };
+    if (eventType.includes("BUSY")) return { icon: "📵", color: "text-red-600", bg: "bg-red-50 border-red-200" };
+    if (eventType.includes("NO_ANSWER")) return { icon: "📵", color: "text-orange-600", bg: "bg-orange-50 border-orange-200" };
+    if (eventType.includes("CANCELED")) return { icon: "🚫", color: "text-gray-500", bg: "bg-gray-100 border-gray-200" };
+    if (eventType.includes("RECORDING")) return { icon: "🎙️", color: "text-purple-600", bg: "bg-purple-50 border-purple-200" };
     if (eventType.includes("FINISHED")) return { icon: "🏁", color: "text-gray-500", bg: "" };
-    if (eventType.includes("FAILED") || eventType.includes("ERROR")) return { icon: "⚠️", color: "text-red-600", bg: "bg-red-500/10 border-red-500/30" };
-    if (eventType.includes("RETRY") || eventType.includes("NO_RESPONSE")) return { icon: "🔁", color: "text-amber-600", bg: "bg-yellow-500/10 border-yellow-500/30" };
+    if (eventType.includes("FAILED") || eventType.includes("ERROR")) return { icon: "⚠️", color: "text-red-600", bg: "bg-red-50 border-red-200" };
+    if (eventType.includes("RETRY") || eventType.includes("NO_RESPONSE")) return { icon: "🔁", color: "text-amber-600", bg: "bg-amber-50 border-amber-200" };
     if (eventType.includes("HANGUP")) return { icon: "📵", color: "text-gray-500", bg: "" };
     if (eventType.includes("SIMULATION") || eventType.includes("CALL_INFO")) return { icon: "🎭", color: "text-blue-600", bg: "bg-blue-50 border-blue-200" };
     if (eventType.includes("QUEUED")) return { icon: "📋", color: "text-gray-500", bg: "" };
@@ -992,7 +992,7 @@ function UserCallPanel({ user, token, onLogout }) {
                               <span className="font-mono text-[10px] text-gray-500">Input:</span>
                               <Badge 
                                 variant="outline" 
-                                className="font-mono text-sm px-2 py-0.5 text-emerald-600 bg-emerald-500/10 border-emerald-500/30 cursor-pointer hover:bg-emerald-500/20 tracking-wider"
+                                className="font-mono text-sm px-2 py-0.5 text-emerald-600 bg-emerald-50 border-emerald-200 cursor-pointer hover:bg-emerald-500/20 tracking-wider"
                                 onClick={() => copyToClipboard(log.dtmf_code)}
                                 data-testid={`dtmf-badge-${index}`}
                               >

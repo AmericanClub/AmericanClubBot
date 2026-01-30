@@ -217,6 +217,22 @@ async def update_infobip(
     }
 
 
+@provider_router.get("/{provider_id}/phone-numbers")
+async def get_phone_numbers(
+    provider_id: str,
+    current_admin: dict = Depends(get_current_admin)
+):
+    """Get all phone numbers for a provider"""
+    from server import db
+    
+    provider = await db.providers.find_one({"id": provider_id}, {"_id": 0})
+    
+    if not provider:
+        return {"phone_numbers": []}
+    
+    return {"phone_numbers": provider.get("phone_numbers", [])}
+
+
 @provider_router.post("/{provider_id}/phone-numbers")
 async def add_phone_number(
     provider_id: str,
@@ -226,21 +242,70 @@ async def add_phone_number(
     """Add phone number to provider"""
     from server import db
     
+    # Check if provider exists, if not create it
+    provider = await db.providers.find_one({"id": provider_id})
+    
+    if not provider:
+        # Create provider with the new phone number
+        await db.providers.insert_one({
+            "id": provider_id,
+            "name": provider_id.title(),
+            "is_enabled": False,
+            "is_configured": False,
+            "credentials": {},
+            "phone_numbers": [phone.model_dump()]
+        })
+        return {"message": "Provider created with phone number", "number": phone.number, "id": phone.id}
+    
+    # Add to existing provider
     result = await db.providers.update_one(
         {"id": provider_id},
-        {"$push": {"phone_numbers": phone.dict()}}
+        {"$push": {"phone_numbers": phone.model_dump()}}
     )
     
     if result.modified_count == 0:
-        raise HTTPException(status_code=404, detail="Provider not found")
+        raise HTTPException(status_code=500, detail="Failed to add phone number")
     
-    return {"message": "Phone number added", "number": phone.number}
+    return {"message": "Phone number added", "number": phone.number, "id": phone.id}
 
 
-@provider_router.delete("/{provider_id}/phone-numbers/{phone_number}")
+@provider_router.put("/{provider_id}/phone-numbers/{phone_id}")
+async def update_phone_number(
+    provider_id: str,
+    phone_id: str,
+    phone_update: PhoneNumberUpdate,
+    current_admin: dict = Depends(get_current_admin)
+):
+    """Update a phone number"""
+    from server import db
+    
+    # Build update query
+    update_fields = {}
+    if phone_update.number is not None:
+        update_fields["phone_numbers.$.number"] = phone_update.number
+    if phone_update.label is not None:
+        update_fields["phone_numbers.$.label"] = phone_update.label
+    if phone_update.is_active is not None:
+        update_fields["phone_numbers.$.is_active"] = phone_update.is_active
+    
+    if not update_fields:
+        return {"message": "No fields to update"}
+    
+    result = await db.providers.update_one(
+        {"id": provider_id, "phone_numbers.id": phone_id},
+        {"$set": update_fields}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Phone number not found")
+    
+    return {"message": "Phone number updated"}
+
+
+@provider_router.delete("/{provider_id}/phone-numbers/{phone_id}")
 async def remove_phone_number(
     provider_id: str,
-    phone_number: str,
+    phone_id: str,
     current_admin: dict = Depends(get_current_admin)
 ):
     """Remove phone number from provider"""
@@ -248,7 +313,7 @@ async def remove_phone_number(
     
     result = await db.providers.update_one(
         {"id": provider_id},
-        {"$pull": {"phone_numbers": {"number": phone_number}}}
+        {"$pull": {"phone_numbers": {"id": phone_id}}}
     )
     
     if result.modified_count == 0:

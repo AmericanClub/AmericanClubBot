@@ -38,11 +38,13 @@ export default function AdminDashboard({ user, token, onLogout }) {
   const [inviteCodes, setInviteCodes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   
   // Modal states
   const [showCreateCode, setShowCreateCode] = useState(false);
   const [showAddCredits, setShowAddCredits] = useState(false);
   const [showEditUser, setShowEditUser] = useState(false);
+  const [showCreateAdmin, setShowCreateAdmin] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   
   // Form states
@@ -55,6 +57,11 @@ export default function AdminDashboard({ user, token, onLogout }) {
   const [editName, setEditName] = useState("");
   const [editEmail, setEditEmail] = useState("");
   const [editPassword, setEditPassword] = useState("");
+  
+  // Create admin form states
+  const [newAdminName, setNewAdminName] = useState("");
+  const [newAdminEmail, setNewAdminEmail] = useState("");
+  const [newAdminPassword, setNewAdminPassword] = useState("");
   
   const authHeaders = { Authorization: `Bearer ${token}` };
 

@@ -182,6 +182,37 @@ Build a full-stack bot-calling website with multi-provider support (Infobip, Sig
 - Clean, professional look matching fintech reference design
 - All purple colors replaced with blue equivalents
 
+### Multi-Admin System ✅ (Jan 30, 2026)
+- Super Admin can create new admins (non-super admin by default)
+- Super Admin can change their own password via sidebar button
+- Create Admin modal with name, email, password fields
+- Change Password modal with current/new/confirm password fields
+- Buttons only visible for Super Admin (hidden for regular users and non-super admins)
+- Backend protection: only super admin can call create-admin endpoint
+- Super Admin cannot be deleted by anyone
+
+## Test Credentials
+- **Super Admin:** admin@american.club / 123 (is_super_admin: true)
+- **User:** fak@american.club / 123
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/login` - User/Admin login (returns is_super_admin for admins)
+- `POST /api/auth/signup` - User signup with invite code
+- `GET /api/auth/me` - Get current user (returns is_super_admin for admins)
+- `PUT /api/auth/change-password` - Change own password (query params: old_password, new_password)
+
+### Admin Endpoints
+- `GET /api/admin/dashboard/stats` - Dashboard statistics
+- `GET /api/admin/users` - List all users
+- `PUT /api/admin/users/{id}/edit` - Edit user
+- `POST /api/admin/users/{id}/credits` - Add credits
+- `DELETE /api/admin/users/{id}` - Delete user (Super Admin can delete admins)
+- `POST /api/admin/create-admin` - Create new admin (Super Admin only)
+- `GET /api/admin/invite-codes` - List invite codes
+- `POST /api/admin/invite-codes` - Create invite code
+
 ## Next Steps / Backlog
 
 ### P1 - High Priority

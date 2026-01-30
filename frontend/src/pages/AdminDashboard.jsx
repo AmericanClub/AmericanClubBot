@@ -40,7 +40,8 @@ export default function AdminDashboard({ user, token, onLogout }) {
   const [inviteCodes, setInviteCodes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  // Use user prop to determine if super admin (set immediately on load)
+  const isSuperAdmin = user?.is_super_admin || false;
   
   // Modal states
   const [showCreateCode, setShowCreateCode] = useState(false);

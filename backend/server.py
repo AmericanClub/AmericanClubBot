@@ -38,7 +38,7 @@ SIGNALWIRE_SPACE_URL = os.environ.get('SIGNALWIRE_SPACE_URL', '')
 SIGNALWIRE_FROM_NUMBER = os.environ.get('SIGNALWIRE_FROM_NUMBER', '')
 
 # Webhook URL for callbacks
-WEBHOOK_BASE_URL = os.environ.get('WEBHOOK_BASE_URL', 'https://voice-navigator-9.preview.emergentagent.com')
+WEBHOOK_BASE_URL = os.environ.get('WEBHOOK_BASE_URL', 'https://callgenius-23.preview.emergentagent.com')
 
 # Create the main app
 app = FastAPI(title="Bot Calling API")

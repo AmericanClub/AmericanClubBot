@@ -525,49 +525,68 @@ export default function AdminDashboard({ user, token, onLogout }) {
                         <span className="text-xs font-mono text-white/50">{u.invite_code_used || "-"}</span>
                       </td>
                       <td className="px-4 py-3 text-right">
-                        {u.role !== "admin" && (
-                          <div className="flex items-center justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => openEditUser(u)}
-                              className="text-white/60 hover:text-white hover:bg-white/10"
-                              title="Edit User"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setSelectedUser(u);
-                                setShowAddCredits(true);
-                              }}
-                              className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10"
-                              title="Add Credits"
-                            >
-                              <Coins className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleToggleUser(u.id)}
-                              className={u.is_active ? "text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10" : "text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10"}
-                              title={u.is_active ? "Disable User" : "Enable User"}
-                            >
-                              {u.is_active ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteUser(u.id)}
-                              className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                              title="Delete User"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        )}
+                        {/* Show actions based on role and super admin status */}
+                        {(() => {
+                          // Current user is the logged-in admin
+                          const isCurrentUser = u.id === user?.id;
+                          const isTargetSuperAdmin = u.is_super_admin;
+                          const isTargetAdmin = u.role === "admin";
+                          
+                          // Don't show any actions for current user's own row
+                          if (isCurrentUser) return null;
+                          
+                          // For admin users: only super admin can see actions, and cannot act on other super admins
+                          if (isTargetAdmin) {
+                            if (!isSuperAdmin || isTargetSuperAdmin) return null;
+                          }
+                          
+                          return (
+                            <div className="flex items-center justify-end gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => openEditUser(u)}
+                                className="text-white/60 hover:text-white hover:bg-white/10"
+                                title="Edit User"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              {/* Credits button only for non-admin users */}
+                              {!isTargetAdmin && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedUser(u);
+                                    setShowAddCredits(true);
+                                  }}
+                                  className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10"
+                                  title="Add Credits"
+                                >
+                                  <Coins className="w-4 h-4" />
+                                </Button>
+                              )}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleToggleUser(u.id)}
+                                className={u.is_active ? "text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10" : "text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10"}
+                                title={u.is_active ? "Disable User" : "Enable User"}
+                              >
+                                {u.is_active ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteUser(u.id)}
+                                className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                                title="Delete User"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          );
+                        })()}
                       </td>
                     </tr>
                   ))}

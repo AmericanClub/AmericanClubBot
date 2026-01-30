@@ -451,30 +451,30 @@
 /* Compact tabs with glow */
 .compact-tabs [role="tablist"] {
     gap: 0.375rem;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(139, 92, 246, 0.08);
     padding: 0.25rem;
     border-radius: 0.625rem;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(139, 92, 246, 0.2);
 }
 
 .compact-tabs [role="tab"] {
     padding: 0.5rem 0.75rem;
     font-size: 0.75rem;
     border-radius: 0.5rem;
-    color: #94a3b8;
+    color: #c4b5fd;
     font-weight: 500;
     transition: all 0.3s ease;
 }
 
 .compact-tabs [role="tab"]:hover {
-    color: #c4b5fd;
-    background: rgba(167, 139, 250, 0.1);
+    color: #e9d5ff;
+    background: rgba(167, 139, 250, 0.15);
 }
 
 .compact-tabs [role="tab"][data-state="active"] {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(168, 85, 247, 0.2));
-    color: #c4b5fd;
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(168, 85, 247, 0.3));
+    color: #f3e8ff;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
 }
 
 /* Scrollbar styles */

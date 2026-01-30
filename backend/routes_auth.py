@@ -428,7 +428,7 @@ async def get_user_transactions(user_id: str, current_admin: dict = Depends(get_
 
 @admin_router.delete("/users/{user_id}")
 async def delete_user(user_id: str, current_admin: dict = Depends(get_current_admin)):
-    """Delete a user (admin cannot delete themselves)"""
+    """Delete a user (admin cannot delete themselves or super admin)"""
     from server import db
     
     # Check if trying to delete self
@@ -440,9 +440,15 @@ async def delete_user(user_id: str, current_admin: dict = Depends(get_current_ad
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
-    # Cannot delete admin users
+    # Check if target is super admin - only super admin can delete other admins
     if user.get("role") == "admin":
-        raise HTTPException(status_code=400, detail="Cannot delete admin users")
+        # If target is super admin, no one can delete
+        if user.get("is_super_admin"):
+            raise HTTPException(status_code=403, detail="Cannot delete Super Admin")
+        
+        # Only super admin can delete other admins
+        if not current_admin.get("is_super_admin"):
+            raise HTTPException(status_code=403, detail="Only Super Admin can delete other admins")
     
     # Delete user
     await db.users.delete_one({"id": user_id})
@@ -451,6 +457,55 @@ async def delete_user(user_id: str, current_admin: dict = Depends(get_current_ad
     await db.credit_transactions.delete_many({"user_id": user_id})
     
     return {"message": f"User {user['email']} deleted successfully"}
+
+
+@admin_router.post("/create-admin")
+async def create_admin(
+    admin_data: AdminCreateRequest,
+    current_admin: dict = Depends(get_current_admin)
+):
+    """Create a new admin user (only super admin can do this)"""
+    from server import db
+    
+    # Only super admin can create new admins
+    if not current_admin.get("is_super_admin"):
+        raise HTTPException(
+            status_code=403, 
+            detail="Only Super Admin can create new admins"
+        )
+    
+    # Check if email already exists
+    existing_user = await db.users.find_one({"email": admin_data.email.lower()})
+    if existing_user:
+        raise HTTPException(
+            status_code=400, 
+            detail="Email already registered"
+        )
+    
+    # Create new admin
+    admin_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    
+    new_admin = {
+        "id": admin_id,
+        "email": admin_data.email.lower(),
+        "name": admin_data.name,
+        "password": get_password_hash(admin_data.password),
+        "role": "admin",
+        "is_super_admin": False,  # New admins are not super admin
+        "credits": 999999,  # Admins have unlimited credits
+        "is_active": True,
+        "created_at": now,
+        "active_session": {}
+    }
+    
+    await db.users.insert_one(new_admin)
+    
+    return {
+        "message": f"Admin {admin_data.name} created successfully",
+        "admin_id": admin_id,
+        "email": admin_data.email.lower()
+    }
 
 
 # ==================

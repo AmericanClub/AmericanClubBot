@@ -53,11 +53,17 @@ const SelectContent = React.forwardRef(({ className, children, position = "poppe
       ref={ref}
       className={cn(
         "relative z-50 max-h-[--radix-select-content-available-height] min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-lg border shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-select-content-transform-origin]",
-        "bg-[#0f0a1e]/95 backdrop-blur-xl border-purple-500/30 text-white",
         position === "popper" &&
           "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
         className
       )}
+      style={{
+        background: 'rgba(15, 10, 30, 0.98)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: '1px solid rgba(139, 92, 246, 0.3)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5), 0 0 30px rgba(139, 92, 246, 0.2)'
+      }}
       position={position}
       {...props}>
       <SelectScrollUpButton />
@@ -84,16 +90,27 @@ const SelectItem = React.forwardRef(({ className, children, ...props }, ref) => 
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex w-full cursor-default select-none items-center rounded-md py-2 pl-3 pr-8 text-sm outline-none transition-colors",
-      "text-white/80 hover:bg-purple-500/20 hover:text-white focus:bg-purple-500/20 focus:text-white",
-      "data-[state=checked]:bg-purple-500/30 data-[state=checked]:text-purple-200",
+      "relative flex w-full cursor-pointer select-none items-center rounded-md py-2 pl-3 pr-8 text-sm outline-none transition-colors",
       "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
+    style={{
+      color: 'rgba(226, 232, 240, 0.9)'
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.background = 'rgba(139, 92, 246, 0.2)';
+      e.currentTarget.style.color = '#f3e8ff';
+    }}
+    onMouseLeave={(e) => {
+      if (!e.currentTarget.dataset.state || e.currentTarget.dataset.state !== 'checked') {
+        e.currentTarget.style.background = 'transparent';
+        e.currentTarget.style.color = 'rgba(226, 232, 240, 0.9)';
+      }
+    }}
     {...props}>
     <span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
       <SelectPrimitive.ItemIndicator>
-        <Check className="h-4 w-4 text-purple-400" />
+        <Check className="h-4 w-4" style={{ color: '#a78bfa' }} />
       </SelectPrimitive.ItemIndicator>
     </span>
     <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>

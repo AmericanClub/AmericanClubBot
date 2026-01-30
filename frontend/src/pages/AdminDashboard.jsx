@@ -446,7 +446,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleToggleUser(u.id)}
-                              className={u.is_active ? "text-yellow-400 hover:text-yellow-300" : "text-emerald-400 hover:text-emerald-300"}
+                              className={u.is_active ? "text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10" : "text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10"}
                               title={u.is_active ? "Disable User" : "Enable User"}
                             >
                               {u.is_active ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
@@ -455,7 +455,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleDeleteUser(u.id)}
-                              className="text-red-400 hover:text-red-300"
+                              className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
                               title="Delete User"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -475,8 +475,11 @@ export default function AdminDashboard({ user, token, onLogout }) {
         {activeTab === "invite-codes" && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-800">Invite Codes</h2>
-              <Button onClick={() => setShowCreateCode(true)} className="bg-cyan-500 hover:bg-cyan-600">
+              <h2 className="text-2xl font-bold text-white neon-text">Invite Codes</h2>
+              <Button 
+                onClick={() => setShowCreateCode(true)} 
+                className="glow-button text-white"
+              >
                 <Plus className="w-4 h-4 mr-2" />
                 Create Code
               </Button>

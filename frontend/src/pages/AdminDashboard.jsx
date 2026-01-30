@@ -606,33 +606,33 @@ export default function AdminDashboard({ user, token, onLogout }) {
         {showAddCredits && selectedUser && (
           <Modal onClose={() => { setShowAddCredits(false); setSelectedUser(null); }} title={`Add Credits to ${selectedUser.name}`}>
             <div className="space-y-4">
-              <div className="bg-gray-100 rounded-lg p-3">
-                <p className="text-xs text-gray-500">Current Balance</p>
-                <p className="text-2xl font-mono text-cyan-400">{selectedUser.credits} credits</p>
+              <div className="glass-card-static p-3" style={{ background: 'rgba(34, 211, 238, 0.1)', border: '1px solid rgba(34, 211, 238, 0.3)' }}>
+                <p className="text-xs text-white/70">Current Balance</p>
+                <p className="text-2xl font-mono text-cyan-400 neon-text">{selectedUser.credits} credits</p>
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-500 uppercase">Amount to Add</label>
+                <label className="text-xs font-medium text-white/70 uppercase">Amount to Add</label>
                 <Input
                   type="number"
                   value={creditAmount}
                   onChange={(e) => setCreditAmount(parseInt(e.target.value) || 0)}
-                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
+                  className="mt-1 glass-input"
                   min={1}
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-500 uppercase">Reason (optional)</label>
+                <label className="text-xs font-medium text-white/70 uppercase">Reason (optional)</label>
                 <Input
                   value={creditReason}
                   onChange={(e) => setCreditReason(e.target.value)}
-                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
+                  className="mt-1 glass-input"
                   placeholder="e.g., Bonus, Promo"
                 />
               </div>
               <Button
                 onClick={handleAddCredits}
                 disabled={isLoading}
-                className="w-full bg-cyan-500 hover:bg-cyan-600"
+                className="w-full glow-button text-white"
               >
                 {isLoading ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : null}
                 Add {creditAmount} Credits

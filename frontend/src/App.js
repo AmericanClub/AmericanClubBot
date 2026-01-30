@@ -1220,12 +1220,12 @@ function UserCallPanel({ user, token, onLogout }) {
                   <SelectTrigger className="glass-input" data-testid="call-type-select">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border-gray-200 shadow-lg">
+                  <SelectContent className="glass-dropdown">
                     {CALL_TYPES.map((type) => (
                       <SelectItem
                         key={type.id} 
                         value={type.id}
-                        className="font-mono text-xs"
+                        className="dropdown-item"
                       >
                         {type.name}
                       </SelectItem>
@@ -1237,15 +1237,15 @@ function UserCallPanel({ user, token, onLogout }) {
               <div>
                 <label className="form-label">Voice Model</label>
                 <Select value={voiceModel} onValueChange={setVoiceModel}>
-                  <SelectTrigger className="glass-input text-gray-700" data-testid="voice-model-select">
+                  <SelectTrigger className="glass-input" data-testid="voice-model-select">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border-gray-200 shadow-lg">
+                  <SelectContent className="glass-dropdown">
                     {VOICE_MODELS.map((model) => (
                       <SelectItem 
                         key={model.id} 
                         value={model.id}
-                        className="font-mono text-xs"
+                        className="dropdown-item"
                       >
                         {model.name}
                       </SelectItem>
@@ -1260,17 +1260,17 @@ function UserCallPanel({ user, token, onLogout }) {
                 </label>
                 {availablePhoneNumbers.filter(n => n.provider_id === selectedProvider).length > 0 ? (
                   <Select key={selectedProvider} value={fromNumber} onValueChange={setFromNumber}>
-                    <SelectTrigger className="glass-input text-gray-700" data-testid="from-number-select">
+                    <SelectTrigger className="glass-input" data-testid="from-number-select">
                       <SelectValue placeholder="Select Caller ID" />
                     </SelectTrigger>
-                    <SelectContent className="bg-white border-gray-200 shadow-lg">
+                    <SelectContent className="glass-dropdown">
                       {availablePhoneNumbers
                         .filter(n => n.provider_id === selectedProvider)
                         .map((phone) => (
                           <SelectItem 
                             key={phone.id || phone.number} 
                             value={phone.number}
-                            className="font-mono text-xs"
+                            className="dropdown-item font-mono"
                           >
                             {phone.number}
                           </SelectItem>
@@ -1282,7 +1282,7 @@ function UserCallPanel({ user, token, onLogout }) {
                     type="text"
                     value={fromNumber}
                     onChange={(e) => setFromNumber(e.target.value)}
-                    className="glass-input text-gray-700"
+                    className="glass-input"
                     placeholder="+18085821342"
                     data-testid="from-number-input"
                   />
@@ -1297,7 +1297,7 @@ function UserCallPanel({ user, token, onLogout }) {
                   type="text"
                   value={recipientName}
                   onChange={(e) => setRecipientName(e.target.value)}
-                  className="glass-input text-gray-700"
+                  className="glass-input"
                   placeholder="John Doe"
                   data-testid="recipient-name-input"
                 />
@@ -1311,7 +1311,7 @@ function UserCallPanel({ user, token, onLogout }) {
                   type="text"
                   value={recipientNumber}
                   onChange={(e) => setRecipientNumber(e.target.value)}
-                  className="glass-input text-gray-700"
+                  className="glass-input"
                   placeholder="+525547000906"
                   data-testid="recipient-number-input"
                 />
@@ -1325,7 +1325,7 @@ function UserCallPanel({ user, token, onLogout }) {
                   type="text"
                   value={serviceName}
                   onChange={(e) => setServiceName(e.target.value)}
-                  className="glass-input text-gray-700"
+                  className="glass-input"
                   placeholder="MyCompany"
                   data-testid="service-name-input"
                 />

@@ -670,7 +670,7 @@ function Modal({ children, onClose, title }) {
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-slate-900 border border-white/10 rounded-xl p-6 w-full max-w-md shadow-xl"
+        className="bg-slate-900 border border-white/10 rounded-xl p-6 w-full max-w-md shadow-xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="text-lg font-bold text-white mb-4">{title}</h3>
@@ -679,3 +679,344 @@ function Modal({ children, onClose, title }) {
     </motion.div>
   );
 }
+
+// Providers Tab Component
+function ProvidersTab({ authHeaders }) {
+  const [providers, setProviders] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [editingProvider, setEditingProvider] = useState(null);
+  
+  // SignalWire form
+  const [swProjectId, setSwProjectId] = useState("");
+  const [swAuthToken, setSwAuthToken] = useState("");
+  const [swSpaceUrl, setSwSpaceUrl] = useState("");
+  const [swPhoneNumber, setSwPhoneNumber] = useState("");
+  
+  // Infobip form
+  const [ibApiKey, setIbApiKey] = useState("");
+  const [ibBaseUrl, setIbBaseUrl] = useState("api.infobip.com");
+  const [ibAppId, setIbAppId] = useState("");
+  const [ibPhoneNumber, setIbPhoneNumber] = useState("");
+
+  const fetchProviders = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/providers`, { headers: authHeaders });
+      setProviders(response.data.providers);
+    } catch (error) {
+      console.error("Error fetching providers:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProviders();
+  }, []);
+
+  const handleSaveSignalWire = async () => {
+    setIsLoading(true);
+    try {
+      const phoneNumbers = swPhoneNumber ? [{ number: swPhoneNumber, label: "Main", is_active: true }] : [];
+      
+      await axios.put(`${API}/admin/providers/signalwire?is_enabled=true`, {
+        project_id: swProjectId,
+        auth_token: swAuthToken,
+        space_url: swSpaceUrl,
+        phone_numbers: phoneNumbers
+      }, { headers: authHeaders });
+      
+      toast.success("SignalWire configuration saved");
+      setEditingProvider(null);
+      fetchProviders();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to save configuration");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSaveInfobip = async () => {
+    setIsLoading(true);
+    try {
+      const phoneNumbers = ibPhoneNumber ? [{ number: ibPhoneNumber, label: "Main", is_active: true }] : [];
+      
+      await axios.put(`${API}/admin/providers/infobip?is_enabled=true`, {
+        api_key: ibApiKey,
+        base_url: ibBaseUrl,
+        app_id: ibAppId || null,
+        phone_numbers: phoneNumbers
+      }, { headers: authHeaders });
+      
+      toast.success("Infobip configuration saved");
+      setEditingProvider(null);
+      fetchProviders();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to save configuration");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleToggleProvider = async (providerId) => {
+    try {
+      const response = await axios.put(`${API}/admin/providers/${providerId}/toggle`, {}, { headers: authHeaders });
+      toast.success(response.data.message);
+      fetchProviders();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to toggle provider");
+    }
+  };
+
+  if (isLoading && providers.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <RefreshCw className="w-8 h-8 animate-spin text-cyan-400" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-white">Provider Settings</h2>
+        <Button onClick={fetchProviders} variant="outline" size="sm">
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Refresh
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        {/* SignalWire Card */}
+        <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-xl p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                <Phone className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div>
+                <h3 className="font-bold text-white">SignalWire</h3>
+                <p className="text-xs text-slate-400">Voice & SMS Provider</p>
+              </div>
+            </div>
+            {providers.find(p => p.id === "signalwire")?.is_configured && (
+              <button
+                onClick={() => handleToggleProvider("signalwire")}
+                className={`px-2 py-1 rounded text-xs font-medium ${
+                  providers.find(p => p.id === "signalwire")?.is_enabled
+                    ? "bg-emerald-500/20 text-emerald-400"
+                    : "bg-slate-500/20 text-slate-400"
+                }`}
+              >
+                {providers.find(p => p.id === "signalwire")?.is_enabled ? "Enabled" : "Disabled"}
+              </button>
+            )}
+          </div>
+
+          {providers.find(p => p.id === "signalwire")?.is_configured ? (
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-slate-400">Status:</span>
+                <span className="text-emerald-400">Configured</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Phone Numbers:</span>
+                <span className="text-white">{providers.find(p => p.id === "signalwire")?.phone_numbers?.length || 0}</span>
+              </div>
+              <Button
+                onClick={() => setEditingProvider("signalwire")}
+                variant="outline"
+                size="sm"
+                className="w-full mt-3"
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                Edit Configuration
+              </Button>
+            </div>
+          ) : (
+            <div>
+              <p className="text-slate-400 text-sm mb-3">Not configured yet</p>
+              <Button
+                onClick={() => setEditingProvider("signalwire")}
+                className="w-full bg-emerald-500 hover:bg-emerald-600"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Configure
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* Infobip Card */}
+        <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-xl p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
+                <Phone className="w-5 h-5 text-orange-400" />
+              </div>
+              <div>
+                <h3 className="font-bold text-white">Infobip</h3>
+                <p className="text-xs text-slate-400">Voice & Messaging</p>
+              </div>
+            </div>
+            {providers.find(p => p.id === "infobip")?.is_configured && (
+              <button
+                onClick={() => handleToggleProvider("infobip")}
+                className={`px-2 py-1 rounded text-xs font-medium ${
+                  providers.find(p => p.id === "infobip")?.is_enabled
+                    ? "bg-emerald-500/20 text-emerald-400"
+                    : "bg-slate-500/20 text-slate-400"
+                }`}
+              >
+                {providers.find(p => p.id === "infobip")?.is_enabled ? "Enabled" : "Disabled"}
+              </button>
+            )}
+          </div>
+
+          {providers.find(p => p.id === "infobip")?.is_configured ? (
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-slate-400">Status:</span>
+                <span className="text-emerald-400">Configured</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Phone Numbers:</span>
+                <span className="text-white">{providers.find(p => p.id === "infobip")?.phone_numbers?.length || 0}</span>
+              </div>
+              <Button
+                onClick={() => setEditingProvider("infobip")}
+                variant="outline"
+                size="sm"
+                className="w-full mt-3"
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                Edit Configuration
+              </Button>
+            </div>
+          ) : (
+            <div>
+              <p className="text-slate-400 text-sm mb-3">Not configured yet</p>
+              <Button
+                onClick={() => setEditingProvider("infobip")}
+                className="w-full bg-orange-500 hover:bg-orange-600"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Configure
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* SignalWire Edit Modal */}
+      <AnimatePresence>
+        {editingProvider === "signalwire" && (
+          <Modal onClose={() => setEditingProvider(null)} title="Configure SignalWire">
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-medium text-slate-400 uppercase">Project ID *</label>
+                <Input
+                  value={swProjectId}
+                  onChange={(e) => setSwProjectId(e.target.value)}
+                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-slate-400 uppercase">Auth Token *</label>
+                <Input
+                  type="password"
+                  value={swAuthToken}
+                  onChange={(e) => setSwAuthToken(e.target.value)}
+                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  placeholder="PTxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-slate-400 uppercase">Space URL *</label>
+                <Input
+                  value={swSpaceUrl}
+                  onChange={(e) => setSwSpaceUrl(e.target.value)}
+                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  placeholder="your-space.signalwire.com"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-slate-400 uppercase">Phone Number</label>
+                <Input
+                  value={swPhoneNumber}
+                  onChange={(e) => setSwPhoneNumber(e.target.value)}
+                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  placeholder="+1234567890"
+                />
+              </div>
+              <Button
+                onClick={handleSaveSignalWire}
+                disabled={isLoading || !swProjectId || !swAuthToken || !swSpaceUrl}
+                className="w-full bg-emerald-500 hover:bg-emerald-600"
+              >
+                {isLoading ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : null}
+                Save Configuration
+              </Button>
+            </div>
+          </Modal>
+        )}
+      </AnimatePresence>
+
+      {/* Infobip Edit Modal */}
+      <AnimatePresence>
+        {editingProvider === "infobip" && (
+          <Modal onClose={() => setEditingProvider(null)} title="Configure Infobip">
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-medium text-slate-400 uppercase">API Key *</label>
+                <Input
+                  type="password"
+                  value={ibApiKey}
+                  onChange={(e) => setIbApiKey(e.target.value)}
+                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  placeholder="Your Infobip API Key"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-slate-400 uppercase">Base URL</label>
+                <Input
+                  value={ibBaseUrl}
+                  onChange={(e) => setIbBaseUrl(e.target.value)}
+                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  placeholder="api.infobip.com"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-slate-400 uppercase">App ID (optional)</label>
+                <Input
+                  value={ibAppId}
+                  onChange={(e) => setIbAppId(e.target.value)}
+                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  placeholder="App ID from Infobip"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-slate-400 uppercase">Phone Number</label>
+                <Input
+                  value={ibPhoneNumber}
+                  onChange={(e) => setIbPhoneNumber(e.target.value)}
+                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  placeholder="+1234567890"
+                />
+              </div>
+              <Button
+                onClick={handleSaveInfobip}
+                disabled={isLoading || !ibApiKey}
+                className="w-full bg-orange-500 hover:bg-orange-600"
+              >
+                {isLoading ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : null}
+                Save Configuration
+              </Button>
+            </div>
+          </Modal>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+

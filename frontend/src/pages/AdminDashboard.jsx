@@ -37,6 +37,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
   const [users, setUsers] = useState([]);
   const [inviteCodes, setInviteCodes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   
   // Modal states
   const [showCreateCode, setShowCreateCode] = useState(false);

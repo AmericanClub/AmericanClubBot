@@ -87,12 +87,12 @@
 
 .logs-header {
     padding: 1rem 1.25rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(139, 92, 246, 0.15);
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-shrink: 0;
-    background: rgba(139, 92, 246, 0.05);
+    background: rgba(139, 92, 246, 0.08);
 }
 
 .logs-container {

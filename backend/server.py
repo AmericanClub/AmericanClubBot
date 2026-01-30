@@ -974,6 +974,20 @@ async def verify_code(call_id: str, request: Request, background_tasks: Backgrou
                 background_tasks.add_task(execute_ivr_step, call_id, "accepted")
             else:
                 # Simulation
+                end_time = datetime.now(timezone.utc).isoformat()
+                start_time = call_log.get("started_at") or call_log.get("created_at")
+                
+                # Calculate duration for simulation (from started_at to now)
+                duration_seconds = 30  # Default simulation duration
+                if start_time:
+                    try:
+                        from datetime import datetime as dt
+                        start_dt = dt.fromisoformat(start_time.replace('Z', '+00:00'))
+                        end_dt = datetime.now(timezone.utc)
+                        duration_seconds = int((end_dt - start_dt).total_seconds())
+                    except:
+                        duration_seconds = 30
+                
                 await db.call_logs.update_one(
                     {"id": call_id},
                     {"$set": {
@@ -981,12 +995,16 @@ async def verify_code(call_id: str, request: Request, background_tasks: Backgrou
                         "current_step": "accepted",
                         "awaiting_verification": False,
                         "status": "FINISHED",
-                        "ended_at": datetime.now(timezone.utc).isoformat()
+                        "ended_at": end_time,
+                        "duration_seconds": duration_seconds
                     }}
                 )
                 await add_call_event(call_id, "VERIFICATION_ACCEPTED", "Code accepted!")
                 await add_call_event(call_id, "ACCEPTED_PLAYING", "Playing: Thank you message...")
-                await add_call_event(call_id, "CALL_FINISHED", "Call completed successfully")
+                await add_call_event(call_id, "CALL_FINISHED", f"Call completed successfully (Duration: {duration_seconds}s)")
+                
+                # Deduct credits for simulation mode
+                await deduct_user_credits(call_id, duration_seconds)
         else:
             # Deny - play rejected message and collect new code
             if provider == "signalwire" and signalwire_call_sid:

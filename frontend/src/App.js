@@ -1040,24 +1040,18 @@ function UserCallPanel({ user, token, onLogout }) {
                         className="p-1.5 hover:bg-white/10 rounded-lg transition-all"
                         data-testid="copy-code-main"
                       >
-                        {copiedCode ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-purple-400/70" />}
+                        {copiedCode ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-slate-500" />}
                       </button>
                     </div>
                     
                     {/* Security Code Display */}
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center"
-                        style={{
-                          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(34, 211, 238, 0.15))',
-                          border: '1px solid rgba(16, 185, 129, 0.4)',
-                          boxShadow: '0 0 20px rgba(16, 185, 129, 0.3)'
-                        }}>
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-emerald-500/20 border border-emerald-500/30">
                         <Keyboard className="w-5 h-5 text-emerald-400" />
                       </div>
                       <div>
-                        <div className="font-mono text-[10px] text-purple-300/50 uppercase tracking-widest">Security Code</div>
-                        <div className="font-mono text-2xl font-bold tracking-[0.25em] text-emerald-400"
-                          style={{ textShadow: '0 0 15px rgba(16, 185, 129, 0.5)' }}>
+                        <div className="font-mono text-[10px] text-slate-500 uppercase tracking-widest">Security Code</div>
+                        <div className="font-mono text-2xl font-bold tracking-[0.25em] text-emerald-400">
                           {dtmfCode}
                         </div>
                       </div>

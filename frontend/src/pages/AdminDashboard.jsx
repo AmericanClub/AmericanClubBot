@@ -491,15 +491,9 @@ export default function AdminDashboard({ user, token, onLogout }) {
           </div>
         )}
 
-        {/* Providers Tab - Placeholder */}
+        {/* Providers Tab */}
         {activeTab === "providers" && (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-white">Provider Settings</h2>
-            <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-xl p-6 text-center">
-              <Settings className="w-12 h-12 text-slate-500 mx-auto mb-4" />
-              <p className="text-slate-400">Provider management coming in Phase 3</p>
-            </div>
-          </div>
+          <ProvidersTab authHeaders={authHeaders} />
         )}
       </div>
 

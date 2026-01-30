@@ -161,6 +161,49 @@ export default function AdminDashboard({ user, token, onLogout }) {
     }
   };
 
+  // Edit user (name, email, password)
+  const openEditUser = (u) => {
+    setSelectedUser(u);
+    setEditName(u.name);
+    setEditEmail(u.email);
+    setEditPassword("");
+    setShowEditUser(true);
+  };
+
+  const handleEditUser = async () => {
+    if (!selectedUser) return;
+    setIsLoading(true);
+    
+    try {
+      const updateData = {};
+      if (editName && editName !== selectedUser.name) updateData.name = editName;
+      if (editEmail && editEmail !== selectedUser.email) updateData.email = editEmail;
+      if (editPassword) updateData.new_password = editPassword;
+      
+      if (Object.keys(updateData).length === 0) {
+        toast.info("No changes to save");
+        setIsLoading(false);
+        return;
+      }
+      
+      const response = await axios.put(`${API}/admin/users/${selectedUser.id}/edit`, updateData, { headers: authHeaders });
+      
+      toast.success(response.data.message);
+      if (response.data.changes) {
+        response.data.changes.forEach(change => console.log("Change:", change));
+      }
+      
+      setShowEditUser(false);
+      setSelectedUser(null);
+      setEditPassword("");
+      fetchUsers();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to update user");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Copy to clipboard
   const [copiedCode, setCopiedCode] = useState(null);
   const copyCode = (code) => {

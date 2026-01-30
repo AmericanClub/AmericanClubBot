@@ -191,16 +191,6 @@ function App() {
     };
     fetchConfig();
   }, []);
-        setInfobipConfigured(response.data.infobip_configured);
-        if (response.data.from_number) {
-          setFromNumber(response.data.from_number);
-        }
-      } catch (e) {
-        console.error("Error fetching config:", e);
-      }
-    };
-    fetchConfig();
-  }, []);
 
   // Update step messages when call type changes
   useEffect(() => {

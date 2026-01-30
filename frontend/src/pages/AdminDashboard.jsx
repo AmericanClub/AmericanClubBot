@@ -22,7 +22,9 @@ import {
   Edit,
   Key,
   Mail,
-  User as UserIcon
+  User as UserIcon,
+  Shield,
+  Lock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

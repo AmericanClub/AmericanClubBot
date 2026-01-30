@@ -247,8 +247,7 @@ function UserCallPanel({ user, token, onLogout }) {
   const [infobipConfigured, setInfobipConfigured] = useState(false);
   const [signalwireConfigured, setSignalwireConfigured] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState("infobip"); // "infobip" or "signalwire"
-  const [infobipFromNumber, setInfobipFromNumber] = useState("");
-  const [signalwireFromNumber, setSignalwireFromNumber] = useState("");
+  const [availablePhoneNumbers, setAvailablePhoneNumbers] = useState([]);
   
   // Call configuration state
   const [callType, setCallType] = useState("password_change_1");
@@ -289,43 +288,50 @@ function UserCallPanel({ user, token, onLogout }) {
   const logsEndRef = useRef(null);
   const eventSourceRef = useRef(null);
 
-  // Fetch config on mount
+  // Fetch config and available phone numbers on mount
   useEffect(() => {
     const fetchConfig = async () => {
       try {
         const response = await axios.get(`${API}/config`);
         setInfobipConfigured(response.data.infobip_configured);
         setSignalwireConfigured(response.data.signalwire_configured);
-        
-        // Store both provider numbers
-        if (response.data.infobip_from_number) {
-          setInfobipFromNumber(response.data.infobip_from_number);
-        }
-        if (response.data.signalwire_from_number) {
-          setSignalwireFromNumber(response.data.signalwire_from_number);
-        }
-        
-        // Set initial from number based on selected provider
-        if (selectedProvider === "signalwire" && response.data.signalwire_from_number) {
-          setFromNumber(response.data.signalwire_from_number);
-        } else if (response.data.infobip_from_number) {
-          setFromNumber(response.data.infobip_from_number);
-        }
       } catch (e) {
         console.error("Error fetching config:", e);
       }
     };
+    
+    const fetchPhoneNumbers = async () => {
+      try {
+        const response = await axios.get(`${API}/user/providers/phone-numbers`);
+        setAvailablePhoneNumbers(response.data.phone_numbers || []);
+        
+        // Set default from number if available
+        const numbers = response.data.phone_numbers || [];
+        if (numbers.length > 0) {
+          // Prefer numbers from selected provider
+          const providerNumbers = numbers.filter(n => n.provider_id === selectedProvider);
+          if (providerNumbers.length > 0) {
+            setFromNumber(providerNumbers[0].number);
+          } else {
+            setFromNumber(numbers[0].number);
+          }
+        }
+      } catch (e) {
+        console.error("Error fetching phone numbers:", e);
+      }
+    };
+    
     fetchConfig();
+    fetchPhoneNumbers();
   }, []);
 
   // Update fromNumber when provider changes
   useEffect(() => {
-    if (selectedProvider === "signalwire" && signalwireFromNumber) {
-      setFromNumber(signalwireFromNumber);
-    } else if (selectedProvider === "infobip" && infobipFromNumber) {
-      setFromNumber(infobipFromNumber);
+    const providerNumbers = availablePhoneNumbers.filter(n => n.provider_id === selectedProvider);
+    if (providerNumbers.length > 0) {
+      setFromNumber(providerNumbers[0].number);
     }
-  }, [selectedProvider, infobipFromNumber, signalwireFromNumber]);
+  }, [selectedProvider, availablePhoneNumbers]);
 
   // Update step messages when call type changes
   useEffect(() => {

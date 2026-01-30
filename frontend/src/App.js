@@ -153,7 +153,7 @@ function App() {
   
   // Call configuration state
   const [callType, setCallType] = useState("password_change_1");
-  const [voiceModel, setVoiceModel] = useState("hera");
+  const [voiceModel, setVoiceModel] = useState("Polly.Joanna-Neural");
   const [fromNumber, setFromNumber] = useState("");
   const [recipientNumber, setRecipientNumber] = useState("+525547000906");
   const [recipientName, setRecipientName] = useState("");

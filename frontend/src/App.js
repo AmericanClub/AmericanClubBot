@@ -1319,4 +1319,4 @@ function UserCallPanel({ user, token, onLogout }) {
   );
 }
 
-export default App;
+export default AppWrapper;

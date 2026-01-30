@@ -319,7 +319,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
                 label="Total Users"
                 value={stats.users.total}
                 subtext={`${stats.users.active} active`}
-                color="violet"
+                color="blue"
               />
               <StatCard
                 icon={Phone}

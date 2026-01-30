@@ -403,20 +403,31 @@ export default function AdminDashboard({ user, token, onLogout }) {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-white">Users</h2>
-              <Button 
-                onClick={async () => {
-                  setIsRefreshing(true);
-                  await fetchUsers();
-                  setTimeout(() => setIsRefreshing(false), 500);
-                }} 
-                variant="outline" 
-                size="sm" 
-                className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white"
-                disabled={isRefreshing}
-              >
-                <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-                {isRefreshing ? 'Refreshing...' : 'Refresh'}
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={async () => {
+                    setIsRefreshing(true);
+                    await fetchUsers();
+                    setTimeout(() => setIsRefreshing(false), 500);
+                  }} 
+                  variant="outline" 
+                  size="sm" 
+                  className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white"
+                  disabled={isRefreshing}
+                >
+                  <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                  {isRefreshing ? 'Refreshing...' : 'Refresh'}
+                </Button>
+                {isSuperAdmin && (
+                  <Button 
+                    onClick={() => setShowCreateAdmin(true)} 
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Shield className="w-4 h-4 mr-2" />
+                    Create Admin
+                  </Button>
+                )}
+              </div>
             </div>
 
             <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(59, 130, 246, 0.15)' }}>

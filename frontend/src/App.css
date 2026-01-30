@@ -572,3 +572,38 @@
 .log-entry {
     animation: slideIn 0.3s ease-out;
 }
+
+/* Glass Dropdown Styles */
+.glass-dropdown {
+    background: rgba(15, 10, 30, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(139, 92, 246, 0.3) !important;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.5),
+        0 0 30px rgba(139, 92, 246, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+    border-radius: 0.75rem !important;
+    overflow: hidden;
+}
+
+.dropdown-item {
+    font-size: 0.75rem !important;
+    color: #e2e8f0 !important;
+    padding: 0.625rem 0.875rem !important;
+    cursor: pointer;
+    transition: all 0.2s ease !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus,
+.dropdown-item[data-highlighted] {
+    background: rgba(139, 92, 246, 0.2) !important;
+    color: #f3e8ff !important;
+}
+
+.dropdown-item[data-state="checked"] {
+    background: rgba(139, 92, 246, 0.3) !important;
+    color: #c4b5fd !important;
+}
+

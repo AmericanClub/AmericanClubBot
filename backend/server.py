@@ -632,10 +632,20 @@ async def create_signalwire_call(call_id: str, config: CallConfig, steps: CallSt
         return None
 
 @api_router.post("/calls/initiate", response_model=Dict)
-async def initiate_call(request: CallRequest, background_tasks: BackgroundTasks):
+async def initiate_call(
+    request: CallRequest, 
+    background_tasks: BackgroundTasks,
+    current_user: dict = None  # Will be injected via dependency
+):
     """Initiate a new single-session IVR call"""
+    from auth import get_current_active_user
+    from fastapi import Request as FastAPIRequest
+    
     try:
         provider = request.config.provider
+        
+        # Get user_id from request header token (optional for now)
+        user_id = request.config.dict().get("user_id") if hasattr(request.config, "user_id") else None
         
         call_log = CallLog(
             config=request.config,
@@ -643,7 +653,11 @@ async def initiate_call(request: CallRequest, background_tasks: BackgroundTasks)
             provider=provider
         )
         
+        # Add user_id to call log
         doc = call_log.model_dump()
+        if user_id:
+            doc["user_id"] = user_id
+        
         await db.call_logs.insert_one(doc)
         
         await add_call_event(call_log.id, "CALL_QUEUED", f"Single-session IVR call queued ({provider.upper()})")

@@ -1289,6 +1289,8 @@ async def signalwire_continue_call(call_id: str, action: str = "accepted"):
         steps = call_log.get("steps", {})
         config = call_log.get("config", {})
         call_sid = call_log.get("signalwire_call_sid")
+        voice = config.get("voice_model", "Polly.Joanna-Neural")
+        voice_attr = get_voice_attribute(voice)
         
         if not call_sid:
             return {"status": "error", "message": "No SignalWire call SID"}
@@ -1301,7 +1303,7 @@ async def signalwire_continue_call(call_id: str, action: str = "accepted"):
             message = format_tts_message(steps.get("accepted", "Thank you. Goodbye."), config)
             laml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Say>{message}</Say>
+    <Say voice="{voice_attr}">{message}</Say>
     <Hangup/>
 </Response>"""
         else:
@@ -1309,7 +1311,7 @@ async def signalwire_continue_call(call_id: str, action: str = "accepted"):
             laml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <Response>
     <Gather numDigits="{config.get('otp_digits', 6)}" action="{WEBHOOK_BASE_URL}/api/signalwire-webhook/voice">
-        <Say>{message}</Say>
+        <Say voice="{voice_attr}">{message}</Say>
     </Gather>
 </Response>"""
         

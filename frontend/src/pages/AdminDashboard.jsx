@@ -227,17 +227,17 @@ export default function AdminDashboard({ user, token, onLogout }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-violet-50">
       {/* Sidebar */}
-      <div className="fixed left-0 top-0 h-full w-64 bg-slate-900/80 backdrop-blur-xl border-r border-white/10 p-4 flex flex-col">
+      <div className="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 p-4 flex flex-col shadow-sm">
         {/* Logo */}
         <div className="flex items-center gap-3 mb-8 px-2">
-          <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center overflow-hidden">
-            <img src="/logo.png" alt="American Club" className="w-8 h-8 object-contain" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center overflow-hidden shadow-md shadow-violet-200">
+            <img src="/logo.png" alt="American Club" className="w-7 h-7 object-contain" />
           </div>
           <div>
-            <h1 className="font-bold text-white text-sm">American Club</h1>
-            <p className="text-[10px] text-cyan-400 font-mono">ADMIN PANEL</p>
+            <h1 className="font-bold text-gray-800 text-sm">American Club</h1>
+            <p className="text-[10px] text-violet-500 font-semibold">ADMIN PANEL</p>
           </div>
         </div>
 
@@ -252,27 +252,27 @@ export default function AdminDashboard({ user, token, onLogout }) {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
                 activeTab === item.id
-                  ? "bg-cyan-500/20 text-cyan-400"
-                  : "text-slate-400 hover:bg-white/5 hover:text-white"
+                  ? "bg-violet-100 text-violet-700 font-medium"
+                  : "text-gray-500 hover:bg-gray-100 hover:text-gray-700"
               }`}
             >
               <item.icon className="w-4 h-4" />
-              <span className="text-sm font-medium">{item.label}</span>
+              <span className="text-sm">{item.label}</span>
             </button>
           ))}
         </nav>
 
         {/* User info */}
-        <div className="border-t border-white/10 pt-4 mt-4">
+        <div className="border-t border-gray-200 pt-4 mt-4">
           <div className="flex items-center gap-3 px-2 mb-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-md shadow-violet-200">
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">{user.name}</p>
-              <p className="text-[10px] text-slate-400 truncate">{user.email}</p>
+              <p className="text-sm font-semibold text-gray-800 truncate">{user.name}</p>
+              <p className="text-[10px] text-gray-500 truncate">{user.email}</p>
             </div>
           </div>
           <Button

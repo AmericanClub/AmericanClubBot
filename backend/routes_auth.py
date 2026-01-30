@@ -304,6 +304,59 @@ async def toggle_user_active(user_id: str, current_admin: dict = Depends(get_cur
     return {"message": f"User {'enabled' if new_status else 'disabled'}", "is_active": new_status}
 
 
+@admin_router.put("/users/{user_id}/edit")
+async def edit_user(
+    user_id: str,
+    edit_data: UserEditRequest,
+    current_admin: dict = Depends(get_current_admin)
+):
+    """Edit user details (name, email, password) - Admin only"""
+    from server import db
+    
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    update_data = {}
+    changes = []
+    
+    # Update name if provided
+    if edit_data.name and edit_data.name != user.get("name"):
+        update_data["name"] = edit_data.name
+        changes.append(f"name changed to '{edit_data.name}'")
+    
+    # Update email if provided
+    if edit_data.email and edit_data.email.lower() != user.get("email"):
+        # Check if email already exists
+        existing = await db.users.find_one({"email": edit_data.email.lower(), "id": {"$ne": user_id}})
+        if existing:
+            raise HTTPException(status_code=400, detail="Email already in use by another user")
+        update_data["email"] = edit_data.email.lower()
+        changes.append(f"email changed to '{edit_data.email.lower()}'")
+    
+    # Update password if provided
+    if edit_data.new_password:
+        update_data["password"] = get_password_hash(edit_data.new_password)
+        changes.append("password changed")
+        # Invalidate user session when password changes
+        update_data["active_session"] = {}
+    
+    if not update_data:
+        return {"message": "No changes made", "changes": []}
+    
+    # Perform update
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": update_data}
+    )
+    
+    return {
+        "message": "User updated successfully",
+        "changes": changes,
+        "session_invalidated": "password" in str(changes)
+    }
+
+
 @admin_router.post("/users/{user_id}/credits")
 async def adjust_user_credits(
     user_id: str,

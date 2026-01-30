@@ -696,25 +696,40 @@ export default function AdminDashboard({ user, token, onLogout }) {
 // Stat Card Component
 function StatCard({ icon: Icon, label, value, subtext, color }) {
   const colors = {
-    violet: "bg-violet-50 border-violet-200 text-violet-600",
-    teal: "bg-teal-50 border-teal-200 text-teal-600",
-    amber: "bg-amber-50 border-amber-200 text-amber-600",
-    emerald: "bg-emerald-50 border-emerald-200 text-emerald-600",
-    cyan: "bg-cyan-50 border-cyan-200 text-cyan-600",
-    purple: "bg-purple-50 border-purple-200 text-purple-600",
-    yellow: "bg-yellow-50 border-yellow-200 text-yellow-600",
+    violet: { bg: 'rgba(139, 92, 246, 0.1)', border: 'rgba(139, 92, 246, 0.3)', text: '#a78bfa', glow: 'rgba(139, 92, 246, 0.2)' },
+    teal: { bg: 'rgba(20, 184, 166, 0.1)', border: 'rgba(20, 184, 166, 0.3)', text: '#5eead4', glow: 'rgba(20, 184, 166, 0.2)' },
+    amber: { bg: 'rgba(245, 158, 11, 0.1)', border: 'rgba(245, 158, 11, 0.3)', text: '#fbbf24', glow: 'rgba(245, 158, 11, 0.2)' },
+    emerald: { bg: 'rgba(16, 185, 129, 0.1)', border: 'rgba(16, 185, 129, 0.3)', text: '#6ee7b7', glow: 'rgba(16, 185, 129, 0.2)' },
+    cyan: { bg: 'rgba(34, 211, 238, 0.1)', border: 'rgba(34, 211, 238, 0.3)', text: '#67e8f9', glow: 'rgba(34, 211, 238, 0.2)' },
+    purple: { bg: 'rgba(168, 85, 247, 0.1)', border: 'rgba(168, 85, 247, 0.3)', text: '#c084fc', glow: 'rgba(168, 85, 247, 0.2)' },
+    yellow: { bg: 'rgba(234, 179, 8, 0.1)', border: 'rgba(234, 179, 8, 0.3)', text: '#facc15', glow: 'rgba(234, 179, 8, 0.2)' },
   };
 
+  const colorScheme = colors[color];
+
   return (
-    <div className={`${colors[color]} border rounded-xl p-5 transition-all hover:shadow-md`}>
-      <div className="flex items-center gap-3">
-        <div className={`w-10 h-10 rounded-lg ${colors[color]} flex items-center justify-center`}>
-          <Icon className="w-5 h-5" />
+    <div 
+      className="glass-card p-5 transition-all duration-300 hover:scale-105"
+      style={{
+        background: `linear-gradient(135deg, ${colorScheme.bg}, rgba(255, 255, 255, 0.02))`,
+        border: `1px solid ${colorScheme.border}`,
+        boxShadow: `0 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px ${colorScheme.glow}`
+      }}
+    >
+      <div className="flex items-center gap-3 mb-4">
+        <div 
+          className="w-10 h-10 rounded-lg flex items-center justify-center"
+          style={{
+            background: `linear-gradient(135deg, ${colorScheme.text}, ${colorScheme.border})`,
+            boxShadow: `0 0 15px ${colorScheme.glow}`
+          }}
+        >
+          <Icon className="w-5 h-5 text-white" />
         </div>
-        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{label}</span>
+        <span className="text-xs font-semibold text-white/70 uppercase tracking-wide">{label}</span>
       </div>
-      <p className="text-3xl font-bold text-gray-800 mt-3">{value}</p>
-      {subtext && <p className="text-sm text-gray-500 mt-1">{subtext}</p>}
+      <p className="text-3xl font-bold text-white neon-text" style={{ color: colorScheme.text }}>{value}</p>
+      {subtext && <p className="text-sm text-white/50 mt-1">{subtext}</p>}
     </div>
   );
 }

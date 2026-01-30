@@ -135,8 +135,10 @@ const CALL_TYPES = [
 const DEFAULT_STEPS = CALL_TYPES[0].steps;
 
 function App() {
-  // Infobip config state
+  // Provider config state
   const [infobipConfigured, setInfobipConfigured] = useState(false);
+  const [signalwireConfigured, setSignalwireConfigured] = useState(false);
+  const [selectedProvider, setSelectedProvider] = useState("infobip"); // "infobip" or "signalwire"
   
   // Call configuration state
   const [callType, setCallType] = useState("password_change_1");
@@ -173,11 +175,22 @@ function App() {
   const logsEndRef = useRef(null);
   const eventSourceRef = useRef(null);
 
-  // Fetch Infobip config on mount
+  // Fetch config on mount
   useEffect(() => {
     const fetchConfig = async () => {
       try {
         const response = await axios.get(`${API}/config`);
+        setInfobipConfigured(response.data.infobip_configured);
+        setSignalwireConfigured(response.data.signalwire_configured);
+        if (response.data.infobip_from_number) {
+          setFromNumber(response.data.infobip_from_number);
+        }
+      } catch (e) {
+        console.error("Error fetching config:", e);
+      }
+    };
+    fetchConfig();
+  }, []);
         setInfobipConfigured(response.data.infobip_configured);
         if (response.data.from_number) {
           setFromNumber(response.data.from_number);

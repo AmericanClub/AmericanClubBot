@@ -784,39 +784,39 @@ function UserCallPanel({ user, token, onLogout }) {
 
   // Get status icon for history
   const getStatusIcon = (status) => {
-    if (status === "FINISHED") return <CheckCircle className="w-4 h-4 text-emerald-400" />;
-    if (status === "FAILED") return <XCircle className="w-4 h-4 text-red-400" />;
-    return <Clock className="w-4 h-4 text-yellow-400" />;
+    if (status === "FINISHED") return <CheckCircle className="w-4 h-4 text-emerald-600" />;
+    if (status === "FAILED") return <XCircle className="w-4 h-4 text-red-600" />;
+    return <Clock className="w-4 h-4 text-amber-600" />;
   };
 
   // Get event icon and color
   const getEventStyle = (eventType) => {
-    if (eventType.includes("CAPTURED_CODE")) return { icon: "🔐", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/30" };
-    if (eventType.includes("DTMF_CODE")) return { icon: "🔐", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/30" };
-    if (eventType.includes("INPUT_STREAM")) return { icon: "🔢", color: "text-cyan-400", bg: "bg-cyan-500/10 border-cyan-500/30" };
-    if (eventType.includes("DTMF")) return { icon: "🔢", color: "text-cyan-400", bg: "bg-cyan-500/10 border-cyan-500/30" };
+    if (eventType.includes("CAPTURED_CODE")) return { icon: "🔐", color: "text-emerald-600", bg: "bg-emerald-500/10 border-emerald-500/30" };
+    if (eventType.includes("DTMF_CODE")) return { icon: "🔐", color: "text-emerald-600", bg: "bg-emerald-500/10 border-emerald-500/30" };
+    if (eventType.includes("INPUT_STREAM")) return { icon: "🔢", color: "text-teal-600", bg: "bg-cyan-500/10 border-cyan-500/30" };
+    if (eventType.includes("DTMF")) return { icon: "🔢", color: "text-teal-600", bg: "bg-cyan-500/10 border-cyan-500/30" };
     if (eventType.includes("STEP1")) return { icon: "1️⃣", color: "text-blue-400", bg: "" };
-    if (eventType.includes("STEP2")) return { icon: "2️⃣", color: "text-purple-400", bg: "" };
-    if (eventType.includes("STEP3") || eventType.includes("AWAITING")) return { icon: "⏳", color: "text-yellow-400", bg: "" };
-    if (eventType.includes("ACCEPTED")) return { icon: "✅", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/30" };
-    if (eventType.includes("REJECTED")) return { icon: "🔄", color: "text-orange-400", bg: "bg-orange-500/10 border-orange-500/30" };
-    if (eventType.includes("INITIATED")) return { icon: "📤", color: "text-cyan-400", bg: "" };
-    if (eventType.includes("CREATED")) return { icon: "📞", color: "text-cyan-400", bg: "" };
-    if (eventType.includes("RINGING")) return { icon: "🔔", color: "text-yellow-400", bg: "" };
-    if (eventType.includes("ESTABLISHED") || eventType.includes("ANSWERED")) return { icon: "📱", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/30" };
+    if (eventType.includes("STEP2")) return { icon: "2️⃣", color: "text-purple-600", bg: "" };
+    if (eventType.includes("STEP3") || eventType.includes("AWAITING")) return { icon: "⏳", color: "text-amber-600", bg: "" };
+    if (eventType.includes("ACCEPTED")) return { icon: "✅", color: "text-emerald-600", bg: "bg-emerald-500/10 border-emerald-500/30" };
+    if (eventType.includes("REJECTED")) return { icon: "🔄", color: "text-orange-600", bg: "bg-orange-500/10 border-orange-500/30" };
+    if (eventType.includes("INITIATED")) return { icon: "📤", color: "text-teal-600", bg: "" };
+    if (eventType.includes("CREATED")) return { icon: "📞", color: "text-teal-600", bg: "" };
+    if (eventType.includes("RINGING")) return { icon: "🔔", color: "text-amber-600", bg: "" };
+    if (eventType.includes("ESTABLISHED") || eventType.includes("ANSWERED")) return { icon: "📱", color: "text-emerald-600", bg: "bg-emerald-500/10 border-emerald-500/30" };
     // AMD Detection styles
-    if (eventType.includes("AMD_HUMAN")) return { icon: "👤", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/30" };
-    if (eventType.includes("AMD_VOICEMAIL") || eventType.includes("VOICEMAIL")) return { icon: "📧", color: "text-orange-400", bg: "bg-orange-500/10 border-orange-500/30" };
-    if (eventType.includes("AMD_FAX")) return { icon: "📠", color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/30" };
-    if (eventType.includes("AMD_UNKNOWN")) return { icon: "❓", color: "text-slate-400", bg: "" };
+    if (eventType.includes("AMD_HUMAN")) return { icon: "👤", color: "text-emerald-600", bg: "bg-emerald-500/10 border-emerald-500/30" };
+    if (eventType.includes("AMD_VOICEMAIL") || eventType.includes("VOICEMAIL")) return { icon: "📧", color: "text-orange-600", bg: "bg-orange-500/10 border-orange-500/30" };
+    if (eventType.includes("AMD_FAX")) return { icon: "📠", color: "text-amber-600", bg: "bg-yellow-500/10 border-yellow-500/30" };
+    if (eventType.includes("AMD_UNKNOWN")) return { icon: "❓", color: "text-gray-500", bg: "" };
     // Call status styles
-    if (eventType.includes("BUSY")) return { icon: "📵", color: "text-red-400", bg: "bg-red-500/10 border-red-500/30" };
-    if (eventType.includes("NO_ANSWER")) return { icon: "📵", color: "text-orange-400", bg: "bg-orange-500/10 border-orange-500/30" };
-    if (eventType.includes("CANCELED")) return { icon: "🚫", color: "text-slate-400", bg: "bg-slate-500/10 border-slate-500/30" };
-    if (eventType.includes("RECORDING")) return { icon: "🎙️", color: "text-purple-400", bg: "bg-purple-500/10 border-purple-500/30" };
-    if (eventType.includes("FINISHED")) return { icon: "🏁", color: "text-slate-400", bg: "" };
-    if (eventType.includes("FAILED") || eventType.includes("ERROR")) return { icon: "⚠️", color: "text-red-400", bg: "bg-red-500/10 border-red-500/30" };
-    if (eventType.includes("RETRY") || eventType.includes("NO_RESPONSE")) return { icon: "🔁", color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/30" };
+    if (eventType.includes("BUSY")) return { icon: "📵", color: "text-red-600", bg: "bg-red-500/10 border-red-500/30" };
+    if (eventType.includes("NO_ANSWER")) return { icon: "📵", color: "text-orange-600", bg: "bg-orange-500/10 border-orange-500/30" };
+    if (eventType.includes("CANCELED")) return { icon: "🚫", color: "text-gray-500", bg: "bg-slate-500/10 border-slate-500/30" };
+    if (eventType.includes("RECORDING")) return { icon: "🎙️", color: "text-purple-600", bg: "bg-purple-500/10 border-purple-500/30" };
+    if (eventType.includes("FINISHED")) return { icon: "🏁", color: "text-gray-500", bg: "" };
+    if (eventType.includes("FAILED") || eventType.includes("ERROR")) return { icon: "⚠️", color: "text-red-600", bg: "bg-red-500/10 border-red-500/30" };
+    if (eventType.includes("RETRY") || eventType.includes("NO_RESPONSE")) return { icon: "🔁", color: "text-amber-600", bg: "bg-yellow-500/10 border-yellow-500/30" };
     if (eventType.includes("HANGUP")) return { icon: "📵", color: "text-gray-500", bg: "" };
     if (eventType.includes("SIMULATION") || eventType.includes("CALL_INFO")) return { icon: "🎭", color: "text-blue-600", bg: "bg-blue-50 border-blue-200" };
     if (eventType.includes("QUEUED")) return { icon: "📋", color: "text-gray-500", bg: "" };
@@ -934,7 +934,7 @@ function UserCallPanel({ user, token, onLogout }) {
                               {call.config?.recipient_number || "Unknown"}
                             </span>
                             {call.dtmf_code && (
-                              <Badge variant="outline" className="text-[10px] px-1 py-0 bg-cyan-500/10 text-cyan-400 border-cyan-500/30">
+                              <Badge variant="outline" className="text-[10px] px-1 py-0 bg-cyan-500/10 text-teal-600 border-cyan-500/30">
                                 {call.dtmf_code}
                               </Badge>
                             )}
@@ -988,11 +988,11 @@ function UserCallPanel({ user, token, onLogout }) {
                           {/* DTMF Code Display */}
                           {log.dtmf_code && (
                             <div className="mt-1 flex items-center gap-1.5">
-                              <Keyboard className="w-3 h-3 text-emerald-400" />
-                              <span className="font-mono text-[10px] text-slate-400">Input:</span>
+                              <Keyboard className="w-3 h-3 text-emerald-600" />
+                              <span className="font-mono text-[10px] text-gray-500">Input:</span>
                               <Badge 
                                 variant="outline" 
-                                className="font-mono text-sm px-2 py-0.5 text-emerald-400 bg-emerald-500/10 border-emerald-500/30 cursor-pointer hover:bg-emerald-500/20 tracking-wider"
+                                className="font-mono text-sm px-2 py-0.5 text-emerald-600 bg-emerald-500/10 border-emerald-500/30 cursor-pointer hover:bg-emerald-500/20 tracking-wider"
                                 onClick={() => copyToClipboard(log.dtmf_code)}
                                 data-testid={`dtmf-badge-${index}`}
                               >
@@ -1000,7 +1000,7 @@ function UserCallPanel({ user, token, onLogout }) {
                                 <Copy className="w-2.5 h-2.5 ml-1" />
                               </Badge>
                               {log.dtmf_code.length >= parseInt(otpDigits) && (
-                                <span className="text-[10px] text-emerald-400 font-mono">({log.dtmf_code.length} digits)</span>
+                                <span className="text-[10px] text-emerald-600 font-mono">({log.dtmf_code.length} digits)</span>
                               )}
                             </div>
                           )}
@@ -1023,18 +1023,18 @@ function UserCallPanel({ user, token, onLogout }) {
                 <div className="decision-box-inner">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                      <Keyboard className="w-4 h-4 text-emerald-400" />
+                      <Keyboard className="w-4 h-4 text-emerald-600" />
                     </div>
                     <div>
-                      <div className="font-mono text-[10px] text-slate-400 uppercase tracking-wider">Security Code</div>
-                      <div className="font-mono text-lg text-emerald-400 tracking-widest flex items-center gap-1.5">
+                      <div className="font-mono text-[10px] text-gray-500 uppercase tracking-wider">Security Code</div>
+                      <div className="font-mono text-lg text-emerald-600 tracking-widest flex items-center gap-1.5">
                         {dtmfCode}
                         <button 
                           onClick={() => copyToClipboard(dtmfCode)}
                           className="p-0.5 hover:bg-white/10 rounded transition-colors"
                           data-testid="copy-code-main"
                         >
-                          {copiedCode ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3 text-slate-400" />}
+                          {copiedCode ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3 text-gray-500" />}
                         </button>
                       </div>
                     </div>
@@ -1082,10 +1082,10 @@ function UserCallPanel({ user, token, onLogout }) {
               >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
-                    <Play className="w-5 h-5 text-purple-400" />
+                    <Play className="w-5 h-5 text-purple-600" />
                   </div>
                   <div>
-                    <div className="font-mono text-xs text-purple-400 uppercase tracking-wider">Call Recording</div>
+                    <div className="font-mono text-xs text-purple-600 uppercase tracking-wider">Call Recording</div>
                     <div className="font-mono text-sm text-slate-300">
                       Duration: {recordingDuration ? `${recordingDuration}s` : "Available"}
                     </div>
@@ -1306,7 +1306,7 @@ function UserCallPanel({ user, token, onLogout }) {
               <div className="flex items-end">
                 <Button 
                   variant="outline"
-                  className={`w-full glass-input border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 font-mono text-[10px] uppercase tracking-wider ${isPreviewing ? 'bg-cyan-500/20 border-cyan-400' : ''}`}
+                  className={`w-full glass-input border-cyan-500/30 text-teal-600 hover:bg-cyan-500/10 font-mono text-[10px] uppercase tracking-wider ${isPreviewing ? 'bg-cyan-500/20 border-cyan-400' : ''}`}
                   data-testid="preview-voice-btn"
                   onClick={isPreviewing ? stopPreview : previewVoice}
                 >
@@ -1340,7 +1340,7 @@ function UserCallPanel({ user, token, onLogout }) {
                     key={step}
                     value={step}
                     className={`flex-1 font-mono text-[10px] uppercase tracking-wider border border-transparent h-6
-                      data-[state=active]:bg-cyan-500/10 data-[state=active]:text-cyan-400 data-[state=active]:border-cyan-500/30
+                      data-[state=active]:bg-cyan-500/10 data-[state=active]:text-teal-600 data-[state=active]:border-cyan-500/30
                       ${currentStep === step ? 'ring-1 ring-emerald-500/50' : ''}`}
                     data-testid={`step-tab-${step}`}
                   >

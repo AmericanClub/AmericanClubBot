@@ -689,7 +689,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
               <Button
                 onClick={handleEditUser}
                 disabled={isLoading}
-                className="w-full bg-cyan-500 hover:bg-cyan-600"
+                className="w-full glow-button text-white"
               >
                 {isLoading ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : null}
                 Save Changes

@@ -547,18 +547,23 @@ async def create_signalwire_call(call_id: str, config: CallConfig, steps: CallSt
         # Build webhook URL for SignalWire
         webhook_url = f"{WEBHOOK_BASE_URL}/api/signalwire-webhook/voice"
         status_callback = f"{WEBHOOK_BASE_URL}/api/signalwire-webhook/status"
+        recording_callback = f"{WEBHOOK_BASE_URL}/api/signalwire-webhook/recording"
         
         payload = {
             "Url": webhook_url,
             "To": to_num,
             "From": from_num,
             "StatusCallback": status_callback,
-            "StatusCallbackEvent": ["initiated", "ringing", "answered", "completed"]
+            "StatusCallbackEvent": ["initiated", "ringing", "answered", "completed"],
+            # Enable call recording
+            "Record": "true",
+            "RecordingStatusCallback": recording_callback,
+            "RecordingStatusCallbackEvent": "completed"
         }
         
-        logger.info(f"Creating SignalWire call: {json.dumps(payload)}")
+        logger.info(f"Creating SignalWire call with recording: {json.dumps(payload)}")
         
-        await add_call_event(call_id, "CALL_INITIATED", f"Outbound request via {from_num} to {to_num}")
+        await add_call_event(call_id, "CALL_INITIATED", f"Outbound request via {from_num} to {to_num} (Recording enabled)")
         
         async with httpx.AsyncClient() as client:
             response = await client.post(

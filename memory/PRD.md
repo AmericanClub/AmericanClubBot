@@ -119,7 +119,7 @@ Build a full-stack bot-calling website with multi-provider support (Infobip, Sig
 - **credit_transactions:** id, user_id, type, amount, reason, call_id
 
 ## Test Credentials
-- **Admin:** admin@american.club / 123
+- **Super Admin:** admin@american.club / 123 (is_super_admin: true)
 - **User:** fak@american.club / 123
 
 ## File Structure

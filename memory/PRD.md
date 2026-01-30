@@ -52,11 +52,12 @@ Build a full-stack bot-calling website with multi-provider support (Infobip, Sig
 - DTMF digit collection and verification
 
 ### UI/UX
-- Dark mode Glassmorphism design
+- Dark Glassmorphism Premium theme (fully implemented - Jan 30, 2026)
 - American Club Bot branding with custom logo
 - Real-time Bot Logs with detailed events
 - Decision Box (Accept/Deny) for verification
 - Provider switching (CH:1 Infobip / CH:2 SignalWire)
+- All dropdown menus with dark purple glassmorphism styling ✅ FIXED
 
 ## Call Types Available
 1. Password Change 1 (Default)
@@ -118,7 +119,7 @@ Build a full-stack bot-calling website with multi-provider support (Infobip, Sig
 
 ## Test Credentials
 - **Admin:** admin@american.club / 123
-- **User:** testuser@test.com / test123
+- **User:** fak@american.club / 123
 
 ## File Structure
 ```
@@ -142,8 +143,22 @@ Build a full-stack bot-calling website with multi-provider support (Infobip, Sig
 ├── memory/
 │   └── PRD.md
 └── test_reports/
-    └── iteration_5.json
+    ├── iteration_5.json
+    └── iteration_6.json  # Dark theme dropdown fix verification
 ```
+
+## Completed in This Session (Jan 30, 2026)
+
+### Dark Glassmorphism Theme Fix ✅
+- Fixed white background on all dropdown menus (Call Type, Voice Model, Caller ID, OTP Digits)
+- Implemented CSS injection via useEffect in AppWrapper component for Radix UI Portal elements
+- All SelectContent dropdowns now use:
+  - Background: rgba(15, 10, 30, 0.98)
+  - Border: rgba(139, 92, 246, 0.3)  
+  - Blur effect: backdrop-filter: blur(20px)
+  - Hover highlight: rgba(139, 92, 246, 0.25)
+- Updated select.jsx component with inline styles as backup
+- Added global CSS rules in index.css for [data-radix-select-content] elements
 
 ## Next Steps / Backlog
 

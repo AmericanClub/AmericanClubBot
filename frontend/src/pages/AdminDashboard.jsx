@@ -364,37 +364,43 @@ export default function AdminDashboard({ user, token, onLogout }) {
         {activeTab === "users" && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-800">Users</h2>
-              <Button onClick={() => fetchUsers()} variant="outline" size="sm" className="border-gray-300 text-gray-600 hover:bg-gray-100">
+              <h2 className="text-2xl font-bold text-white neon-text">Users</h2>
+              <Button 
+                onClick={() => fetchUsers()} 
+                variant="outline" 
+                size="sm" 
+                className="glass-card border-white/20 text-white/80 hover:bg-white/10 hover:text-white"
+                style={{ backdropFilter: 'blur(10px)' }}
+              >
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Refresh
               </Button>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+            <div className="glass-table">
               <table className="w-full">
-                <thead className="bg-gray-100/50">
+                <thead className="glass-table-header">
                   <tr>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">User</th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Role</th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Credits</th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Status</th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Invite Code</th>
-                    <th className="text-right text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Actions</th>
+                    <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">User</th>
+                    <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Role</th>
+                    <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Credits</th>
+                    <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Status</th>
+                    <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Invite Code</th>
+                    <th className="text-right text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {users.map((u) => (
-                    <tr key={u.id} className="hover:bg-gray-50">
+                    <tr key={u.id} className="glass-table-row">
                       <td className="px-4 py-3">
                         <div>
-                          <p className="text-sm font-medium text-gray-800">{u.name}</p>
-                          <p className="text-xs text-gray-500">{u.email}</p>
+                          <p className="text-sm font-medium text-white">{u.name}</p>
+                          <p className="text-xs text-white/50">{u.email}</p>
                         </div>
                       </td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex px-2 py-0.5 text-[10px] font-medium rounded-full ${
-                          u.role === "admin" ? "bg-purple-500/20 text-purple-400" : "bg-slate-500/20 text-gray-500"
+                          u.role === "admin" ? "bg-purple-500/20 text-purple-400 badge-glow" : "bg-slate-500/20 text-white/60"
                         }`}>
                           {u.role.toUpperCase()}
                         </span>

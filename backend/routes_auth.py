@@ -653,15 +653,21 @@ async def get_all_invite_codes(
 
 @admin_router.delete("/invite-codes/{code_id}")
 async def delete_invite_code(code_id: str, current_admin: dict = Depends(get_current_admin)):
-    """Delete unused invite code"""
+    """Delete invite code - allowed if unused OR if the user who used it no longer exists"""
     from server import db
     
     code = await db.invite_codes.find_one({"id": code_id}, {"_id": 0})
     if not code:
         raise HTTPException(status_code=404, detail="Invite code not found")
     
-    if code["is_used"]:
-        raise HTTPException(status_code=400, detail="Cannot delete used invite code")
+    # If code is used, check if the user still exists
+    if code["is_used"] and code.get("used_by"):
+        user_exists = await db.users.find_one({"id": code["used_by"]})
+        if user_exists:
+            raise HTTPException(
+                status_code=400, 
+                detail="Cannot delete: invite code was used by an existing user"
+            )
     
     await db.invite_codes.delete_one({"id": code_id})
     

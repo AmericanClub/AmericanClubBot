@@ -1020,67 +1020,150 @@ function UserCallPanel({ user, token, onLogout }) {
             )}
           </AnimatePresence>
           
-          {/* Logs Container */}
-          <div className="logs-container" data-testid="logs-container">
+          {/* Logs Container - with Decision Box sticky at top */}
+          <div className="logs-container-wrapper" data-testid="logs-container-wrapper">
+            {/* Decision Box - Sticky at top, only shows when there's a code */}
             <AnimatePresence>
-              {logs.length === 0 ? (
-                <div className="text-center text-slate-600 font-mono text-xs py-4">
-                  No logs yet. Start a call to see events.
-                </div>
-              ) : (
-                logs.map((log, index) => {
-                  const style = getEventStyle(log.event_type);
-                  return (
-                    <motion.div
-                      key={`${log.timestamp}-${index}`}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0 }}
-                      className={`log-entry ${style.bg ? `${style.bg} border rounded` : ''}`}
-                      data-testid={`log-entry-${index}`}
-                    >
-                      <div className="flex items-start gap-2">
-                        <span className="text-sm">{style.icon}</span>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="log-timestamp">
-                              [{formatTimestamp(log.timestamp)}]
-                            </span>
-                            <span className={`font-mono text-[10px] font-semibold ${style.color}`}>
-                              {log.event_type}
-                            </span>
-                          </div>
-                          <div className="log-details">
-                            {log.details}
-                          </div>
-                          
-                          {/* DTMF Code Display */}
-                          {log.dtmf_code && (
-                            <div className="mt-1 flex items-center gap-1.5">
-                              <Keyboard className="w-3 h-3 text-emerald-600" />
-                              <span className="font-mono text-[10px] text-gray-500">Input:</span>
-                              <Badge 
-                                variant="outline" 
-                                className="font-mono text-sm px-2 py-0.5 text-emerald-600 bg-emerald-50 border-emerald-200 cursor-pointer hover:bg-emerald-500/20 tracking-wider"
-                                onClick={() => copyToClipboard(log.dtmf_code)}
-                                data-testid={`dtmf-badge-${index}`}
-                              >
-                                {log.dtmf_code}
-                                <Copy className="w-2.5 h-2.5 ml-1" />
-                              </Badge>
-                              {log.dtmf_code.length >= parseInt(otpDigits) && (
-                                <span className="text-[10px] text-emerald-600 font-mono">({log.dtmf_code.length} digits)</span>
-                              )}
-                            </div>
-                          )}
+              {showVerifyButtons && dtmfCode && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="decision-box-inline"
+                  data-testid="decision-box"
+                >
+                  <div className="decision-box-content">
+                    {/* Status indicator */}
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                        <span className="text-amber-400 text-[11px] font-semibold tracking-wide">AWAITING VERIFICATION</span>
+                      </div>
+                      <button 
+                        onClick={() => copyToClipboard(dtmfCode)}
+                        className="p-1.5 hover:bg-white/10 rounded-lg transition-all"
+                        data-testid="copy-code-main"
+                      >
+                        {copiedCode ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-purple-400/70" />}
+                      </button>
+                    </div>
+                    
+                    {/* Security Code Display */}
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(34, 211, 238, 0.15))',
+                          border: '1px solid rgba(16, 185, 129, 0.4)',
+                          boxShadow: '0 0 20px rgba(16, 185, 129, 0.3)'
+                        }}>
+                        <Keyboard className="w-5 h-5 text-emerald-400" />
+                      </div>
+                      <div>
+                        <div className="font-mono text-[10px] text-purple-300/50 uppercase tracking-widest">Security Code</div>
+                        <div className="font-mono text-2xl font-bold tracking-[0.25em] text-emerald-400"
+                          style={{ textShadow: '0 0 15px rgba(16, 185, 129, 0.5)' }}>
+                          {dtmfCode}
                         </div>
                       </div>
-                    </motion.div>
-                  );
-                })
+                    </div>
+                    
+                    {/* Action Buttons */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleVerify(true)}
+                        disabled={isVerifying}
+                        className="decision-btn-inline decision-btn-accept-inline flex-1"
+                        data-testid="accept-btn"
+                      >
+                        {isVerifying ? (
+                          <RefreshCw className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <ThumbsUp className="w-4 h-4" />
+                        )}
+                        <span className="font-semibold text-sm">ACCEPT</span>
+                      </button>
+                      <button
+                        onClick={() => handleVerify(false)}
+                        disabled={isVerifying}
+                        className="decision-btn-inline decision-btn-deny-inline flex-1"
+                        data-testid="deny-btn"
+                      >
+                        {isVerifying ? (
+                          <RefreshCw className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <ThumbsDown className="w-4 h-4" />
+                        )}
+                        <span className="font-semibold text-sm">DENY</span>
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
               )}
             </AnimatePresence>
-            <div ref={logsEndRef} />
+            
+            {/* Logs - Newest at TOP */}
+            <div className="logs-container" data-testid="logs-container">
+              <AnimatePresence>
+                {logs.length === 0 ? (
+                  <div className="text-center text-slate-600 font-mono text-xs py-4">
+                    No logs yet. Start a call to see events.
+                  </div>
+                ) : (
+                  [...logs].reverse().map((log, index) => {
+                    const style = getEventStyle(log.event_type);
+                    return (
+                      <motion.div
+                        key={`${log.timestamp}-${logs.length - 1 - index}`}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.15 }}
+                        className={`log-entry ${style.bg ? `${style.bg} border rounded` : ''}`}
+                        data-testid={`log-entry-${logs.length - 1 - index}`}
+                      >
+                        <div className="flex items-start gap-2">
+                          <span className="text-sm">{style.icon}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="log-timestamp">
+                                [{formatTimestamp(log.timestamp)}]
+                              </span>
+                              <span className={`font-mono text-[10px] font-semibold ${style.color}`}>
+                                {log.event_type}
+                              </span>
+                            </div>
+                            <div className="log-details">
+                              {log.details}
+                            </div>
+                            
+                            {/* DTMF Code Display */}
+                            {log.dtmf_code && (
+                              <div className="mt-1 flex items-center gap-1.5">
+                                <Keyboard className="w-3 h-3 text-emerald-600" />
+                                <span className="font-mono text-[10px] text-gray-500">Input:</span>
+                                <Badge 
+                                  variant="outline" 
+                                  className="font-mono text-sm px-2 py-0.5 text-emerald-600 bg-emerald-50 border-emerald-200 cursor-pointer hover:bg-emerald-500/20 tracking-wider"
+                                  onClick={() => copyToClipboard(log.dtmf_code)}
+                                  data-testid={`dtmf-badge-${logs.length - 1 - index}`}
+                                >
+                                  {log.dtmf_code}
+                                  <Copy className="w-2.5 h-2.5 ml-1" />
+                                </Badge>
+                                {log.dtmf_code.length >= parseInt(otpDigits) && (
+                                  <span className="text-[10px] text-emerald-600 font-mono">({log.dtmf_code.length} digits)</span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })
+                )}
+              </AnimatePresence>
+            </div>
           </div>
           
           {/* Decision Box - Floating Modal Overlay */}

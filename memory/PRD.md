@@ -174,6 +174,14 @@ Build a full-stack bot-calling website with multi-provider support (Infobip, Sig
 - Users can see the most recent events without scrolling
 - Implemented using [...logs].reverse()
 
+### Theme Change to Dark Navy Modern ✅ (Jan 30, 2026)
+- Complete theme overhaul from purple glassmorphism to blue navy modern
+- Applied to all pages: Login, User Panel, Admin Dashboard
+- Color scheme: Primary #3b82f6 (blue), Background #0a0e1a (dark navy)
+- Blue gradient accent on left side of pages
+- Clean, professional look matching fintech reference design
+- All purple colors replaced with blue equivalents
+
 ## Next Steps / Backlog
 
 ### P1 - High Priority

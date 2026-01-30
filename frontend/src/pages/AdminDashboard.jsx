@@ -405,10 +405,19 @@ export default function AdminDashboard({ user, token, onLogout }) {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleToggleUser(u.id)}
-                              className={u.is_active ? "text-red-400 hover:text-red-300" : "text-emerald-400 hover:text-emerald-300"}
+                              className={u.is_active ? "text-yellow-400 hover:text-yellow-300" : "text-emerald-400 hover:text-emerald-300"}
                               title={u.is_active ? "Disable User" : "Enable User"}
                             >
                               {u.is_active ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteUser(u.id)}
+                              className="text-red-400 hover:text-red-300"
+                              title="Delete User"
+                            >
+                              <Trash2 className="w-4 h-4" />
                             </Button>
                           </div>
                         )}

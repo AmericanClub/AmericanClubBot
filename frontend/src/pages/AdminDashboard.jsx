@@ -648,19 +648,19 @@ export default function AdminDashboard({ user, token, onLogout }) {
           <Modal onClose={() => { setShowEditUser(false); setSelectedUser(null); setEditPassword(""); }} title={`Edit User: ${selectedUser.name}`}>
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-medium text-gray-500 uppercase flex items-center gap-2">
+                <label className="text-xs font-medium text-white/70 uppercase flex items-center gap-2">
                   <UserIcon className="w-3 h-3" />
                   Name
                 </label>
                 <Input
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
-                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
+                  className="mt-1 glass-input"
                   placeholder="User name"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-500 uppercase flex items-center gap-2">
+                <label className="text-xs font-medium text-white/70 uppercase flex items-center gap-2">
                   <Mail className="w-3 h-3" />
                   Email
                 </label>
@@ -668,12 +668,12 @@ export default function AdminDashboard({ user, token, onLogout }) {
                   type="email"
                   value={editEmail}
                   onChange={(e) => setEditEmail(e.target.value)}
-                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
+                  className="mt-1 glass-input"
                   placeholder="user@example.com"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-500 uppercase flex items-center gap-2">
+                <label className="text-xs font-medium text-white/70 uppercase flex items-center gap-2">
                   <Key className="w-3 h-3" />
                   New Password
                 </label>
@@ -681,10 +681,10 @@ export default function AdminDashboard({ user, token, onLogout }) {
                   type="password"
                   value={editPassword}
                   onChange={(e) => setEditPassword(e.target.value)}
-                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
+                  className="mt-1 glass-input"
                   placeholder="Leave blank to keep current"
                 />
-                <p className="text-[10px] text-gray-400 mt-1">User will be logged out if password is changed</p>
+                <p className="text-[10px] text-white/40 mt-1">User will be logged out if password is changed</p>
               </div>
               <Button
                 onClick={handleEditUser}

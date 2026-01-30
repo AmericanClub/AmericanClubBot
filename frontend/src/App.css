@@ -103,6 +103,24 @@
     position: relative;
 }
 
+/* Hide scrollbar but keep functionality */
+.logs-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.logs-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.logs-container::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.3);
+    border-radius: 2px;
+}
+
+.logs-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 92, 246, 0.5);
+}
+
 /* Setup panel */
 .setup-panel {
     height: 100%;

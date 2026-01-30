@@ -218,7 +218,7 @@ async def logout(current_user: dict = Depends(get_current_user)):
 @auth_router.get("/me", response_model=UserResponse)
 async def get_me(current_user: dict = Depends(get_current_user)):
     """Get current user info"""
-    return UserResponse(
+    response = UserResponse(
         id=current_user["id"],
         email=current_user["email"],
         name=current_user["name"],
@@ -228,6 +228,12 @@ async def get_me(current_user: dict = Depends(get_current_user)):
         created_at=current_user["created_at"],
         last_login=current_user.get("last_login")
     )
+    # Add is_super_admin to response if user is admin
+    if current_user.get("role") == "admin":
+        response_dict = response.model_dump()
+        response_dict["is_super_admin"] = current_user.get("is_super_admin", False)
+        return response_dict
+    return response
 
 
 @auth_router.put("/change-password")

@@ -689,40 +689,40 @@ export default function AdminDashboard({ user, token, onLogout }) {
 // Stat Card Component
 function StatCard({ icon: Icon, label, value, subtext, color }) {
   const colors = {
-    violet: { bg: 'rgba(139, 92, 246, 0.1)', border: 'rgba(139, 92, 246, 0.3)', text: '#a78bfa', glow: 'rgba(139, 92, 246, 0.2)' },
+    blue: { bg: 'rgba(59, 130, 246, 0.1)', border: 'rgba(59, 130, 246, 0.3)', text: '#60a5fa', glow: 'rgba(59, 130, 246, 0.2)' },
     teal: { bg: 'rgba(20, 184, 166, 0.1)', border: 'rgba(20, 184, 166, 0.3)', text: '#5eead4', glow: 'rgba(20, 184, 166, 0.2)' },
     amber: { bg: 'rgba(245, 158, 11, 0.1)', border: 'rgba(245, 158, 11, 0.3)', text: '#fbbf24', glow: 'rgba(245, 158, 11, 0.2)' },
     emerald: { bg: 'rgba(16, 185, 129, 0.1)', border: 'rgba(16, 185, 129, 0.3)', text: '#6ee7b7', glow: 'rgba(16, 185, 129, 0.2)' },
     cyan: { bg: 'rgba(34, 211, 238, 0.1)', border: 'rgba(34, 211, 238, 0.3)', text: '#67e8f9', glow: 'rgba(34, 211, 238, 0.2)' },
-    purple: { bg: 'rgba(168, 85, 247, 0.1)', border: 'rgba(168, 85, 247, 0.3)', text: '#c084fc', glow: 'rgba(168, 85, 247, 0.2)' },
+    sky: { bg: 'rgba(14, 165, 233, 0.1)', border: 'rgba(14, 165, 233, 0.3)', text: '#38bdf8', glow: 'rgba(14, 165, 233, 0.2)' },
     yellow: { bg: 'rgba(234, 179, 8, 0.1)', border: 'rgba(234, 179, 8, 0.3)', text: '#facc15', glow: 'rgba(234, 179, 8, 0.2)' },
   };
 
-  const colorScheme = colors[color];
+  const colorScheme = colors[color] || colors.blue;
 
   return (
     <div 
-      className="glass-card p-5 transition-all duration-300 hover:scale-105"
+      className="p-5 transition-all duration-200 hover:scale-[1.02] rounded-xl"
       style={{
-        background: `linear-gradient(135deg, ${colorScheme.bg}, rgba(255, 255, 255, 0.02))`,
+        background: `linear-gradient(135deg, ${colorScheme.bg}, rgba(15, 23, 42, 0.8))`,
         border: `1px solid ${colorScheme.border}`,
-        boxShadow: `0 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px ${colorScheme.glow}`
+        boxShadow: `0 4px 16px rgba(0, 0, 0, 0.2)`
       }}
     >
       <div className="flex items-center gap-3 mb-4">
         <div 
           className="w-10 h-10 rounded-lg flex items-center justify-center"
           style={{
-            background: `linear-gradient(135deg, ${colorScheme.text}, ${colorScheme.border})`,
-            boxShadow: `0 0 15px ${colorScheme.glow}`
+            background: `${colorScheme.bg}`,
+            border: `1px solid ${colorScheme.border}`
           }}
         >
-          <Icon className="w-5 h-5 text-white" />
+          <Icon className="w-5 h-5" style={{ color: colorScheme.text }} />
         </div>
-        <span className="text-xs font-semibold text-white/70 uppercase tracking-wide">{label}</span>
+        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">{label}</span>
       </div>
-      <p className="text-3xl font-bold text-white neon-text" style={{ color: colorScheme.text }}>{value}</p>
-      {subtext && <p className="text-sm text-white/50 mt-1">{subtext}</p>}
+      <p className="text-3xl font-bold" style={{ color: colorScheme.text }}>{value}</p>
+      {subtext && <p className="text-sm text-slate-500 mt-1">{subtext}</p>}
     </div>
   );
 }
@@ -735,23 +735,23 @@ function Modal({ children, onClose, title }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50"
-      style={{ background: 'rgba(0, 0, 0, 0.5)' }}
+      style={{ background: 'rgba(0, 0, 0, 0.6)' }}
       onClick={onClose}
     >
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="glass-card p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
+        className="p-6 w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl"
         style={{
-          background: 'rgba(15, 10, 30, 0.9)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(167, 139, 250, 0.3)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 92, 246, 0.2)'
+          background: 'rgba(15, 23, 42, 0.95)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(59, 130, 246, 0.25)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-lg font-bold text-white neon-text mb-4">{title}</h3>
+        <h3 className="text-lg font-bold text-white mb-4">{title}</h3>
         {children}
       </motion.div>
     </motion.div>

@@ -1297,34 +1297,34 @@ function ProvidersTab({ authHeaders }) {
           <Modal onClose={() => setEditingProvider(null)} title="Configure Infobip">
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-medium text-gray-500 uppercase">API Key *</label>
+                <label className="text-xs font-medium text-white/70 uppercase">API Key *</label>
                 <Input
                   type="password"
                   value={ibApiKey}
                   onChange={(e) => setIbApiKey(e.target.value)}
-                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
+                  className="mt-1 glass-input"
                   placeholder="Your Infobip API Key"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-500 uppercase">Base URL</label>
+                <label className="text-xs font-medium text-white/70 uppercase">Base URL</label>
                 <Input
                   value={ibBaseUrl}
                   onChange={(e) => setIbBaseUrl(e.target.value)}
-                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
+                  className="mt-1 glass-input"
                   placeholder="api.infobip.com"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-500 uppercase">App ID (optional)</label>
+                <label className="text-xs font-medium text-white/70 uppercase">App ID (optional)</label>
                 <Input
                   value={ibAppId}
                   onChange={(e) => setIbAppId(e.target.value)}
-                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
+                  className="mt-1 glass-input"
                   placeholder="App ID from Infobip"
                 />
               </div>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-white/40">
                 Note: Add phone numbers after saving credentials using the "Add Number" button.
               </p>
               <Button

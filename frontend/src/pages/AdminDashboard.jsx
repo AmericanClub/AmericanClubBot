@@ -1017,11 +1017,15 @@ function ProvidersTab({ authHeaders }) {
           {/* Phone Numbers Section */}
           <div className="p-5">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-medium text-gray-600">Phone Numbers</h4>
+              <h4 className="text-sm font-medium text-white/70">Phone Numbers</h4>
               <Button
                 onClick={() => openAddPhone("signalwire")}
                 size="sm"
-                className="h-7 text-xs bg-emerald-500 hover:bg-emerald-600"
+                className="h-7 text-xs text-white"
+                style={{
+                  background: 'linear-gradient(135deg, #10b981, #059669)',
+                  boxShadow: '0 0 15px rgba(16, 185, 129, 0.3)'
+                }}
               >
                 <Plus className="w-3 h-3 mr-1" />
                 Add Number
@@ -1029,24 +1033,24 @@ function ProvidersTab({ authHeaders }) {
             </div>
             
             {(providers.find(p => p.id === "signalwire")?.phone_numbers?.length || 0) === 0 ? (
-              <p className="text-gray-400 text-sm">No phone numbers configured</p>
+              <p className="text-white/40 text-sm">No phone numbers configured</p>
             ) : (
               <div className="space-y-2">
                 {providers.find(p => p.id === "signalwire")?.phone_numbers?.map((phone) => (
                   <div 
                     key={phone.id || phone.number}
-                    className="flex items-center justify-between p-2 rounded-lg bg-gray-50 border border-gray-200"
+                    className="flex items-center justify-between p-2 rounded-lg glass-card-static"
                   >
                     <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${phone.is_active ? 'bg-emerald-400' : 'bg-slate-500'}`} />
-                      <span className="font-mono text-sm text-gray-800">{phone.number}</span>
+                      <span className={`w-2 h-2 rounded-full status-glow ${phone.is_active ? 'bg-emerald-400' : 'bg-slate-500'}`} />
+                      <span className="font-mono text-sm text-white">{phone.number}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleTogglePhoneActive("signalwire", phone)}
-                        className={`h-7 w-7 p-0 ${phone.is_active ? 'text-emerald-400' : 'text-gray-400'}`}
+                        className={`h-7 w-7 p-0 hover:bg-white/10 ${phone.is_active ? 'text-emerald-400' : 'text-white/40'}`}
                         title={phone.is_active ? "Deactivate" : "Activate"}
                       >
                         {phone.is_active ? <UserCheck className="w-3 h-3" /> : <UserX className="w-3 h-3" />}

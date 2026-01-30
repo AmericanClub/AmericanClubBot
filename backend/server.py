@@ -516,61 +516,150 @@ async def root():
 async def get_config():
     return {
         "infobip_configured": bool(INFOBIP_API_KEY and INFOBIP_BASE_URL),
-        "from_number": INFOBIP_FROM_NUMBER,
+        "signalwire_configured": bool(SIGNALWIRE_PROJECT_ID and SIGNALWIRE_AUTH_TOKEN and SIGNALWIRE_SPACE_URL),
+        "infobip_from_number": INFOBIP_FROM_NUMBER,
+        "signalwire_from_number": SIGNALWIRE_FROM_NUMBER,
         "app_name": INFOBIP_APP_NAME,
         "app_id": INFOBIP_APP_ID
     }
+
+# ===================
+# SignalWire Functions
+# ===================
+
+async def create_signalwire_call(call_id: str, config: CallConfig, steps: CallSteps):
+    """Create outbound call using SignalWire API"""
+    try:
+        import base64
+        
+        # SignalWire uses Basic Auth
+        auth_string = f"{SIGNALWIRE_PROJECT_ID}:{SIGNALWIRE_AUTH_TOKEN}"
+        auth_bytes = base64.b64encode(auth_string.encode()).decode()
+        
+        to_num = config.recipient_number.replace(" ", "").replace("-", "")
+        if not to_num.startswith("+"):
+            to_num = f"+{to_num}"
+        
+        from_num = config.from_number.replace(" ", "").replace("-", "")
+        if not from_num.startswith("+"):
+            from_num = f"+{from_num}"
+        
+        # Build webhook URL for SignalWire
+        webhook_url = f"{WEBHOOK_BASE_URL}/api/signalwire-webhook/voice"
+        status_callback = f"{WEBHOOK_BASE_URL}/api/signalwire-webhook/status"
+        
+        payload = {
+            "Url": webhook_url,
+            "To": to_num,
+            "From": from_num,
+            "StatusCallback": status_callback,
+            "StatusCallbackEvent": ["initiated", "ringing", "answered", "completed"]
+        }
+        
+        logger.info(f"Creating SignalWire call: {json.dumps(payload)}")
+        
+        await add_call_event(call_id, "CALL_INITIATED", f"Outbound request via {from_num} to {to_num}")
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"https://{SIGNALWIRE_SPACE_URL}/api/laml/2010-04-01/Accounts/{SIGNALWIRE_PROJECT_ID}/Calls.json",
+                data=payload,
+                headers={
+                    "Authorization": f"Basic {auth_bytes}",
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                timeout=30.0
+            )
+            
+            logger.info(f"SignalWire response: {response.status_code} - {response.text}")
+            
+            if response.status_code in [200, 201]:
+                result = response.json()
+                call_sid = result.get("sid")
+                
+                await db.call_logs.update_one(
+                    {"id": call_id},
+                    {"$set": {"signalwire_call_sid": call_sid, "status": "CALLING", "provider": "signalwire"}}
+                )
+                
+                await add_call_event(call_id, "CALL_CREATED", f"Call SID: {call_sid[:16]}...")
+                
+                return call_sid
+            else:
+                error_msg = f"Failed to create call: {response.status_code} - {response.text}"
+                await add_call_event(call_id, "CALL_ERROR", error_msg)
+                return None
+                
+    except Exception as e:
+        logger.error(f"Error creating SignalWire call: {e}")
+        await add_call_event(call_id, "CALL_ERROR", str(e))
+        return None
 
 @api_router.post("/calls/initiate", response_model=Dict)
 async def initiate_call(request: CallRequest, background_tasks: BackgroundTasks):
     """Initiate a new single-session IVR call"""
     try:
+        provider = request.config.provider
+        
         call_log = CallLog(
             config=request.config,
-            steps=request.steps
+            steps=request.steps,
+            provider=provider
         )
         
         doc = call_log.model_dump()
         await db.call_logs.insert_one(doc)
         
-        await add_call_event(call_log.id, "CALL_QUEUED", "Single-session IVR call queued")
+        await add_call_event(call_log.id, "CALL_QUEUED", f"Single-session IVR call queued ({provider.upper()})")
         
         use_simulation = True
         simulation_reason = "Simulation mode"
         
-        if INFOBIP_API_KEY and INFOBIP_BASE_URL:
-            # Check if we have a configuration ID
-            if INFOBIP_CONFIG_ID:
-                # Try to create outbound call using Calls API with config ID
-                infobip_call_id = await create_outbound_call(call_log.id, request.config)
-                if infobip_call_id:
+        if provider == "signalwire":
+            # Use SignalWire
+            if SIGNALWIRE_PROJECT_ID and SIGNALWIRE_AUTH_TOKEN and SIGNALWIRE_SPACE_URL:
+                call_sid = await create_signalwire_call(call_log.id, request.config, request.steps)
+                if call_sid:
                     use_simulation = False
                 else:
-                    simulation_reason = "Failed to create outbound call"
+                    simulation_reason = "Failed to create SignalWire call"
             else:
-                # Try using application ID
-                app_id = await create_calls_application()
-                if app_id:
+                simulation_reason = "SignalWire not configured"
+                await add_call_event(call_log.id, "CALL_INFO", simulation_reason)
+        else:
+            # Use Infobip
+            if INFOBIP_API_KEY and INFOBIP_BASE_URL:
+                if INFOBIP_CONFIG_ID:
                     infobip_call_id = await create_outbound_call(call_log.id, request.config)
                     if infobip_call_id:
                         use_simulation = False
                     else:
-                        simulation_reason = "Failed to create outbound call"
+                        simulation_reason = "Failed to create Infobip call"
                 else:
-                    simulation_reason = "Infobip Calls API not available - Please configure Calls Application in Infobip Portal"
-                    await add_call_event(call_log.id, "CALL_INFO", simulation_reason)
+                    app_id = await create_calls_application()
+                    if app_id:
+                        infobip_call_id = await create_outbound_call(call_log.id, request.config)
+                        if infobip_call_id:
+                            use_simulation = False
+                        else:
+                            simulation_reason = "Failed to create Infobip call"
+                    else:
+                        simulation_reason = "Infobip Calls API not configured"
+                        await add_call_event(call_log.id, "CALL_INFO", simulation_reason)
+            else:
+                simulation_reason = "Infobip not configured"
         
         if use_simulation:
-            # Run simulation mode
             await add_call_event(call_log.id, "SIMULATION_MODE", f"Running in simulation: {simulation_reason}")
             background_tasks.add_task(simulate_ivr_flow, call_log.id, request.config, request.steps)
         
         return {
             "status": "initiated",
             "call_id": call_log.id,
-            "message": "Single-session IVR call initiated",
-            "using_infobip": not use_simulation,
-            "mode": "Live Infobip" if not use_simulation else "Simulation"
+            "message": f"Single-session IVR call initiated via {provider.upper()}",
+            "provider": provider,
+            "using_live": not use_simulation,
+            "mode": f"Live {provider.upper()}" if not use_simulation else "Simulation"
         }
         
     except Exception as e:

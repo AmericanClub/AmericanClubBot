@@ -673,7 +673,16 @@ function App() {
     if (eventType.includes("CREATED")) return { icon: "📞", color: "text-cyan-400", bg: "" };
     if (eventType.includes("RINGING")) return { icon: "🔔", color: "text-yellow-400", bg: "" };
     if (eventType.includes("ESTABLISHED") || eventType.includes("ANSWERED")) return { icon: "📱", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/30" };
-    if (eventType.includes("AMD_DETECTION")) return { icon: "🎤", color: "text-purple-400", bg: "" };
+    // AMD Detection styles
+    if (eventType.includes("AMD_HUMAN")) return { icon: "👤", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/30" };
+    if (eventType.includes("AMD_VOICEMAIL") || eventType.includes("VOICEMAIL")) return { icon: "📧", color: "text-orange-400", bg: "bg-orange-500/10 border-orange-500/30" };
+    if (eventType.includes("AMD_FAX")) return { icon: "📠", color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/30" };
+    if (eventType.includes("AMD_UNKNOWN")) return { icon: "❓", color: "text-slate-400", bg: "" };
+    // Call status styles
+    if (eventType.includes("BUSY")) return { icon: "📵", color: "text-red-400", bg: "bg-red-500/10 border-red-500/30" };
+    if (eventType.includes("NO_ANSWER")) return { icon: "📵", color: "text-orange-400", bg: "bg-orange-500/10 border-orange-500/30" };
+    if (eventType.includes("CANCELED")) return { icon: "🚫", color: "text-slate-400", bg: "bg-slate-500/10 border-slate-500/30" };
+    if (eventType.includes("RECORDING")) return { icon: "🎙️", color: "text-purple-400", bg: "bg-purple-500/10 border-purple-500/30" };
     if (eventType.includes("FINISHED")) return { icon: "🏁", color: "text-slate-400", bg: "" };
     if (eventType.includes("FAILED") || eventType.includes("ERROR")) return { icon: "⚠️", color: "text-red-400", bg: "bg-red-500/10 border-red-500/30" };
     if (eventType.includes("RETRY") || eventType.includes("NO_RESPONSE")) return { icon: "🔁", color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/30" };

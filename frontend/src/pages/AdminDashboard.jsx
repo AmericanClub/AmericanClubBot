@@ -272,10 +272,9 @@ export default function AdminDashboard({ user, token, onLogout }) {
               onClick={() => setActiveTab(item.id)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200`}
               style={{
-                background: activeTab === item.id ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.1))' : 'transparent',
-                border: activeTab === item.id ? '1px solid rgba(139, 92, 246, 0.3)' : '1px solid transparent',
-                color: activeTab === item.id ? '#a78bfa' : '#94a3b8',
-                boxShadow: activeTab === item.id ? '0 0 20px rgba(139, 92, 246, 0.2)' : 'none'
+                background: activeTab === item.id ? 'rgba(59, 130, 246, 0.15)' : 'transparent',
+                color: activeTab === item.id ? '#60a5fa' : '#94a3b8',
+                border: activeTab === item.id ? '1px solid rgba(59, 130, 246, 0.3)' : '1px solid transparent'
               }}
             >
               <item.icon className="w-4 h-4" />
@@ -285,29 +284,21 @@ export default function AdminDashboard({ user, token, onLogout }) {
         </nav>
 
         {/* User info */}
-        <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)' }} className="pt-4 mt-4">
+        <div style={{ borderTop: '1px solid rgba(59, 130, 246, 0.15)' }} className="pt-4 mt-4">
           <div className="flex items-center gap-3 px-2 mb-3">
-            <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold"
-              style={{
-                background: 'linear-gradient(135deg, #8b5cf6, #a855f7)',
-                boxShadow: '0 0 20px rgba(139, 92, 246, 0.4)'
-              }}>
+            <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold bg-blue-600">
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-white truncate">{user.name}</p>
-              <p className="text-[10px] text-white/50 truncate">{user.email}</p>
+              <p className="text-[10px] text-slate-500 truncate">{user.email}</p>
             </div>
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={onLogout}
-            className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-500/10"
-            style={{
-              border: '1px solid rgba(239, 68, 68, 0.2)',
-              transition: 'all 0.3s ease'
-            }}
+            className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/20"
           >
             <LogOut className="w-4 h-4 mr-2" />
             Logout
@@ -320,7 +311,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
         {/* Dashboard Tab */}
         {activeTab === "dashboard" && stats && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-white neon-text">Dashboard</h2>
+            <h2 className="text-2xl font-bold text-white">Dashboard</h2>
             
             <div className="grid grid-cols-4 gap-4">
               <StatCard

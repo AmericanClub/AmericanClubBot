@@ -1160,7 +1160,7 @@ function UserCallPanel({ user, token, onLogout }) {
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-4 p-4 rounded-lg bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-blue-500/30"
+                className="mt-4 p-4 rounded-lg bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/30"
                 data-testid="recording-player"
               >
                 <div className="flex items-center gap-3 mb-3">

@@ -341,9 +341,14 @@ function UserCallPanel({ user, token, onLogout }) {
     }
   }, [callType]);
 
-  // Auto-scroll logs
+  // Auto-scroll logs - only within logs container
   useEffect(() => {
-    logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (logsEndRef.current) {
+      const logsContainer = logsEndRef.current.closest('.logs-container');
+      if (logsContainer) {
+        logsContainer.scrollTop = logsContainer.scrollHeight;
+      }
+    }
   }, [logs]);
 
   // Cleanup SSE on unmount

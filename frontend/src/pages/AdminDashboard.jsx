@@ -312,7 +312,25 @@ export default function AdminDashboard({ user, token, onLogout }) {
         {/* Dashboard Tab */}
         {activeTab === "dashboard" && stats && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-white">Dashboard</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-white">Dashboard</h2>
+              <Button 
+                onClick={async () => {
+                  setIsRefreshing(true);
+                  await fetchStats();
+                  await fetchUsers();
+                  await fetchInviteCodes();
+                  setTimeout(() => setIsRefreshing(false), 500);
+                }} 
+                variant="outline" 
+                size="sm" 
+                className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white"
+                disabled={isRefreshing}
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                {isRefreshing ? 'Refreshing...' : 'Refresh'}
+              </Button>
+            </div>
             
             <div className="grid grid-cols-4 gap-4">
               <StatCard

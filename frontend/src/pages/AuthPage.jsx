@@ -224,12 +224,11 @@ export default function AuthPage({ onLogin }) {
 
           {/* Toggle Login/Signup */}
           <div className="mt-6 text-center">
-            <p className="text-white/50 text-sm">
+            <p className="text-slate-500 text-sm">
               {isLogin ? "Don't have an account?" : "Already have an account?"}
               <button
                 onClick={() => setIsLogin(!isLogin)}
-                className="ml-2 text-purple-400 hover:text-purple-300 font-semibold transition-colors"
-                style={{ textShadow: '0 0 20px rgba(167, 139, 250, 0.5)' }}
+                className="ml-2 text-blue-400 hover:text-blue-300 font-semibold transition-colors"
                 data-testid="toggle-auth-mode"
               >
                 {isLogin ? "Sign up" : "Sign in"}
@@ -239,23 +238,12 @@ export default function AuthPage({ onLogin }) {
         </motion.div>
 
         {/* Footer note */}
-        <p className="text-center text-white/30 text-xs mt-6">
+        <p className="text-center text-slate-600 text-xs mt-6">
           {isLogin 
             ? "Sign in to access American Club dashboard" 
             : "Invite code required to create an account"}
         </p>
       </motion.div>
-
-      <style jsx>{`
-        @keyframes gradientShift {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-        @keyframes float {
-          0%, 100% { transform: translateY(0) scale(1); }
-          50% { transform: translateY(-30px) scale(1.05); }
-        }
-      `}</style>
     </div>
   );
 }

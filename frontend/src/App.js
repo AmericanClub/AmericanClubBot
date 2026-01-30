@@ -246,6 +246,80 @@ function App() {
     };
   }, []);
 
+  // Preview voice using Web Speech API
+  const [isPreviewing, setIsPreviewing] = useState(false);
+  
+  const previewVoice = () => {
+    // Get the current step message
+    let message = stepMessages[activeStep] || stepMessages.step1;
+    
+    // Replace placeholders
+    message = message
+      .replace(/{name}/g, recipientName || "Customer")
+      .replace(/{service}/g, serviceName || "Account")
+      .replace(/{digits}/g, otpDigits);
+    
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+    
+    // Create utterance
+    const utterance = new SpeechSynthesisUtterance(message);
+    
+    // Set voice based on selected model
+    const voices = window.speechSynthesis.getVoices();
+    const voiceInfo = VOICE_MODELS.find(v => v.id === voiceModel);
+    
+    if (voiceInfo) {
+      // Try to find a matching voice
+      let selectedVoice = null;
+      
+      if (voiceInfo.gender === "female") {
+        selectedVoice = voices.find(v => 
+          v.lang.startsWith("en") && v.name.toLowerCase().includes("female")
+        ) || voices.find(v => 
+          v.lang.startsWith("en") && (v.name.includes("Samantha") || v.name.includes("Karen") || v.name.includes("Victoria"))
+        );
+      } else {
+        selectedVoice = voices.find(v => 
+          v.lang.startsWith("en") && v.name.toLowerCase().includes("male")
+        ) || voices.find(v => 
+          v.lang.startsWith("en") && (v.name.includes("Daniel") || v.name.includes("Alex") || v.name.includes("Tom"))
+        );
+      }
+      
+      // Fallback to any English voice
+      if (!selectedVoice) {
+        selectedVoice = voices.find(v => v.lang.startsWith("en"));
+      }
+      
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      }
+    }
+    
+    utterance.rate = 0.9; // Slightly slower for clarity
+    utterance.pitch = 1;
+    
+    setIsPreviewing(true);
+    
+    utterance.onend = () => {
+      setIsPreviewing(false);
+    };
+    
+    utterance.onerror = () => {
+      setIsPreviewing(false);
+      toast.error("Preview failed");
+    };
+    
+    window.speechSynthesis.speak(utterance);
+    toast.success(`Previewing: ${activeStep.toUpperCase()}`);
+  };
+  
+  const stopPreview = () => {
+    window.speechSynthesis.cancel();
+    setIsPreviewing(false);
+  };
+
   // Fetch call history
   const fetchCallHistory = useCallback(async () => {
     try {

@@ -580,6 +580,63 @@ export default function AdminDashboard({ user, token, onLogout }) {
           </Modal>
         )}
       </AnimatePresence>
+
+      {/* Edit User Modal */}
+      <AnimatePresence>
+        {showEditUser && selectedUser && (
+          <Modal onClose={() => { setShowEditUser(false); setSelectedUser(null); setEditPassword(""); }} title={`Edit User: ${selectedUser.name}`}>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-medium text-slate-400 uppercase flex items-center gap-2">
+                  <UserIcon className="w-3 h-3" />
+                  Name
+                </label>
+                <Input
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  placeholder="User name"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-slate-400 uppercase flex items-center gap-2">
+                  <Mail className="w-3 h-3" />
+                  Email
+                </label>
+                <Input
+                  type="email"
+                  value={editEmail}
+                  onChange={(e) => setEditEmail(e.target.value)}
+                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  placeholder="user@example.com"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-slate-400 uppercase flex items-center gap-2">
+                  <Key className="w-3 h-3" />
+                  New Password
+                </label>
+                <Input
+                  type="password"
+                  value={editPassword}
+                  onChange={(e) => setEditPassword(e.target.value)}
+                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  placeholder="Leave blank to keep current"
+                />
+                <p className="text-[10px] text-slate-500 mt-1">User will be logged out if password is changed</p>
+              </div>
+              <Button
+                onClick={handleEditUser}
+                disabled={isLoading}
+                className="w-full bg-cyan-500 hover:bg-cyan-600"
+              >
+                {isLoading ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : null}
+                Save Changes
+              </Button>
+            </div>
+          </Modal>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

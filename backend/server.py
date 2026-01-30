@@ -37,8 +37,8 @@ SIGNALWIRE_AUTH_TOKEN = os.environ.get('SIGNALWIRE_AUTH_TOKEN', '')
 SIGNALWIRE_SPACE_URL = os.environ.get('SIGNALWIRE_SPACE_URL', '')
 SIGNALWIRE_FROM_NUMBER = os.environ.get('SIGNALWIRE_FROM_NUMBER', '')
 
-# Webhook URL for callbacks
-WEBHOOK_BASE_URL = os.environ.get('WEBHOOK_BASE_URL', 'https://voicebot-hub-2.preview.emergentagent.com')
+# Webhook URL for callbacks - uses APP_URL from environment or falls back to empty
+WEBHOOK_BASE_URL = os.environ.get('WEBHOOK_BASE_URL') or os.environ.get('APP_URL', '')
 
 # Create the main app
 app = FastAPI(title="Bot Calling API")

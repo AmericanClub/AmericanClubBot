@@ -11,8 +11,8 @@ from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import uuid
 
-# JWT Settings
-SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "your-super-secret-key-change-in-production-2024")
+# JWT Settings - SECRET_KEY is required in production
+SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or os.environ.get("APP_URL", "fallback-dev-key-" + str(uuid.uuid4()))
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES_USER = 60 * 24  # 24 hours for users
 ACCESS_TOKEN_EXPIRE_MINUTES_ADMIN = 60 * 24 * 365  # 1 year for admins (effectively never)

@@ -1281,17 +1281,117 @@ async def signalwire_status_webhook(request: Request):
                 )
                 await add_call_event(call_id, "CALL_FINISHED", f"Call ended. Duration: {duration}s")
             
-            elif call_status in ["busy", "no-answer", "failed", "canceled"]:
+            elif call_status == "busy":
                 await db.call_logs.update_one(
                     {"id": call_id},
-                    {"$set": {"status": "FAILED", "error_message": call_status}}
+                    {"$set": {"status": "BUSY", "error_message": "Line busy", "ended_at": datetime.now(timezone.utc).isoformat()}}
                 )
-                await add_call_event(call_id, "CALL_FAILED", f"Call failed: {call_status}")
+                await add_call_event(call_id, "CALL_BUSY", "📵 Line is BUSY - Target is on another call")
+            
+            elif call_status == "no-answer":
+                await db.call_logs.update_one(
+                    {"id": call_id},
+                    {"$set": {"status": "NO_ANSWER", "error_message": "No answer", "ended_at": datetime.now(timezone.utc).isoformat()}}
+                )
+                await add_call_event(call_id, "CALL_NO_ANSWER", "📵 NO ANSWER - Target did not pick up")
+            
+            elif call_status == "failed":
+                sip_code = data.get("SipResponseCode", "")
+                await db.call_logs.update_one(
+                    {"id": call_id},
+                    {"$set": {"status": "FAILED", "error_message": f"Call failed (SIP: {sip_code})", "ended_at": datetime.now(timezone.utc).isoformat()}}
+                )
+                await add_call_event(call_id, "CALL_FAILED", f"❌ Call FAILED - SIP Code: {sip_code}")
+            
+            elif call_status == "canceled":
+                await db.call_logs.update_one(
+                    {"id": call_id},
+                    {"$set": {"status": "CANCELED", "error_message": "Call canceled", "ended_at": datetime.now(timezone.utc).isoformat()}}
+                )
+                await add_call_event(call_id, "CALL_CANCELED", "🚫 Call was CANCELED")
         
         return {"status": "received"}
         
     except Exception as e:
         logger.error(f"SignalWire status webhook error: {e}")
+        return {"status": "error"}
+
+@api_router.post("/signalwire-webhook/amd")
+async def signalwire_amd_webhook(request: Request):
+    """Handle SignalWire AMD (Answering Machine Detection) webhook"""
+    try:
+        form_data = await request.form()
+        data = dict(form_data)
+        logger.info(f"SignalWire AMD Webhook: {json.dumps(data)}")
+        
+        call_sid = data.get("CallSid", "")
+        answered_by = data.get("AnsweredBy", "unknown")
+        machine_detection_duration = data.get("MachineDetectionDuration", "")
+        
+        if not call_sid:
+            return {"status": "no call sid"}
+        
+        call_log = await db.call_logs.find_one({"signalwire_call_sid": call_sid}, {"_id": 0})
+        
+        if call_log:
+            call_id = call_log["id"]
+            
+            # Update call log with AMD result
+            await db.call_logs.update_one(
+                {"id": call_id},
+                {"$set": {"answered_by": answered_by}}
+            )
+            
+            if answered_by == "human":
+                await add_call_event(call_id, "AMD_HUMAN", "👤 HUMAN detected - Proceeding with IVR")
+            elif answered_by in ["machine_start", "machine_end_beep", "machine_end_silence", "machine_end_other"]:
+                await add_call_event(call_id, "AMD_VOICEMAIL", "📧 VOICEMAIL detected - Call will be ended")
+                
+                # Optionally hang up the call if voicemail detected
+                try:
+                    import base64
+                    auth_string = f"{SIGNALWIRE_PROJECT_ID}:{SIGNALWIRE_AUTH_TOKEN}"
+                    auth_bytes = base64.b64encode(auth_string.encode()).decode()
+                    
+                    # Update call to hangup with voicemail message
+                    laml = '''<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Hangup/>
+</Response>'''
+                    
+                    async with httpx.AsyncClient() as client:
+                        response = await client.post(
+                            f"https://{SIGNALWIRE_SPACE_URL}/api/laml/2010-04-01/Accounts/{SIGNALWIRE_PROJECT_ID}/Calls/{call_sid}.json",
+                            data={"Twiml": laml, "Status": "completed"},
+                            headers={
+                                "Authorization": f"Basic {auth_bytes}",
+                                "Content-Type": "application/x-www-form-urlencoded"
+                            },
+                            timeout=30.0
+                        )
+                        logger.info(f"AMD hangup response: {response.status_code}")
+                    
+                    await db.call_logs.update_one(
+                        {"id": call_id},
+                        {"$set": {"status": "VOICEMAIL", "error_message": "Voicemail detected", "ended_at": datetime.now(timezone.utc).isoformat()}}
+                    )
+                    await add_call_event(call_id, "CALL_VOICEMAIL", "📧 Call ended - Voicemail box reached")
+                except Exception as e:
+                    logger.error(f"Error hanging up voicemail call: {e}")
+                    
+            elif answered_by == "fax":
+                await add_call_event(call_id, "AMD_FAX", "📠 FAX machine detected - Ending call")
+                await db.call_logs.update_one(
+                    {"id": call_id},
+                    {"$set": {"status": "FAX", "error_message": "Fax detected", "ended_at": datetime.now(timezone.utc).isoformat()}}
+                )
+            else:
+                await add_call_event(call_id, "AMD_UNKNOWN", f"❓ Detection result: {answered_by}")
+        
+        return {"status": "received"}
+        
+    except Exception as e:
+        logger.error(f"SignalWire AMD webhook error: {e}")
         return {"status": "error"}
 
 @api_router.post("/signalwire-webhook/recording")

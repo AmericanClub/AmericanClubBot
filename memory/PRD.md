@@ -52,12 +52,13 @@ Build a full-stack bot-calling website with multi-provider support (Infobip, Sig
 - DTMF digit collection and verification
 
 ### UI/UX
-- Dark Glassmorphism Premium theme (fully implemented - Jan 30, 2026)
+- Dark Navy Modern theme (fully implemented - Jan 30, 2026)
 - American Club Bot branding with custom logo
-- Real-time Bot Logs with detailed events
-- Decision Box (Accept/Deny) for verification
+- Real-time Bot Logs with detailed events (newest at top)
+- Decision Box inline in Bot Logs panel (Accept/Deny)
 - Provider switching (CH:1 Infobip / CH:2 SignalWire)
-- All dropdown menus with dark purple glassmorphism styling ✅ FIXED
+- All dropdown menus with dark navy styling
+- Blue color scheme throughout (#3b82f6 primary)
 
 ## Call Types Available
 1. Password Change 1 (Default)

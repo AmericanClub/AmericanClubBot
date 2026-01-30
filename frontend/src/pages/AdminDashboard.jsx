@@ -384,7 +384,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
                       </td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex px-2 py-0.5 text-[10px] font-medium rounded-full ${
-                          u.role === "admin" ? "bg-purple-500/20 text-purple-400 badge-glow" : "bg-slate-500/20 text-white/60"
+                          u.role === "admin" ? "bg-blue-500/20 text-blue-400 badge-glow" : "bg-slate-500/20 text-white/60"
                         }`}>
                           {u.role.toUpperCase()}
                         </span>

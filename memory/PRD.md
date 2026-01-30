@@ -112,7 +112,7 @@ Build a full-stack bot-calling website with multi-provider support (Infobip, Sig
 ## Database Schema
 
 ### Collections
-- **users:** id, email, password, name, role, credits, is_active, active_session
+- **users:** id, email, password, name, role, credits, is_active, active_session, **is_super_admin** (boolean for admin hierarchy)
 - **invite_codes:** id, code, credits, is_used, used_by_email
 - **providers:** id, name, is_enabled, is_configured, credentials, phone_numbers[]
 - **call_logs:** id, user_id, provider, status, recording_url, credits_used

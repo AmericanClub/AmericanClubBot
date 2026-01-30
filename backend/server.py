@@ -531,7 +531,7 @@ async def get_config():
 # ===================
 
 async def create_signalwire_call(call_id: str, config: CallConfig, steps: CallSteps):
-    """Create outbound call using SignalWire API"""
+    """Create outbound call using SignalWire API with AMD"""
     try:
         import base64
         
@@ -547,10 +547,11 @@ async def create_signalwire_call(call_id: str, config: CallConfig, steps: CallSt
         if not from_num.startswith("+"):
             from_num = f"+{from_num}"
         
-        # Build webhook URL for SignalWire
+        # Build webhook URLs for SignalWire
         webhook_url = f"{WEBHOOK_BASE_URL}/api/signalwire-webhook/voice"
         status_callback = f"{WEBHOOK_BASE_URL}/api/signalwire-webhook/status"
         recording_callback = f"{WEBHOOK_BASE_URL}/api/signalwire-webhook/recording"
+        amd_callback = f"{WEBHOOK_BASE_URL}/api/signalwire-webhook/amd"
         
         payload = {
             "Url": webhook_url,
@@ -561,12 +562,19 @@ async def create_signalwire_call(call_id: str, config: CallConfig, steps: CallSt
             # Enable call recording
             "Record": "true",
             "RecordingStatusCallback": recording_callback,
-            "RecordingStatusCallbackEvent": "completed"
+            "RecordingStatusCallbackEvent": "completed",
+            # Enable AMD (Answering Machine Detection)
+            "MachineDetection": "DetectMessageEnd",
+            "MachineDetectionTimeout": "30",
+            "MachineDetectionSpeechThreshold": "2400",
+            "AsyncAmd": "true",
+            "AsyncAmdStatusCallback": amd_callback,
+            "AsyncAmdStatusCallbackMethod": "POST"
         }
         
-        logger.info(f"Creating SignalWire call with recording: {json.dumps(payload)}")
+        logger.info(f"Creating SignalWire call with AMD & recording: {json.dumps(payload)}")
         
-        await add_call_event(call_id, "CALL_INITIATED", f"Outbound request via {from_num} to {to_num} (Recording enabled)")
+        await add_call_event(call_id, "CALL_INITIATED", f"Outbound request via {from_num} to {to_num} (AMD + Recording)")
         
         async with httpx.AsyncClient() as client:
             response = await client.post(

@@ -269,7 +269,13 @@ async def get_all_users(current_admin: dict = Depends(get_current_admin)):
     from server import db
     
     users = await db.users.find({}, {"_id": 0, "password": 0}).to_list(1000)
-    return {"users": users, "total": len(users)}
+    
+    # Add is_super_admin info for the requesting admin
+    return {
+        "users": users, 
+        "total": len(users),
+        "current_admin_is_super": current_admin.get("is_super_admin", False)
+    }
 
 
 @admin_router.get("/users/{user_id}")

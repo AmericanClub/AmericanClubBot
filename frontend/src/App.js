@@ -1106,7 +1106,7 @@ function UserCallPanel({ user, token, onLogout }) {
           {/* Header */}
           <div className="flex items-center justify-between mb-3">
             <h1 className="font-heading text-lg font-bold text-white">
-              Voice Bot Control
+              Call Panel
             </h1>
             <Badge 
               variant="default"

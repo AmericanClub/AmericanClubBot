@@ -27,7 +27,7 @@ class TestAuthEndpoints:
         })
         assert response.status_code == 200, f"Admin login failed: {response.text}"
         data = response.json()
-        assert "token" in data, "Token not in response"
+        assert "access_token" in data, "access_token not in response"
         assert "user" in data, "User not in response"
         assert data["user"]["role"] == "admin", "User is not admin"
         print(f"✓ Admin login successful - role: {data['user']['role']}")
@@ -40,7 +40,7 @@ class TestAuthEndpoints:
         })
         assert response.status_code == 200, f"User login failed: {response.text}"
         data = response.json()
-        assert "token" in data, "Token not in response"
+        assert "access_token" in data, "access_token not in response"
         assert "user" in data, "User not in response"
         assert "credits" in data["user"], "Credits not in user data"
         print(f"✓ User login successful - credits: {data['user']['credits']}")

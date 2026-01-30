@@ -519,8 +519,8 @@ export default function AdminDashboard({ user, token, onLogout }) {
                         <span className="text-sm font-mono text-cyan-400 neon-text">{code.credits}</span>
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`inline-flex px-2 py-0.5 text-[10px] font-medium rounded-full ${
-                          code.is_used ? "bg-slate-500/20 text-gray-500" : "bg-emerald-500/20 text-emerald-400"
+                        <span className={`inline-flex px-2 py-0.5 text-[10px] font-medium rounded-full status-glow ${
+                          code.is_used ? "bg-slate-500/20 text-white/60" : "bg-emerald-500/20 text-emerald-400"
                         }`}>
                           {code.is_used ? "Used" : "Available"}
                         </span>
@@ -528,22 +528,22 @@ export default function AdminDashboard({ user, token, onLogout }) {
                       <td className="px-4 py-3">
                         {code.used_by_name ? (
                           <div>
-                            <p className="text-xs text-gray-800">{code.used_by_name}</p>
-                            <p className="text-[10px] text-gray-500">{code.used_by_email}</p>
+                            <p className="text-xs text-white">{code.used_by_name}</p>
+                            <p className="text-[10px] text-white/50">{code.used_by_email}</p>
                           </div>
                         ) : (
-                          <span className="text-xs text-gray-400">-</span>
+                          <span className="text-xs text-white/40">-</span>
                         )}
                       </td>
                       <td className="px-4 py-3">
-                        <span className="text-xs text-gray-500">{code.notes || "-"}</span>
+                        <span className="text-xs text-white/50">{code.notes || "-"}</span>
                       </td>
                       <td className="px-4 py-3 text-right">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeleteCode(code.id)}
-                          className="text-red-400 hover:text-red-300"
+                          className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
                           disabled={code.is_used}
                           title={code.is_used ? "Cannot delete used code" : "Delete Code"}
                         >

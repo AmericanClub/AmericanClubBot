@@ -798,7 +798,7 @@ async def initiate_user_call(request: CallRequest, background_tasks: BackgroundT
         
         if use_simulation:
             await add_call_event(call_log.id, "SIMULATION_MODE", f"Using simulation: {simulation_reason}")
-            background_tasks.add_task(run_call_simulation, call_log.id)
+            background_tasks.add_task(simulate_ivr_flow, call_log.id, request.config, request.steps)
         
         return {
             "status": "initiated",

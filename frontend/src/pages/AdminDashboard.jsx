@@ -229,40 +229,33 @@ export default function AdminDashboard({ user, token, onLogout }) {
   return (
     <div className="min-h-screen relative overflow-hidden"
       style={{
-        background: 'linear-gradient(-45deg, #0f0a1e, #1e1145, #2d1b69, #1a1333)',
-        backgroundSize: '400% 400%',
-        animation: 'gradientShift 15s ease infinite'
+        background: '#0a0e1a'
       }}>
       
-      {/* Background orbs */}
+      {/* Background gradient */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 right-0 w-[500px] h-[500px] rounded-full opacity-20"
-          style={{ background: 'radial-gradient(circle, rgba(139, 92, 246, 0.5) 0%, transparent 70%)' }} />
-        <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] rounded-full opacity-15"
-          style={{ background: 'radial-gradient(circle, rgba(34, 211, 238, 0.5) 0%, transparent 70%)' }} />
+        <div className="absolute top-0 left-0 w-1/2 h-full"
+          style={{ background: 'radial-gradient(ellipse at 0% 50%, rgba(59, 130, 246, 0.12) 0%, transparent 60%)' }} />
+        <div className="absolute top-0 right-0 w-1/3 h-1/2"
+          style={{ background: 'radial-gradient(circle at 100% 0%, rgba(6, 182, 212, 0.08) 0%, transparent 50%)' }} />
       </div>
 
       {/* Sidebar */}
       <div className="fixed left-0 top-0 h-full w-64 p-4 flex flex-col z-20"
         style={{
-          background: 'rgba(255, 255, 255, 0.02)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderRight: '1px solid rgba(255, 255, 255, 0.05)'
+          background: 'rgba(15, 23, 42, 0.8)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          borderRight: '1px solid rgba(59, 130, 246, 0.15)'
         }}>
         {/* Logo */}
         <div className="flex items-center gap-3 mb-8 px-2">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden"
-            style={{
-              background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(168, 85, 247, 0.2))',
-              border: '1px solid rgba(167, 139, 250, 0.3)',
-              boxShadow: '0 0 20px rgba(139, 92, 246, 0.3)'
-            }}>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden bg-blue-600/20 border border-blue-500/30">
             <img src="/logo.png" alt="American Club" className="w-7 h-7 object-contain" />
           </div>
           <div>
-            <h1 className="font-bold text-white text-sm" style={{ textShadow: '0 0 20px rgba(167, 139, 250, 0.3)' }}>American Club</h1>
-            <p className="text-[10px] text-purple-400 font-semibold">ADMIN PANEL</p>
+            <h1 className="font-bold text-white text-sm">American Club</h1>
+            <p className="text-[10px] text-blue-400 font-semibold">ADMIN PANEL</p>
           </div>
         </div>
 
@@ -277,7 +270,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300`}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200`}
               style={{
                 background: activeTab === item.id ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.1))' : 'transparent',
                 border: activeTab === item.id ? '1px solid rgba(139, 92, 246, 0.3)' : '1px solid transparent',

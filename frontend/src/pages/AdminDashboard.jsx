@@ -1039,10 +1039,14 @@ function ProvidersTab({ authHeaders }) {
                 {providers.find(p => p.id === "signalwire")?.phone_numbers?.map((phone) => (
                   <div 
                     key={phone.id || phone.number}
-                    className="flex items-center justify-between p-2 rounded-lg glass-card-static"
+                    className="flex items-center justify-between p-2 rounded-lg"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid rgba(255, 255, 255, 0.08)'
+                    }}
                   >
                     <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full status-glow ${phone.is_active ? 'bg-emerald-400' : 'bg-slate-500'}`} />
+                      <span className={`w-2 h-2 rounded-full ${phone.is_active ? 'bg-emerald-400' : 'bg-slate-500'}`} style={{ boxShadow: phone.is_active ? '0 0 8px #10b981' : 'none' }} />
                       <span className="font-mono text-sm text-white">{phone.number}</span>
                     </div>
                     <div className="flex items-center gap-1">

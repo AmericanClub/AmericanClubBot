@@ -144,7 +144,8 @@ Build a full-stack bot-calling website with multi-provider support (Infobip, Sig
 │   └── PRD.md
 └── test_reports/
     ├── iteration_5.json
-    └── iteration_6.json  # Dark theme dropdown fix verification
+    ├── iteration_6.json  # Dark theme dropdown fix verification
+    └── iteration_8.json  # Decision Box floating modal verification
 ```
 
 ## Completed in This Session (Jan 30, 2026)
@@ -154,11 +155,20 @@ Build a full-stack bot-calling website with multi-provider support (Infobip, Sig
 - Implemented CSS injection via useEffect in AppWrapper component for Radix UI Portal elements
 - All SelectContent dropdowns now use:
   - Background: rgba(15, 10, 30, 0.98)
-  - Border: rgba(139, 92, 246, 0.3)  
+  - Border: rgba(139, 92, 246, 0.35)  
   - Blur effect: backdrop-filter: blur(20px)
   - Hover highlight: rgba(139, 92, 246, 0.25)
 - Updated select.jsx component with inline styles as backup
-- Added global CSS rules in index.css for [data-radix-select-content] elements
+- Added global CSS rules in index.css and App.css for [data-radix-select-content] elements
+
+### Decision Box Floating Modal ✅
+- Converted Decision Box from inline sticky element to floating modal overlay
+- Modal uses position: fixed with inset: 0 for full-screen overlay
+- Centered with flex (align-items: center, justify-content: center)
+- Added dark backdrop with blur effect (rgba(0, 0, 0, 0.6) + blur(8px))
+- Framer Motion animations for smooth entrance/exit
+- Layout NO LONGER shifts when Decision Box appears
+- Enhanced visual design with glowing borders and glassmorphism effects
 
 ## Next Steps / Backlog
 

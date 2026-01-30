@@ -9,6 +9,7 @@ import {
   Layers, 
   Trash2,
   Volume2,
+  VolumeX,
   User,
   Hash,
   Building,

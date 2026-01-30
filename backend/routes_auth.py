@@ -1,0 +1,539 @@
+"""
+Authentication Routes - Login, Signup, Logout, User Management
+"""
+from fastapi import APIRouter, HTTPException, status, Request, Depends, BackgroundTasks
+from datetime import datetime, timezone
+from typing import Optional
+import uuid
+
+from auth import (
+    UserCreate, UserLogin, UserResponse, TokenResponse,
+    InviteCodeCreate, InviteCodeResponse, CreditAdjustment,
+    verify_password, get_password_hash, create_access_token,
+    generate_invite_code, get_client_ip, get_device_info,
+    get_current_user, get_current_admin, get_current_active_user
+)
+
+auth_router = APIRouter(prefix="/auth", tags=["Authentication"])
+admin_router = APIRouter(prefix="/admin", tags=["Admin"])
+
+
+# ==================
+# Auth Routes
+# ==================
+
+@auth_router.post("/signup", response_model=TokenResponse)
+async def signup(user_data: UserCreate, request: Request):
+    """Register new user with invite code"""
+    from server import db
+    
+    # Validate invite code
+    invite_code = await db.invite_codes.find_one({
+        "code": user_data.invite_code.upper(),
+        "is_used": False
+    }, {"_id": 0})
+    
+    if not invite_code:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or already used invite code"
+        )
+    
+    # Check if email already exists
+    existing_user = await db.users.find_one({"email": user_data.email.lower()})
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered"
+        )
+    
+    # Create user
+    user_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    
+    # Create session
+    token, session_id = create_access_token(
+        data={"sub": user_id},
+        role="user"
+    )
+    
+    client_ip = get_client_ip(request)
+    device_info = get_device_info(request)
+    
+    new_user = {
+        "id": user_id,
+        "email": user_data.email.lower(),
+        "password": get_password_hash(user_data.password),
+        "name": user_data.name,
+        "role": "user",
+        "credits": invite_code["credits"],
+        "total_credits_used": 0,
+        "is_active": True,
+        "invite_code_used": invite_code["code"],
+        "active_session": {
+            "session_id": session_id,
+            "ip": client_ip,
+            "device": device_info,
+            "login_at": now
+        },
+        "created_at": now,
+        "last_login": now
+    }
+    
+    await db.users.insert_one(new_user)
+    
+    # Mark invite code as used
+    await db.invite_codes.update_one(
+        {"code": invite_code["code"]},
+        {"$set": {
+            "is_used": True,
+            "used_by": user_id,
+            "used_by_email": user_data.email.lower(),
+            "used_by_name": user_data.name,
+            "used_at": now
+        }}
+    )
+    
+    # Add credit transaction log
+    await db.credit_transactions.insert_one({
+        "id": str(uuid.uuid4()),
+        "user_id": user_id,
+        "type": "signup_bonus",
+        "amount": invite_code["credits"],
+        "balance_after": invite_code["credits"],
+        "reason": f"Signup bonus from invite code: {invite_code['code']}",
+        "created_at": now
+    })
+    
+    return TokenResponse(
+        access_token=token,
+        user=UserResponse(
+            id=user_id,
+            email=new_user["email"],
+            name=new_user["name"],
+            role=new_user["role"],
+            credits=new_user["credits"],
+            is_active=new_user["is_active"],
+            created_at=new_user["created_at"],
+            last_login=new_user["last_login"]
+        )
+    )
+
+
+@auth_router.post("/login", response_model=TokenResponse)
+async def login(user_data: UserLogin, request: Request):
+    """Login user - invalidates previous sessions (single device)"""
+    from server import db
+    
+    # Find user
+    user = await db.users.find_one({"email": user_data.email.lower()}, {"_id": 0})
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password"
+        )
+    
+    # Verify password
+    if not verify_password(user_data.password, user["password"]):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password"
+        )
+    
+    # Check if active
+    if not user.get("is_active", False):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Account is disabled"
+        )
+    
+    # Create new session (this invalidates any previous session)
+    token, session_id = create_access_token(
+        data={"sub": user["id"]},
+        role=user["role"]
+    )
+    
+    client_ip = get_client_ip(request)
+    device_info = get_device_info(request)
+    now = datetime.now(timezone.utc).isoformat()
+    
+    # Update user with new session
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {
+            "active_session": {
+                "session_id": session_id,
+                "ip": client_ip,
+                "device": device_info,
+                "login_at": now
+            },
+            "last_login": now
+        }}
+    )
+    
+    return TokenResponse(
+        access_token=token,
+        user=UserResponse(
+            id=user["id"],
+            email=user["email"],
+            name=user["name"],
+            role=user["role"],
+            credits=user.get("credits", 0),
+            is_active=user["is_active"],
+            created_at=user["created_at"],
+            last_login=now
+        )
+    )
+
+
+@auth_router.post("/logout")
+async def logout(current_user: dict = Depends(get_current_user)):
+    """Logout current user - invalidate session"""
+    from server import db
+    
+    await db.users.update_one(
+        {"id": current_user["id"]},
+        {"$set": {"active_session": {}}}
+    )
+    
+    return {"message": "Logged out successfully"}
+
+
+@auth_router.get("/me", response_model=UserResponse)
+async def get_me(current_user: dict = Depends(get_current_user)):
+    """Get current user info"""
+    return UserResponse(
+        id=current_user["id"],
+        email=current_user["email"],
+        name=current_user["name"],
+        role=current_user["role"],
+        credits=current_user.get("credits", 0),
+        is_active=current_user["is_active"],
+        created_at=current_user["created_at"],
+        last_login=current_user.get("last_login")
+    )
+
+
+@auth_router.put("/change-password")
+async def change_password(
+    old_password: str,
+    new_password: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Change user password"""
+    from server import db
+    
+    if not verify_password(old_password, current_user["password"]):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect"
+        )
+    
+    await db.users.update_one(
+        {"id": current_user["id"]},
+        {"$set": {"password": get_password_hash(new_password)}}
+    )
+    
+    return {"message": "Password changed successfully"}
+
+
+# ==================
+# Admin Routes - User Management
+# ==================
+
+@admin_router.get("/users")
+async def get_all_users(current_admin: dict = Depends(get_current_admin)):
+    """Get all users (admin only)"""
+    from server import db
+    
+    users = await db.users.find({}, {"_id": 0, "password": 0}).to_list(1000)
+    return {"users": users, "total": len(users)}
+
+
+@admin_router.get("/users/{user_id}")
+async def get_user(user_id: str, current_admin: dict = Depends(get_current_admin)):
+    """Get specific user details"""
+    from server import db
+    
+    user = await db.users.find_one({"id": user_id}, {"_id": 0, "password": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Get user's call history count
+    call_count = await db.call_logs.count_documents({"user_id": user_id})
+    user["total_calls"] = call_count
+    
+    return user
+
+
+@admin_router.put("/users/{user_id}/toggle-active")
+async def toggle_user_active(user_id: str, current_admin: dict = Depends(get_current_admin)):
+    """Enable/disable user account"""
+    from server import db
+    
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user["role"] == "admin":
+        raise HTTPException(status_code=400, detail="Cannot disable admin account")
+    
+    new_status = not user.get("is_active", True)
+    
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"is_active": new_status}}
+    )
+    
+    # If disabling, invalidate session
+    if not new_status:
+        await db.users.update_one(
+            {"id": user_id},
+            {"$set": {"active_session": {}}}
+        )
+    
+    return {"message": f"User {'enabled' if new_status else 'disabled'}", "is_active": new_status}
+
+
+@admin_router.post("/users/{user_id}/credits")
+async def adjust_user_credits(
+    user_id: str,
+    adjustment: CreditAdjustment,
+    current_admin: dict = Depends(get_current_admin)
+):
+    """Add or deduct credits from user"""
+    from server import db
+    
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    current_credits = user.get("credits", 0)
+    new_credits = current_credits + adjustment.amount
+    
+    if new_credits < 0:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot deduct {abs(adjustment.amount)} credits. User only has {current_credits}"
+        )
+    
+    now = datetime.now(timezone.utc).isoformat()
+    
+    # Update user credits
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"credits": new_credits}}
+    )
+    
+    # Add transaction log
+    await db.credit_transactions.insert_one({
+        "id": str(uuid.uuid4()),
+        "user_id": user_id,
+        "type": "admin_adjustment",
+        "amount": adjustment.amount,
+        "balance_after": new_credits,
+        "reason": adjustment.reason,
+        "adjusted_by": current_admin["id"],
+        "created_at": now
+    })
+    
+    return {
+        "message": f"Credits adjusted by {adjustment.amount}",
+        "previous_credits": current_credits,
+        "new_credits": new_credits
+    }
+
+
+@admin_router.get("/users/{user_id}/transactions")
+async def get_user_transactions(user_id: str, current_admin: dict = Depends(get_current_admin)):
+    """Get user's credit transaction history"""
+    from server import db
+    
+    transactions = await db.credit_transactions.find(
+        {"user_id": user_id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    return {"transactions": transactions}
+
+
+# ==================
+# Admin Routes - Invite Codes
+# ==================
+
+@admin_router.post("/invite-codes", response_model=InviteCodeResponse)
+async def create_invite_code(
+    code_data: InviteCodeCreate,
+    current_admin: dict = Depends(get_current_admin)
+):
+    """Create new invite code"""
+    from server import db
+    
+    code = code_data.code.upper() if code_data.code else generate_invite_code()
+    
+    # Check if code already exists
+    existing = await db.invite_codes.find_one({"code": code})
+    if existing:
+        raise HTTPException(
+            status_code=400,
+            detail="Invite code already exists"
+        )
+    
+    now = datetime.now(timezone.utc).isoformat()
+    
+    new_code = {
+        "id": str(uuid.uuid4()),
+        "code": code,
+        "credits": code_data.credits,
+        "is_used": False,
+        "used_by": None,
+        "used_by_email": None,
+        "used_by_name": None,
+        "used_at": None,
+        "notes": code_data.notes,
+        "created_by": current_admin["id"],
+        "created_by_name": current_admin["name"],
+        "created_at": now
+    }
+    
+    await db.invite_codes.insert_one(new_code)
+    
+    return InviteCodeResponse(
+        id=new_code["id"],
+        code=new_code["code"],
+        credits=new_code["credits"],
+        is_used=new_code["is_used"],
+        notes=new_code["notes"],
+        created_at=new_code["created_at"],
+        created_by=current_admin["name"]
+    )
+
+
+@admin_router.post("/invite-codes/bulk")
+async def create_bulk_invite_codes(
+    count: int,
+    credits: int,
+    prefix: Optional[str] = None,
+    current_admin: dict = Depends(get_current_admin)
+):
+    """Create multiple invite codes at once"""
+    from server import db
+    
+    if count > 100:
+        raise HTTPException(status_code=400, detail="Maximum 100 codes at once")
+    
+    now = datetime.now(timezone.utc).isoformat()
+    codes_created = []
+    
+    for _ in range(count):
+        code = generate_invite_code()
+        if prefix:
+            code = f"{prefix.upper()}-{code.split('-')[1]}"
+        
+        new_code = {
+            "id": str(uuid.uuid4()),
+            "code": code,
+            "credits": credits,
+            "is_used": False,
+            "used_by": None,
+            "used_by_email": None,
+            "used_by_name": None,
+            "used_at": None,
+            "notes": f"Bulk generated ({count} codes)",
+            "created_by": current_admin["id"],
+            "created_by_name": current_admin["name"],
+            "created_at": now
+        }
+        
+        await db.invite_codes.insert_one(new_code)
+        codes_created.append(code)
+    
+    return {"message": f"Created {count} invite codes", "codes": codes_created}
+
+
+@admin_router.get("/invite-codes")
+async def get_all_invite_codes(
+    used: Optional[bool] = None,
+    current_admin: dict = Depends(get_current_admin)
+):
+    """Get all invite codes"""
+    from server import db
+    
+    query = {}
+    if used is not None:
+        query["is_used"] = used
+    
+    codes = await db.invite_codes.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    stats = {
+        "total": len(codes),
+        "used": sum(1 for c in codes if c["is_used"]),
+        "unused": sum(1 for c in codes if not c["is_used"])
+    }
+    
+    return {"codes": codes, "stats": stats}
+
+
+@admin_router.delete("/invite-codes/{code_id}")
+async def delete_invite_code(code_id: str, current_admin: dict = Depends(get_current_admin)):
+    """Delete unused invite code"""
+    from server import db
+    
+    code = await db.invite_codes.find_one({"id": code_id}, {"_id": 0})
+    if not code:
+        raise HTTPException(status_code=404, detail="Invite code not found")
+    
+    if code["is_used"]:
+        raise HTTPException(status_code=400, detail="Cannot delete used invite code")
+    
+    await db.invite_codes.delete_one({"id": code_id})
+    
+    return {"message": "Invite code deleted"}
+
+
+# ==================
+# Admin Routes - Dashboard Stats
+# ==================
+
+@admin_router.get("/dashboard/stats")
+async def get_dashboard_stats(current_admin: dict = Depends(get_current_admin)):
+    """Get admin dashboard statistics"""
+    from server import db
+    
+    total_users = await db.users.count_documents({"role": "user"})
+    active_users = await db.users.count_documents({"role": "user", "is_active": True})
+    total_calls = await db.call_logs.count_documents({})
+    total_credits_used = 0
+    
+    # Aggregate total credits used
+    pipeline = [
+        {"$match": {"type": "call_deduction"}},
+        {"$group": {"_id": None, "total": {"$sum": {"$abs": "$amount"}}}}
+    ]
+    result = await db.credit_transactions.aggregate(pipeline).to_list(1)
+    if result:
+        total_credits_used = result[0].get("total", 0)
+    
+    # Invite code stats
+    total_codes = await db.invite_codes.count_documents({})
+    used_codes = await db.invite_codes.count_documents({"is_used": True})
+    
+    return {
+        "users": {
+            "total": total_users,
+            "active": active_users,
+            "inactive": total_users - active_users
+        },
+        "calls": {
+            "total": total_calls
+        },
+        "credits": {
+            "total_used": total_credits_used
+        },
+        "invite_codes": {
+            "total": total_codes,
+            "used": used_codes,
+            "unused": total_codes - used_codes
+        }
+    }

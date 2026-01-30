@@ -31,6 +31,12 @@ INFOBIP_APP_NAME = os.environ.get('INFOBIP_APP_NAME', 'AmericanClub1')
 INFOBIP_APP_ID = os.environ.get('INFOBIP_APP_ID', '')
 INFOBIP_CONFIG_ID = os.environ.get('INFOBIP_CONFIG_ID', '')
 
+# SignalWire configuration
+SIGNALWIRE_PROJECT_ID = os.environ.get('SIGNALWIRE_PROJECT_ID', '')
+SIGNALWIRE_AUTH_TOKEN = os.environ.get('SIGNALWIRE_AUTH_TOKEN', '')
+SIGNALWIRE_SPACE_URL = os.environ.get('SIGNALWIRE_SPACE_URL', '')
+SIGNALWIRE_FROM_NUMBER = os.environ.get('SIGNALWIRE_FROM_NUMBER', '')
+
 # Webhook URL for callbacks
 WEBHOOK_BASE_URL = os.environ.get('WEBHOOK_BASE_URL', 'https://voice-navigator-9.preview.emergentagent.com')
 

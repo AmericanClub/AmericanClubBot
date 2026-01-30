@@ -141,17 +141,17 @@ export default function AuthPage({ onLogin }) {
 
                 {/* Name */}
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold text-purple-300/70 uppercase tracking-wider">
+                  <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
                     Full Name *
                   </label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-400/50" />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400/50" />
                     <Input
                       type="text"
                       placeholder="Enter your name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-purple-500/50 focus:ring-purple-500/20 rounded-xl h-11 backdrop-blur-sm"
+                      className="pl-10 bg-slate-900/50 border-slate-700/50 text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-blue-500/20 rounded-lg h-11"
                       required={!isLogin}
                       data-testid="name-input"
                     />
@@ -162,17 +162,17 @@ export default function AuthPage({ onLogin }) {
 
             {/* Email */}
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-purple-300/70 uppercase tracking-wider">
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
                 Email Address *
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-400/50" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400/50" />
                 <Input
                   type="email"
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-purple-500/50 focus:ring-purple-500/20 rounded-xl h-11 backdrop-blur-sm"
+                  className="pl-10 bg-slate-900/50 border-slate-700/50 text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-blue-500/20 rounded-lg h-11"
                   required
                   data-testid="email-input"
                 />
@@ -181,24 +181,24 @@ export default function AuthPage({ onLogin }) {
 
             {/* Password */}
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-purple-300/70 uppercase tracking-wider">
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
                 Password *
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-400/50" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400/50" />
                 <Input
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 pr-10 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-purple-500/50 focus:ring-purple-500/20 rounded-xl h-11 backdrop-blur-sm"
+                  className="pl-10 pr-10 bg-slate-900/50 border-slate-700/50 text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-blue-500/20 rounded-lg h-11"
                   required
                   data-testid="password-input"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-400/50 hover:text-purple-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-blue-400 transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -209,12 +209,9 @@ export default function AuthPage({ onLogin }) {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full font-semibold py-3 mt-6 rounded-xl h-12 text-white"
+              className="w-full font-semibold py-3 mt-6 rounded-lg h-12 text-white bg-blue-600 hover:bg-blue-700 transition-colors"
               style={{
-                background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #8b5cf6 100%)',
-                backgroundSize: '200% 200%',
-                boxShadow: '0 4px 20px rgba(139, 92, 246, 0.4), 0 0 40px rgba(139, 92, 246, 0.2)',
-                transition: 'all 0.3s ease'
+                boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
               }}
               data-testid="submit-btn"
             >

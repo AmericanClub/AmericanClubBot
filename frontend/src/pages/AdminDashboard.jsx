@@ -1248,36 +1248,40 @@ function ProvidersTab({ authHeaders }) {
                 <Input
                   value={swProjectId}
                   onChange={(e) => setSwProjectId(e.target.value)}
-                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
+                  className="mt-1 glass-input"
                   placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-500 uppercase">Auth Token *</label>
+                <label className="text-xs font-medium text-white/70 uppercase">Auth Token *</label>
                 <Input
                   type="password"
                   value={swAuthToken}
                   onChange={(e) => setSwAuthToken(e.target.value)}
-                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
+                  className="mt-1 glass-input"
                   placeholder="PTxxxxxxxxxxxxxxxxxxxxxxxxxx"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-500 uppercase">Space URL *</label>
+                <label className="text-xs font-medium text-white/70 uppercase">Space URL *</label>
                 <Input
                   value={swSpaceUrl}
                   onChange={(e) => setSwSpaceUrl(e.target.value)}
-                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
+                  className="mt-1 glass-input"
                   placeholder="your-space.signalwire.com"
                 />
               </div>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-white/40">
                 Note: Add phone numbers after saving credentials using the "Add Number" button.
               </p>
               <Button
                 onClick={handleSaveSignalWire}
                 disabled={isLoading || !swProjectId || !swAuthToken || !swSpaceUrl}
-                className="w-full bg-emerald-500 hover:bg-emerald-600"
+                className="w-full text-white"
+                style={{
+                  background: 'linear-gradient(135deg, #10b981, #059669)',
+                  boxShadow: '0 0 20px rgba(16, 185, 129, 0.3)'
+                }}
               >
                 {isLoading ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : null}
                 Save Configuration

@@ -362,7 +362,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
 
             <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(59, 130, 246, 0.15)' }}>
               <table className="w-full">
-                <thead className="glass-table-header">
+                <thead className="rounded-xl-header">
                   <tr>
                     <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">User</th>
                     <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Role</th>
@@ -374,7 +374,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {users.map((u) => (
-                    <tr key={u.id} className="glass-table-row">
+                    <tr key={u.id} className="rounded-xl-row">
                       <td className="px-4 py-3">
                         <div>
                           <p className="text-sm font-medium text-white">{u.name}</p>
@@ -389,7 +389,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="text-sm font-mono text-cyan-400 neon-text">{u.credits}</span>
+                        <span className="text-sm font-mono text-cyan-400 ">{u.credits}</span>
                       </td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium rounded-full status-glow ${
@@ -458,7 +458,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
         {activeTab === "invite-codes" && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-white neon-text">Invite Codes</h2>
+              <h2 className="text-2xl font-bold text-white ">Invite Codes</h2>
               <Button 
                 onClick={() => setShowCreateCode(true)} 
                 className="glow-button text-white"
@@ -468,9 +468,9 @@ export default function AdminDashboard({ user, token, onLogout }) {
               </Button>
             </div>
 
-            <div className="glass-table">
+            <div className="rounded-xl">
               <table className="w-full">
-                <thead className="glass-table-header">
+                <thead className="rounded-xl-header">
                   <tr>
                     <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Code</th>
                     <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Credits</th>
@@ -482,7 +482,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {inviteCodes.map((code) => (
-                    <tr key={code.id} className="glass-table-row">
+                    <tr key={code.id} className="rounded-xl-row">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <span className="font-mono text-sm text-white">{code.code}</span>
@@ -499,7 +499,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="text-sm font-mono text-cyan-400 neon-text">{code.credits}</span>
+                        <span className="text-sm font-mono text-cyan-400 ">{code.credits}</span>
                       </td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex px-2 py-0.5 text-[10px] font-medium rounded-full status-glow ${
@@ -589,9 +589,9 @@ export default function AdminDashboard({ user, token, onLogout }) {
         {showAddCredits && selectedUser && (
           <Modal onClose={() => { setShowAddCredits(false); setSelectedUser(null); }} title={`Add Credits to ${selectedUser.name}`}>
             <div className="space-y-4">
-              <div className="glass-card-static p-3" style={{ background: 'rgba(34, 211, 238, 0.1)', border: '1px solid rgba(34, 211, 238, 0.3)' }}>
+              <div className="rounded-xl-static p-3" style={{ background: 'rgba(34, 211, 238, 0.1)', border: '1px solid rgba(34, 211, 238, 0.3)' }}>
                 <p className="text-xs text-white/70">Current Balance</p>
-                <p className="text-2xl font-mono text-cyan-400 neon-text">{selectedUser.credits} credits</p>
+                <p className="text-2xl font-mono text-cyan-400 ">{selectedUser.credits} credits</p>
               </div>
               <div>
                 <label className="text-xs font-medium text-white/70 uppercase">Amount to Add</label>
@@ -944,12 +944,12 @@ function ProvidersTab({ authHeaders }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white neon-text">Provider Settings</h2>
+        <h2 className="text-2xl font-bold text-white ">Provider Settings</h2>
         <Button 
           onClick={fetchProviders} 
           variant="outline" 
           size="sm"
-          className="glass-card border-white/20 text-white/80 hover:bg-white/10 hover:text-white"
+          className="rounded-xl border-white/20 text-white/80 hover:bg-white/10 hover:text-white"
           style={{ backdropFilter: 'blur(10px)' }}
         >
           <RefreshCw className="w-4 h-4 mr-2" />
@@ -959,7 +959,7 @@ function ProvidersTab({ authHeaders }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* SignalWire Card */}
-        <div className="glass-card overflow-hidden">
+        <div className="rounded-xl overflow-hidden">
           <div className="p-5" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -1067,7 +1067,7 @@ function ProvidersTab({ authHeaders }) {
         </div>
 
         {/* Infobip Card */}
-        <div className="glass-card overflow-hidden">
+        <div className="rounded-xl overflow-hidden">
           <div className="p-5" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">

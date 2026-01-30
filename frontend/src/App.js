@@ -1134,11 +1134,8 @@ function UserCallPanel({ user, token, onLogout }) {
 
         {/* Right Panel - Call Setup */}
         <div className="setup-panel" data-testid="setup-panel">
-          {/* Main Header - Voice Bot Control - Sticky */}
-          <div className="sticky top-0 z-10 pb-3 -mx-[1.5rem] px-[1.5rem] pt-1"
-            style={{
-              background: 'linear-gradient(to bottom, rgba(15, 10, 30, 1) 0%, rgba(15, 10, 30, 0.95) 70%, transparent 100%)',
-            }}>
+          {/* Main Header - Voice Bot Control */}
+          <div className="mb-4">
             <div className="flex items-center justify-between mb-3">
               <h1 className="font-heading text-xl font-bold text-white" style={{ textShadow: '0 0 30px rgba(167, 139, 250, 0.4)' }}>
                 Voice Bot Control
@@ -1174,9 +1171,9 @@ function UserCallPanel({ user, token, onLogout }) {
                 style={{
                   background: selectedProvider === "infobip"
                     ? 'linear-gradient(135deg, rgba(34, 211, 238, 0.2), rgba(6, 182, 212, 0.1))'
-                    : 'rgba(255, 255, 255, 0.03)',
-                  border: `1px solid ${selectedProvider === "infobip" ? 'rgba(34, 211, 238, 0.5)' : 'rgba(255, 255, 255, 0.08)'}`,
-                  color: selectedProvider === "infobip" ? '#22d3ee' : '#94a3b8',
+                    : 'rgba(139, 92, 246, 0.08)',
+                  border: `1px solid ${selectedProvider === "infobip" ? 'rgba(34, 211, 238, 0.5)' : 'rgba(139, 92, 246, 0.2)'}`,
+                  color: selectedProvider === "infobip" ? '#22d3ee' : '#a78bfa',
                   boxShadow: selectedProvider === "infobip" ? '0 0 25px rgba(34, 211, 238, 0.3), inset 0 0 20px rgba(34, 211, 238, 0.1)' : 'none'
                 }}
                 data-testid="provider-ch1"
@@ -1193,9 +1190,9 @@ function UserCallPanel({ user, token, onLogout }) {
                 style={{
                   background: selectedProvider === "signalwire"
                     ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.1))'
-                    : 'rgba(255, 255, 255, 0.03)',
-                  border: `1px solid ${selectedProvider === "signalwire" ? 'rgba(139, 92, 246, 0.5)' : 'rgba(255, 255, 255, 0.08)'}`,
-                  color: selectedProvider === "signalwire" ? '#a78bfa' : '#94a3b8',
+                    : 'rgba(139, 92, 246, 0.08)',
+                  border: `1px solid ${selectedProvider === "signalwire" ? 'rgba(139, 92, 246, 0.5)' : 'rgba(139, 92, 246, 0.2)'}`,
+                  color: selectedProvider === "signalwire" ? '#a78bfa' : '#a78bfa',
                   boxShadow: selectedProvider === "signalwire" ? '0 0 25px rgba(139, 92, 246, 0.3), inset 0 0 20px rgba(139, 92, 246, 0.1)' : 'none'
                 }}
                 data-testid="provider-ch2"

@@ -1190,18 +1190,18 @@ function ProvidersTab({ authHeaders }) {
           <Modal onClose={() => setShowAddPhone(false)} title={`Add Phone Number - ${selectedProvider?.toUpperCase()}`}>
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-medium text-gray-500 uppercase">Phone Number *</label>
+                <label className="text-xs font-medium text-white/70 uppercase">Phone Number *</label>
                 <Input
                   value={newPhoneNumber}
                   onChange={(e) => setNewPhoneNumber(e.target.value)}
-                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
+                  className="mt-1 glass-input"
                   placeholder="+1234567890"
                 />
               </div>
               <Button
                 onClick={handleAddPhoneNumber}
                 disabled={isLoading || !newPhoneNumber}
-                className="w-full bg-cyan-500 hover:bg-cyan-600"
+                className="w-full glow-button text-white"
               >
                 {isLoading ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : null}
                 Add Phone Number

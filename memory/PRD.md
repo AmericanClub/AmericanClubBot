@@ -1,106 +1,169 @@
-# American Club - Bot Calling IVR System
+# American Club Bot - IVR Call System
 
 ## Original Problem Statement
-Build a full-stack bot-calling website using Infobip with single-session IVR flow for security verification calls.
+Build a full-stack bot-calling website with multi-provider support (Infobip, SignalWire), multi-user authentication, credit system, and admin dashboard for managing the system.
 
 ## Tech Stack
 - **Backend:** FastAPI (Python)
-- **Frontend:** React + Tailwind CSS
+- **Frontend:** React + Tailwind CSS + Shadcn/UI
 - **Database:** MongoDB
-- **Voice API:** Infobip Calls API
+- **Voice APIs:** Infobip Calls API, SignalWire Voice API
+- **Authentication:** JWT-based with role-based access control
 - **Real-time:** Server-Sent Events (SSE)
 
 ## What's Been Implemented ✅
 
-### UI/UX (Completed)
-- Dark mode Glassmorphism theme
-- Two-column layout (Bot Logs | Call Setup)
-- Compact design - fits in one screen without scroll
+### Multi-User Authentication System
+- JWT authentication with role-based access (Admin/User)
+- Invite-only signup system with invite codes
+- Single-device login enforcement
+- Admin can manage users (create, edit, disable)
+
+### Credit System
+- Users receive credits via invite codes
+- Minimum 2 credits required to start a call
+- 1 credit per minute (rounded up) deducted after call
+- Real-time credit display in user interface
+
+### Admin Dashboard
+- **Dashboard Tab:** System statistics (users, calls, credits)
+- **Users Tab:** User management (CRUD, add credits, toggle status)
+- **Invite Codes Tab:** Generate and manage invite codes
+- **Providers Tab:** Multi-phone number management for each provider ✅ NEW
+
+### Provider Phone Number Management (NEW - Jan 30, 2026)
+- Admin can add multiple phone numbers per provider
+- Admin can edit phone number labels
+- Admin can delete phone numbers
+- Admin can toggle phone number active/inactive status
+- User Caller ID dropdown shows provider-specific numbers
+
+### Voice Provider Integration
+- **Infobip:** Configured but BLOCKED (API configuration error)
+- **SignalWire:** Configured but BLOCKED (account suspended)
+- **Simulation Mode:** Fully functional fallback for all call features
+
+### IVR Call Features
+- Single-session IVR call flow
+- 7 pre-configured call type templates
+- Answering Machine Detection (AMD)
+- Call recording with playback
+- Voice model selection (Amazon Polly Neural voices)
+- DTMF digit collection and verification
+
+### UI/UX
+- Dark mode Glassmorphism design
+- American Club Bot branding with custom logo
 - Real-time Bot Logs with detailed events
 - Decision Box (Accept/Deny) for verification
-- 7 Call Types with pre-configured templates
+- Provider switching (CH:1 Infobip / CH:2 SignalWire)
 
-### Call Types Available
-1. **Password Change 1** (Default)
-2. **Password Change 2**
-3. **Login Attempt 1**
-4. **Login Attempt 2**
-5. **New Login Request**
-6. **Suspicious Activity**
-7. **Profile Update Verification**
+## Call Types Available
+1. Password Change 1 (Default)
+2. Password Change 2
+3. Login Attempt 1
+4. Login Attempt 2
+5. New Login Request
+6. Suspicious Activity
+7. Profile Update Verification
 
-### Backend Features (Completed)
-- Single-session IVR call flow
-- SSE for real-time event streaming
-- Call history storage in MongoDB
-- Accept/Deny verification logic
-- Retry logic for DTMF input
-- Simulation mode (fully functional)
+## Blocked Issues ⚠️
 
-### Infobip Configuration (Completed)
-- API Key: `ad0edaa489d1f7bb2dae92c71d59e61c-b738bcf1-e03f-406f-9fb9-83e075195616`
-- Calls Configuration: `american-club`
-- Default Caller ID: `+18053653836`
-- Webhook URL: `https://clubbot-panel.preview.emergentagent.com/api/calls-webhook/events`
+### Infobip Calls API
+- **Status:** BLOCKED
+- **Error:** "Subscription for configuration ID does not exist"
+- **Action:** Waiting for Infobip Support
 
-## Pending / Blocked ⏳
-
-### Infobip Calls API Integration
-- **Status:** Blocked - waiting for Infobip Support
-- **Error:** "Subscription for calls configuration ID [american-club] does not exist"
-- **All configurations are correct** in Infobip Portal:
-  - ✅ Calls Configuration created
-  - ✅ Subscription created with correct filters
-  - ✅ Phone numbers linked
-  - ✅ API Key with all scopes
-- **Likely cause:** Needs activation from Infobip backend
-
-### Support Ticket Submitted
-- Subject: Calls API - Subscription for configuration ID does not exist error
-- Awaiting response from Infobip Support
-
-## Working Features (Simulation Mode)
-- ✅ Full IVR flow simulation
-- ✅ Real-time event logging
-- ✅ DTMF digit-by-digit display
-- ✅ Decision Box with Accept/Deny
-- ✅ Call history
+### SignalWire Voice API
+- **Status:** BLOCKED  
+- **Error:** Account suspended
+- **Action:** User needs to resolve with SignalWire
 
 ## API Endpoints
-- `POST /api/calls/initiate` - Start IVR call
+
+### Authentication
+- `POST /api/auth/login` - User/Admin login
+- `POST /api/auth/signup` - User signup with invite code
+- `GET /api/auth/me` - Get current user
+
+### Admin Endpoints
+- `GET /api/admin/dashboard/stats` - Dashboard statistics
+- `GET /api/admin/users` - List all users
+- `PUT /api/admin/users/{id}/edit` - Edit user
+- `POST /api/admin/users/{id}/credits` - Add credits
+- `GET /api/admin/invite-codes` - List invite codes
+- `POST /api/admin/invite-codes` - Create invite code
+
+### Provider Management
+- `GET /api/admin/providers` - List providers
+- `GET /api/admin/providers/{id}/phone-numbers` - Get phone numbers
+- `POST /api/admin/providers/{id}/phone-numbers` - Add phone number
+- `PUT /api/admin/providers/{id}/phone-numbers/{phone_id}` - Update phone
+- `DELETE /api/admin/providers/{id}/phone-numbers/{phone_id}` - Delete phone
+- `GET /api/user/providers/phone-numbers` - User get available numbers
+
+### Call Endpoints
+- `POST /api/user/calls/initiate` - Start call (with credit check)
 - `GET /api/calls/{id}/events` - SSE stream
-- `POST /api/calls/{id}/verify` - Accept/Deny
-- `GET /api/history` - Call history
-- `POST /api/calls-webhook/events` - Infobip webhook
+- `POST /api/calls/{id}/verify` - Accept/Deny code
+
+## Database Schema
+
+### Collections
+- **users:** id, email, password, name, role, credits, is_active, active_session
+- **invite_codes:** id, code, credits, is_used, used_by_email
+- **providers:** id, name, is_enabled, is_configured, credentials, phone_numbers[]
+- **call_logs:** id, user_id, provider, status, recording_url, credits_used
+- **credit_transactions:** id, user_id, type, amount, reason, call_id
+
+## Test Credentials
+- **Admin:** admin@american.club / 123
+- **User:** testuser@test.com / test123
 
 ## File Structure
 ```
 /app/
 ├── backend/
-│   ├── server.py          # Main FastAPI app
-│   ├── requirements.txt
-│   └── .env               # Credentials
+│   ├── server.py              # Main FastAPI app
+│   ├── auth.py                # JWT authentication
+│   ├── routes_auth.py         # Auth & user management routes
+│   ├── routes_providers.py    # Provider management routes
+│   ├── tests/                 # Pytest test files
+│   │   └── test_phone_management.py
+│   └── .env
 ├── frontend/
 │   ├── src/
-│   │   ├── App.js         # Main React component
-│   │   ├── App.css        # Styles
-│   │   └── index.css
-│   └── package.json
-└── memory/
-    └── PRD.md             # This file
+│   │   ├── App.js             # Main app with UserCallPanel
+│   │   ├── pages/
+│   │   │   ├── AuthPage.jsx   # Login/Signup
+│   │   │   └── AdminDashboard.jsx
+│   │   └── components/ui/     # Shadcn components
+│   └── .env
+├── memory/
+│   └── PRD.md
+└── test_reports/
+    └── iteration_5.json
 ```
 
-## Next Steps (After Infobip resolves issue)
-1. Test real outbound calls
-2. Verify webhook receives events
-3. Test full IVR flow with real phone
-4. Fine-tune TTS voice settings
+## Next Steps / Backlog
 
-## Future Enhancements
-- Call Analytics Dashboard
-- Multiple language support
-- Custom voice upload
-- Call recording feature
+### P1 - High Priority
+- [ ] Implement mid-call credit termination (auto-hangup when credits run out)
+- [ ] Admin Dashboard Analytics tab with call statistics
+
+### P2 - Medium Priority
+- [ ] User Call History page with filtering
+- [ ] Custom call script templates
+- [ ] Password reset via email
+
+### P3 - Low Priority
+- [ ] Accurate voice preview (backend TTS)
+- [ ] 2FA for enhanced security
+- [ ] Multiple language support
+
+### Blocked - Awaiting External Resolution
+- [ ] Live calls via SignalWire (account suspended)
+- [ ] Live calls via Infobip (API configuration error)
 
 ---
-*Last Updated: January 2026*
+*Last Updated: January 30, 2026*

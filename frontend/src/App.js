@@ -1090,26 +1090,31 @@ function UserCallPanel({ user, token, onLogout }) {
               data-testid="decision-box"
             >
                 <div className="decision-box-inner">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                      <Keyboard className="w-4 h-4 text-emerald-600" />
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(34, 211, 238, 0.15))',
+                        border: '1px solid rgba(16, 185, 129, 0.3)',
+                        boxShadow: '0 0 20px rgba(16, 185, 129, 0.3)'
+                      }}>
+                      <Keyboard className="w-5 h-5 text-emerald-400" />
                     </div>
                     <div>
-                      <div className="font-mono text-[10px] text-gray-500 uppercase tracking-wider">Security Code</div>
-                      <div className="font-mono text-lg text-emerald-600 tracking-widest flex items-center gap-1.5">
+                      <div className="font-mono text-[10px] text-purple-300/70 uppercase tracking-wider">Security Code</div>
+                      <div className="font-mono text-xl text-emerald-400 tracking-widest flex items-center gap-2" style={{ textShadow: '0 0 15px rgba(16, 185, 129, 0.5)' }}>
                         {dtmfCode}
                         <button 
                           onClick={() => copyToClipboard(dtmfCode)}
-                          className="p-0.5 hover:bg-white/10 rounded transition-colors"
+                          className="p-1 hover:bg-white/10 rounded-lg transition-colors"
                           data-testid="copy-code-main"
                         >
-                          {copiedCode ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3 text-gray-500" />}
+                          {copiedCode ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-purple-400/70" />}
                         </button>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <button
                       onClick={() => handleVerify(true)}
                       disabled={isVerifying}

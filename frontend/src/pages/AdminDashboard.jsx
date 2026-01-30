@@ -961,8 +961,14 @@ function ProvidersTab({ authHeaders }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-800">Provider Settings</h2>
-        <Button onClick={fetchProviders} variant="outline" size="sm">
+        <h2 className="text-2xl font-bold text-white neon-text">Provider Settings</h2>
+        <Button 
+          onClick={fetchProviders} 
+          variant="outline" 
+          size="sm"
+          className="glass-card border-white/20 text-white/80 hover:bg-white/10 hover:text-white"
+          style={{ backdropFilter: 'blur(10px)' }}
+        >
           <RefreshCw className="w-4 h-4 mr-2" />
           Refresh
         </Button>

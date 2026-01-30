@@ -139,11 +139,13 @@ function App() {
   const [infobipConfigured, setInfobipConfigured] = useState(false);
   const [signalwireConfigured, setSignalwireConfigured] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState("infobip"); // "infobip" or "signalwire"
+  const [infobipFromNumber, setInfobipFromNumber] = useState("");
+  const [signalwireFromNumber, setSignalwireFromNumber] = useState("");
   
   // Call configuration state
   const [callType, setCallType] = useState("password_change_1");
   const [voiceModel, setVoiceModel] = useState("hera");
-  const [fromNumber, setFromNumber] = useState("+18053653836");
+  const [fromNumber, setFromNumber] = useState("");
   const [recipientNumber, setRecipientNumber] = useState("+525547000906");
   const [recipientName, setRecipientName] = useState("");
   const [serviceName, setServiceName] = useState("");

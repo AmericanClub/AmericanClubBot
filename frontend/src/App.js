@@ -179,6 +179,10 @@ function App() {
   const [showVerifyButtons, setShowVerifyButtons] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   
+  // Recording state
+  const [recordingUrl, setRecordingUrl] = useState(null);
+  const [recordingDuration, setRecordingDuration] = useState(null);
+  
   // Call history state
   const [callHistory, setCallHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);

@@ -42,12 +42,21 @@ import { Badge } from "@/components/ui/badge";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-// Voice models
+// Voice models - Amazon Polly Neural (Most Natural)
 const VOICE_MODELS = [
-  { id: "hera", name: "Hera (Female, Mature)" },
-  { id: "aria", name: "Aria (Female, Young)" },
-  { id: "apollo", name: "Apollo (Male, Mature)" },
-  { id: "zeus", name: "Zeus (Male, Deep)" },
+  // Neural Voices (Premium - Most Natural) ⭐
+  { id: "Polly.Joanna-Neural", name: "Joanna (Female, US) ⭐ Most Natural", gender: "female", accent: "US" },
+  { id: "Polly.Matthew-Neural", name: "Matthew (Male, US) ⭐ Professional", gender: "male", accent: "US" },
+  { id: "Polly.Kendra-Neural", name: "Kendra (Female, US) Warm & Friendly", gender: "female", accent: "US" },
+  { id: "Polly.Ruth-Neural", name: "Ruth (Female, US) Clear & Confident", gender: "female", accent: "US" },
+  { id: "Polly.Stephen-Neural", name: "Stephen (Male, US) Authoritative", gender: "male", accent: "US" },
+  { id: "Polly.Amy-Neural", name: "Amy (Female, British) Professional", gender: "female", accent: "UK" },
+  { id: "Polly.Brian-Neural", name: "Brian (Male, British) Trustworthy", gender: "male", accent: "UK" },
+  // Standard Voices (Free)
+  { id: "Polly.Joanna", name: "Joanna Standard (Female, US)", gender: "female", accent: "US" },
+  { id: "Polly.Matthew", name: "Matthew Standard (Male, US)", gender: "male", accent: "US" },
+  { id: "woman", name: "Default Woman (Basic)", gender: "female", accent: "US" },
+  { id: "man", name: "Default Man (Basic)", gender: "male", accent: "US" },
 ];
 
 // Call types with their default messages

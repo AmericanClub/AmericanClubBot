@@ -826,40 +826,60 @@ function UserCallPanel({ user, token, onLogout }) {
   return (
     <div className="app-container" data-testid="app-container">
       {/* User Header Bar */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200 px-4 py-2 shadow-sm">
+      <div className="fixed top-0 left-0 right-0 z-50 px-4 py-2"
+        style={{
+          background: 'rgba(15, 10, 30, 0.8)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
+        }}>
         <div className="max-w-[1800px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center overflow-hidden shadow-md shadow-violet-200">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(168, 85, 247, 0.2))',
+                border: '1px solid rgba(167, 139, 250, 0.3)',
+                boxShadow: '0 0 20px rgba(139, 92, 246, 0.3)'
+              }}>
               <img src="/logo.png" alt="American Club" className="w-7 h-7 object-contain" />
             </div>
             <div>
-              <h1 className="font-bold text-gray-800 text-sm">American Club</h1>
-              <p className="text-[10px] text-gray-500">IVR Call System</p>
+              <h1 className="font-bold text-white text-sm" style={{ textShadow: '0 0 20px rgba(167, 139, 250, 0.3)' }}>American Club</h1>
+              <p className="text-[10px] text-purple-400/70">IVR Call System</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
             {/* Credits Display */}
-            <div className="flex items-center gap-2 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl px-4 py-2 border border-amber-200">
-              <Coins className="w-4 h-4 text-amber-500" />
+            <div className="flex items-center gap-2 rounded-xl px-4 py-2"
+              style={{
+                background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.1))',
+                border: '1px solid rgba(251, 191, 36, 0.3)',
+                boxShadow: '0 0 20px rgba(251, 191, 36, 0.2)'
+              }}>
+              <Coins className="w-4 h-4 text-yellow-400" style={{ filter: 'drop-shadow(0 0 8px rgba(251, 191, 36, 0.5))' }} />
               <div>
-                <span className="font-mono text-lg font-bold text-amber-600" data-testid="user-credits">{userCredits}</span>
-                <span className="text-[10px] text-amber-500 ml-1">credits</span>
+                <span className="font-mono text-lg font-bold text-yellow-400" data-testid="user-credits" style={{ textShadow: '0 0 15px rgba(251, 191, 36, 0.5)' }}>{userCredits}</span>
+                <span className="text-[10px] text-yellow-500/70 ml-1">credits</span>
               </div>
             </div>
             {/* User Info */}
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <p className="text-sm font-semibold text-gray-800">{user?.name}</p>
-                <p className="text-[10px] text-gray-500">{user?.email}</p>
+                <p className="text-sm font-semibold text-white">{user?.name}</p>
+                <p className="text-[10px] text-white/50">{user?.email}</p>
               </div>
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-md shadow-violet-200">
+              <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                style={{
+                  background: 'linear-gradient(135deg, #8b5cf6, #a855f7)',
+                  boxShadow: '0 0 20px rgba(139, 92, 246, 0.4)'
+                }}>
                 {user?.name?.charAt(0)?.toUpperCase() || "U"}
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onLogout}
-                className="text-gray-400 hover:text-red-500 hover:bg-red-50"
+                className="text-white/50 hover:text-red-400 hover:bg-red-500/10"
                 data-testid="logout-btn"
               >
                 <LogOut className="w-4 h-4" />
@@ -875,10 +895,11 @@ function UserCallPanel({ user, token, onLogout }) {
           <div className="logs-header">
             <div className="flex items-center gap-2">
               <div className={`status-indicator ${getStatusClass(callStatus)}`} data-testid="status-indicator" />
-              <h2 className="font-heading text-sm font-semibold text-gray-800">
+              <h2 className="font-heading text-sm font-semibold text-white">
                 Bot Logs
               </h2>
-              <span className="font-mono text-[10px] text-gray-400 uppercase bg-gray-100 px-2 py-0.5 rounded">
+              <span className="font-mono text-[10px] text-purple-400 uppercase px-2 py-0.5 rounded"
+                style={{ background: 'rgba(139, 92, 246, 0.2)', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
                 {callStatus}
               </span>
             </div>
@@ -887,7 +908,7 @@ function UserCallPanel({ user, token, onLogout }) {
                 variant="ghost"
                 size="sm"
                 onClick={() => { setShowHistory(!showHistory); fetchCallHistory(); }}
-                className="text-gray-500 hover:text-violet-600 hover:bg-violet-50 h-7 px-2 text-xs"
+                className="text-white/50 hover:text-purple-400 hover:bg-purple-500/10 h-7 px-2 text-xs"
                 data-testid="history-btn"
               >
                 <History className="w-3 h-3 mr-1" />
@@ -897,7 +918,7 @@ function UserCallPanel({ user, token, onLogout }) {
                 variant="ghost"
                 size="sm"
                 onClick={handleClearLogs}
-                className="text-gray-500 hover:text-violet-600 hover:bg-violet-50 h-7 px-2 text-xs"
+                className="text-white/50 hover:text-purple-400 hover:bg-purple-500/10 h-7 px-2 text-xs"
                 data-testid="clear-logs-btn"
               >
                 <Trash2 className="w-3 h-3 mr-1" />
@@ -916,7 +937,7 @@ function UserCallPanel({ user, token, onLogout }) {
                 className="border-b border-white/5 overflow-hidden"
               >
                 <div className="p-2 max-h-32 overflow-y-auto">
-                  <h3 className="font-mono text-[10px] text-cyan-500/70 uppercase tracking-wider mb-2">
+                  <h3 className="font-mono text-[10px] text-cyan-400/70 uppercase tracking-wider mb-2">
                     Recent Calls
                   </h3>
                   {callHistory.length === 0 ? (

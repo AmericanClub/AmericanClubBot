@@ -145,7 +145,8 @@ Build a full-stack bot-calling website with multi-provider support (Infobip, Sig
 └── test_reports/
     ├── iteration_5.json
     ├── iteration_6.json  # Dark theme dropdown fix verification
-    └── iteration_8.json  # Decision Box floating modal verification
+    ├── iteration_8.json  # Decision Box floating modal verification
+    └── iteration_9.json  # Decision Box inline + log order reversal
 ```
 
 ## Completed in This Session (Jan 30, 2026)
@@ -161,14 +162,16 @@ Build a full-stack bot-calling website with multi-provider support (Infobip, Sig
 - Updated select.jsx component with inline styles as backup
 - Added global CSS rules in index.css and App.css for [data-radix-select-content] elements
 
-### Decision Box Floating Modal ✅
-- Converted Decision Box from inline sticky element to floating modal overlay
-- Modal uses position: fixed with inset: 0 for full-screen overlay
-- Centered with flex (align-items: center, justify-content: center)
-- Added dark backdrop with blur effect (rgba(0, 0, 0, 0.6) + blur(8px))
-- Framer Motion animations for smooth entrance/exit
+### Decision Box Restructure ✅
+- Moved Decision Box from floating modal to INLINE sticky element inside Bot Logs panel
+- Decision Box only appears when there's a code to verify (no placeholder)
+- Smooth animation: scale 0.95->1, opacity 0->1, y -10->0 (300ms)
 - Layout NO LONGER shifts when Decision Box appears
-- Enhanced visual design with glowing borders and glassmorphism effects
+
+### Log Order Reversal ✅
+- Logs now display NEWEST at TOP, OLDEST at bottom
+- Users can see the most recent events without scrolling
+- Implemented using [...logs].reverse()
 
 ## Next Steps / Backlog
 

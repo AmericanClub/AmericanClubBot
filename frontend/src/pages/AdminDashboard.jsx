@@ -310,7 +310,11 @@ export default function AdminDashboard({ user, token, onLogout }) {
             variant="ghost"
             size="sm"
             onClick={onLogout}
-            className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
+            className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-500/10"
+            style={{
+              border: '1px solid rgba(239, 68, 68, 0.2)',
+              transition: 'all 0.3s ease'
+            }}
           >
             <LogOut className="w-4 h-4 mr-2" />
             Logout
@@ -319,11 +323,11 @@ export default function AdminDashboard({ user, token, onLogout }) {
       </div>
 
       {/* Main Content */}
-      <div className="ml-64 p-6">
+      <div className="ml-64 p-6 relative z-10">
         {/* Dashboard Tab */}
         {activeTab === "dashboard" && stats && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800">Dashboard</h2>
+            <h2 className="text-2xl font-bold text-white neon-text">Dashboard</h2>
             
             <div className="grid grid-cols-4 gap-4">
               <StatCard

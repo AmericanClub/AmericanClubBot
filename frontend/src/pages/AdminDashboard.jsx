@@ -1059,7 +1059,7 @@ function ProvidersTab({ authHeaders }) {
                         variant="ghost"
                         size="sm"
                         onClick={() => openEditPhone("signalwire", phone)}
-                        className="h-7 w-7 p-0 text-gray-500 hover:text-gray-800"
+                        className="h-7 w-7 p-0 text-white/60 hover:text-white hover:bg-white/10"
                       >
                         <Edit className="w-3 h-3" />
                       </Button>
@@ -1067,7 +1067,7 @@ function ProvidersTab({ authHeaders }) {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDeletePhoneNumber("signalwire", phone.id)}
-                        className="h-7 w-7 p-0 text-red-400 hover:text-red-300"
+                        className="h-7 w-7 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
                       >
                         <Trash2 className="w-3 h-3" />
                       </Button>
@@ -1080,11 +1080,12 @@ function ProvidersTab({ authHeaders }) {
         </div>
 
         {/* Infobip Card */}
-        <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden">
-          <div className="p-5 border-b border-gray-200">
+        <div className="glass-card overflow-hidden">
+          <div className="p-5" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center"
+                  style={{ boxShadow: '0 0 15px rgba(251, 146, 60, 0.3)' }}>
                   <Phone className="w-5 h-5 text-orange-400" />
                 </div>
                 <div>

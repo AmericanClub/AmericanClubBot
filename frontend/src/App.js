@@ -1109,16 +1109,16 @@ function UserCallPanel({ user, token, onLogout }) {
         {/* Right Panel - Call Setup */}
         <div className="setup-panel" data-testid="setup-panel">
           {/* Main Header - Voice Bot Control */}
-          <div className="flex items-center justify-between mb-3">
-            <h1 className="font-heading text-xl font-bold text-white">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="font-heading text-xl font-bold text-gray-800">
               Voice Bot Control
             </h1>
             <Badge 
               variant="default"
-              className={`text-[10px] px-2 py-0.5 ${
+              className={`text-[10px] px-3 py-1 rounded-full font-medium ${
                 selectedProvider === "signalwire" 
-                  ? (signalwireConfigured ? "bg-purple-500/20 text-purple-400 border-purple-500/30" : "bg-yellow-500/20 text-yellow-400 border-yellow-500/30")
-                  : (infobipConfigured ? "bg-cyan-500/20 text-cyan-400 border-cyan-500/30" : "bg-yellow-500/20 text-yellow-400 border-yellow-500/30")
+                  ? (signalwireConfigured ? "bg-purple-100 text-purple-600 border border-purple-200" : "bg-amber-100 text-amber-600 border border-amber-200")
+                  : (infobipConfigured ? "bg-teal-100 text-teal-600 border border-teal-200" : "bg-amber-100 text-amber-600 border border-amber-200")
               }`}
             >
               {selectedProvider === "signalwire" 
@@ -1129,35 +1129,35 @@ function UserCallPanel({ user, token, onLogout }) {
           </div>
 
           {/* Provider Tabs */}
-          <div className="flex items-center gap-2 mb-3" data-testid="provider-tabs">
+          <div className="flex items-center gap-2 mb-4" data-testid="provider-tabs">
             <button
               onClick={() => setSelectedProvider("infobip")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-mono text-[10px] uppercase tracking-wider transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-xs uppercase tracking-wide transition-all ${
                 selectedProvider === "infobip"
-                  ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/50"
-                  : "bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10"
+                  ? "bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-lg shadow-teal-200"
+                  : "bg-white text-gray-500 border border-gray-200 hover:border-teal-300 hover:bg-teal-50"
               }`}
               data-testid="provider-ch1"
             >
-              <span className={`w-2 h-2 rounded-full ${infobipConfigured ? "bg-emerald-400" : "bg-yellow-400"}`} />
+              <span className={`w-2 h-2 rounded-full ${infobipConfigured ? "bg-emerald-400" : "bg-amber-400"}`} />
               CH: 1 (Infobip)
             </button>
             <button
               onClick={() => setSelectedProvider("signalwire")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-mono text-[10px] uppercase tracking-wider transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-xs uppercase tracking-wide transition-all ${
                 selectedProvider === "signalwire"
-                  ? "bg-purple-500/20 text-purple-400 border border-purple-500/50"
-                  : "bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10"
+                  ? "bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg shadow-violet-200"
+                  : "bg-white text-gray-500 border border-gray-200 hover:border-violet-300 hover:bg-violet-50"
               }`}
               data-testid="provider-ch2"
             >
-              <span className={`w-2 h-2 rounded-full ${signalwireConfigured ? "bg-emerald-400" : "bg-yellow-400"}`} />
+              <span className={`w-2 h-2 rounded-full ${signalwireConfigured ? "bg-emerald-400" : "bg-amber-400"}`} />
               CH: 2 (SignalWire)
             </button>
           </div>
           
           {/* Call Configuration */}
-          <div className="form-section glass-panel p-3 rounded-lg mb-3" data-testid="call-config-section">
+          <div className="form-section glass-panel p-4 mb-4" data-testid="call-config-section">
             <h3 className="section-title">
               <Settings className="w-4 h-4" />
               Call Configuration
@@ -1167,12 +1167,12 @@ function UserCallPanel({ user, token, onLogout }) {
               <div>
                 <label className="form-label">Call Type</label>
                 <Select value={callType} onValueChange={setCallType}>
-                  <SelectTrigger className="glass-input font-mono text-cyan-100" data-testid="call-type-select">
+                  <SelectTrigger className="glass-input" data-testid="call-type-select">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-slate-900 border-slate-800">
+                  <SelectContent className="bg-white border-gray-200 shadow-lg">
                     {CALL_TYPES.map((type) => (
-                      <SelectItem 
+                      <SelectItem
                         key={type.id} 
                         value={type.id}
                         className="font-mono text-xs"

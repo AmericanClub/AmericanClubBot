@@ -1083,68 +1083,115 @@ function UserCallPanel({ user, token, onLogout }) {
             <div ref={logsEndRef} />
           </div>
           
-          {/* Decision Box - Accept/Deny */}
+          {/* Decision Box - Floating Modal Overlay */}
           {showVerifyButtons && dtmfCode && (
-            <div
-              className="decision-box"
-              data-testid="decision-box"
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center"
+              style={{
+                background: 'rgba(0, 0, 0, 0.6)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)'
+              }}
+              data-testid="decision-overlay"
             >
-                <div className="decision-box-inner">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center"
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.8, opacity: 0, y: 20 }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                className="decision-modal"
+                data-testid="decision-box"
+              >
+                {/* Glowing border effect */}
+                <div className="absolute inset-0 rounded-2xl"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(168, 85, 247, 0.2), rgba(139, 92, 246, 0.4))',
+                    filter: 'blur(20px)',
+                    transform: 'scale(1.1)',
+                    zIndex: -1
+                  }}
+                />
+                
+                <div className="relative bg-gradient-to-br from-[#1a1333] via-[#0f0a1e] to-[#1a1333] rounded-2xl p-6 border border-purple-500/30"
+                  style={{
+                    boxShadow: '0 0 60px rgba(139, 92, 246, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                  }}>
+                  
+                  {/* Status indicator */}
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                    <span className="text-amber-400 text-xs font-medium tracking-wide">AWAITING VERIFICATION</span>
+                  </div>
+                  
+                  {/* Security Code Display */}
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-14 h-14 rounded-xl flex items-center justify-center"
                       style={{
                         background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(34, 211, 238, 0.15))',
-                        border: '1px solid rgba(16, 185, 129, 0.3)',
-                        boxShadow: '0 0 20px rgba(16, 185, 129, 0.3)'
+                        border: '1px solid rgba(16, 185, 129, 0.4)',
+                        boxShadow: '0 0 30px rgba(16, 185, 129, 0.4)'
                       }}>
-                      <Keyboard className="w-5 h-5 text-emerald-400" />
+                      <Keyboard className="w-7 h-7 text-emerald-400" />
                     </div>
                     <div>
-                      <div className="font-mono text-[10px] text-purple-300/70 uppercase tracking-wider">Security Code</div>
-                      <div className="font-mono text-xl text-emerald-400 tracking-widest flex items-center gap-2" style={{ textShadow: '0 0 15px rgba(16, 185, 129, 0.5)' }}>
-                        {dtmfCode}
+                      <div className="font-mono text-xs text-purple-300/60 uppercase tracking-widest mb-1">Security Code</div>
+                      <div className="flex items-center gap-3">
+                        <span className="font-mono text-3xl font-bold tracking-[0.3em] text-emerald-400"
+                          style={{ textShadow: '0 0 20px rgba(16, 185, 129, 0.6)' }}>
+                          {dtmfCode}
+                        </span>
                         <button 
                           onClick={() => copyToClipboard(dtmfCode)}
-                          className="p-1 hover:bg-white/10 rounded-lg transition-colors"
+                          className="p-2 hover:bg-white/10 rounded-lg transition-all hover:scale-110"
                           data-testid="copy-code-main"
                         >
-                          {copiedCode ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-purple-400/70" />}
+                          {copiedCode ? <Check className="w-5 h-5 text-emerald-400" /> : <Copy className="w-5 h-5 text-purple-400/70" />}
                         </button>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="flex gap-3">
+                  {/* Action Buttons */}
+                  <div className="flex gap-4">
                     <button
                       onClick={() => handleVerify(true)}
                       disabled={isVerifying}
-                      className="decision-btn decision-btn-accept"
+                      className="decision-btn decision-btn-accept flex-1"
                       data-testid="accept-btn"
                     >
                       {isVerifying ? (
-                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <RefreshCw className="w-5 h-5 animate-spin" />
                       ) : (
-                        <ThumbsUp className="w-4 h-4" />
+                        <ThumbsUp className="w-5 h-5" />
                       )}
-                      ACCEPT
+                      <span className="font-semibold">ACCEPT</span>
                     </button>
                     <button
                       onClick={() => handleVerify(false)}
                       disabled={isVerifying}
-                      className="decision-btn decision-btn-deny"
+                      className="decision-btn decision-btn-deny flex-1"
                       data-testid="deny-btn"
                     >
                       {isVerifying ? (
-                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <RefreshCw className="w-5 h-5 animate-spin" />
                       ) : (
-                        <ThumbsDown className="w-4 h-4" />
+                        <ThumbsDown className="w-5 h-5" />
                       )}
-                      DENY
+                      <span className="font-semibold">DENY</span>
                     </button>
                   </div>
+                  
+                  {/* Close hint */}
+                  <p className="text-center text-purple-400/40 text-xs mt-4">
+                    Verify the code received by the recipient
+                  </p>
                 </div>
-              </div>
-            )}
+              </motion.div>
+            </motion.div>
+          )}
             
             {/* Recording Playback */}
             {recordingUrl && callStatus === "FINISHED" && (

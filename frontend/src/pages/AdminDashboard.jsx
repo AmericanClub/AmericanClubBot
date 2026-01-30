@@ -485,27 +485,27 @@ export default function AdminDashboard({ user, token, onLogout }) {
               </Button>
             </div>
 
-            <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden">
+            <div className="glass-table">
               <table className="w-full">
-                <thead className="bg-gray-100/50">
+                <thead className="glass-table-header">
                   <tr>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Code</th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Credits</th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Status</th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Used By</th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Notes</th>
-                    <th className="text-right text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Actions</th>
+                    <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Code</th>
+                    <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Credits</th>
+                    <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Status</th>
+                    <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Used By</th>
+                    <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Notes</th>
+                    <th className="text-right text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {inviteCodes.map((code) => (
-                    <tr key={code.id} className="hover:bg-gray-50">
+                    <tr key={code.id} className="glass-table-row">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-sm text-gray-800">{code.code}</span>
+                          <span className="font-mono text-sm text-white">{code.code}</span>
                           <button
                             onClick={() => copyCode(code.code)}
-                            className="text-gray-500 hover:text-gray-800"
+                            className="text-white/60 hover:text-white transition-colors"
                           >
                             {copiedCode === code.code ? (
                               <Check className="w-3 h-3 text-emerald-400" />
@@ -516,7 +516,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="text-sm font-mono text-cyan-400">{code.credits}</span>
+                        <span className="text-sm font-mono text-cyan-400 neon-text">{code.credits}</span>
                       </td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex px-2 py-0.5 text-[10px] font-medium rounded-full ${

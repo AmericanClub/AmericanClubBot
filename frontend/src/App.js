@@ -480,7 +480,10 @@ function App() {
             CALL_PRE_ESTABLISHED: "RINGING",
             CALL_ANSWERED: "ESTABLISHED",
             CALL_ESTABLISHED: "ESTABLISHED",
-            AMD_DETECTION: "ESTABLISHED",
+            AMD_HUMAN: "ESTABLISHED",
+            AMD_VOICEMAIL: "VOICEMAIL",
+            AMD_FAX: "FAX",
+            AMD_UNKNOWN: "ESTABLISHED",
             STEP1_PLAYING: "ESTABLISHED",
             STEP2_PLAYING: "ESTABLISHED",
             STEP3_PLAYING: "ESTABLISHED",
@@ -489,13 +492,18 @@ function App() {
             CALL_FINISHED: "FINISHED",
             CALL_FAILED: "FAILED",
             CALL_HANGUP: "FINISHED",
+            CALL_BUSY: "BUSY",
+            CALL_NO_ANSWER: "NO_ANSWER",
+            CALL_CANCELED: "CANCELED",
+            CALL_VOICEMAIL: "VOICEMAIL",
           };
           
           const newStatus = statusMap[data.event_type];
           if (newStatus) {
             setCallStatus(newStatus);
             
-            if (["FINISHED", "FAILED"].includes(newStatus)) {
+            // End call states
+            if (["FINISHED", "FAILED", "BUSY", "NO_ANSWER", "CANCELED", "VOICEMAIL", "FAX"].includes(newStatus)) {
               setIsCallActive(false);
               setShowVerifyButtons(false);
               eventSource.close();

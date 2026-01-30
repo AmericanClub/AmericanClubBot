@@ -1602,7 +1602,10 @@ def create_laml_gather(message: str, num_digits: int, action: str, voice: str = 
     
     return Response(content=laml, media_type="application/xml")
 
-# Include router
+# Include routers
+from routes_auth import auth_router, admin_router
+api_router.include_router(auth_router)
+api_router.include_router(admin_router)
 app.include_router(api_router)
 
 # CORS middleware
@@ -1613,6 +1616,39 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.on_event("startup")
+async def startup():
+    """Initialize database and create default admin"""
+    from auth import get_password_hash
+    
+    # Create indexes
+    await db.users.create_index("email", unique=True)
+    await db.users.create_index("id", unique=True)
+    await db.invite_codes.create_index("code", unique=True)
+    await db.call_logs.create_index("user_id")
+    await db.credit_transactions.create_index("user_id")
+    
+    # Check if admin exists
+    admin = await db.users.find_one({"email": "admin@american.club"})
+    
+    if not admin:
+        # Create default admin
+        admin_user = {
+            "id": str(uuid.uuid4()),
+            "email": "admin@american.club",
+            "password": get_password_hash("123"),
+            "name": "Administrator",
+            "role": "admin",
+            "credits": 999999,  # Admin has unlimited credits
+            "total_credits_used": 0,
+            "is_active": True,
+            "active_session": {},
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "last_login": None
+        }
+        await db.users.insert_one(admin_user)
+        logger.info("Default admin created: admin@american.club")
 
 @app.on_event("shutdown")
 async def shutdown():

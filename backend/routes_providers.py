@@ -18,9 +18,16 @@ provider_router = APIRouter(prefix="/admin/providers", tags=["Providers"])
 # ==================
 
 class PhoneNumber(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     number: str
     label: str = "Main"
     is_active: bool = True
+
+
+class PhoneNumberUpdate(BaseModel):
+    number: Optional[str] = None
+    label: Optional[str] = None
+    is_active: Optional[bool] = None
 
 
 class SignalWireConfig(BaseModel):

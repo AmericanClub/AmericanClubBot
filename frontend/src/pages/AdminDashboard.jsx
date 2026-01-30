@@ -348,20 +348,19 @@ export default function AdminDashboard({ user, token, onLogout }) {
         {activeTab === "users" && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-white neon-text">Users</h2>
+              <h2 className="text-2xl font-bold text-white">Users</h2>
               <Button 
                 onClick={() => fetchUsers()} 
                 variant="outline" 
                 size="sm" 
-                className="glass-card border-white/20 text-white/80 hover:bg-white/10 hover:text-white"
-                style={{ backdropFilter: 'blur(10px)' }}
+                className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white"
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Refresh
               </Button>
             </div>
 
-            <div className="glass-table">
+            <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(59, 130, 246, 0.15)' }}>
               <table className="w-full">
                 <thead className="glass-table-header">
                   <tr>

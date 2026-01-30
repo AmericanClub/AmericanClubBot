@@ -249,8 +249,32 @@ function App() {
 
   // Preview voice using Web Speech API
   const [isPreviewing, setIsPreviewing] = useState(false);
+  const [voicesLoaded, setVoicesLoaded] = useState(false);
+  
+  // Load voices on mount
+  useEffect(() => {
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        setVoicesLoaded(true);
+      }
+    };
+    
+    loadVoices();
+    
+    // Chrome needs this event
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+  }, []);
   
   const previewVoice = () => {
+    // Check if speech synthesis is available
+    if (!window.speechSynthesis) {
+      toast.error("Speech synthesis not supported in this browser");
+      return;
+    }
+    
     // Get the current step message
     let message = stepMessages[activeStep] || stepMessages.step1;
     
@@ -270,7 +294,7 @@ function App() {
     const voices = window.speechSynthesis.getVoices();
     const voiceInfo = VOICE_MODELS.find(v => v.id === voiceModel);
     
-    if (voiceInfo) {
+    if (voices.length > 0 && voiceInfo) {
       // Try to find a matching voice
       let selectedVoice = null;
       
@@ -278,13 +302,13 @@ function App() {
         selectedVoice = voices.find(v => 
           v.lang.startsWith("en") && v.name.toLowerCase().includes("female")
         ) || voices.find(v => 
-          v.lang.startsWith("en") && (v.name.includes("Samantha") || v.name.includes("Karen") || v.name.includes("Victoria"))
+          v.lang.startsWith("en") && (v.name.includes("Samantha") || v.name.includes("Karen") || v.name.includes("Victoria") || v.name.includes("Fiona"))
         );
       } else {
         selectedVoice = voices.find(v => 
           v.lang.startsWith("en") && v.name.toLowerCase().includes("male")
         ) || voices.find(v => 
-          v.lang.startsWith("en") && (v.name.includes("Daniel") || v.name.includes("Alex") || v.name.includes("Tom"))
+          v.lang.startsWith("en") && (v.name.includes("Daniel") || v.name.includes("Alex") || v.name.includes("Tom") || v.name.includes("Fred"))
         );
       }
       
@@ -293,27 +317,37 @@ function App() {
         selectedVoice = voices.find(v => v.lang.startsWith("en"));
       }
       
+      // Last fallback - any voice
+      if (!selectedVoice && voices.length > 0) {
+        selectedVoice = voices[0];
+      }
+      
       if (selectedVoice) {
         utterance.voice = selectedVoice;
       }
     }
     
+    utterance.lang = "en-US";
     utterance.rate = 0.9; // Slightly slower for clarity
     utterance.pitch = 1;
     
     setIsPreviewing(true);
+    toast.success(`Previewing: ${activeStep.toUpperCase()}`, { duration: 2000 });
     
     utterance.onend = () => {
       setIsPreviewing(false);
     };
     
-    utterance.onerror = () => {
+    utterance.onerror = (e) => {
+      console.error("Speech error:", e);
       setIsPreviewing(false);
-      toast.error("Preview failed");
+      toast.error("Preview failed - try again");
     };
     
-    window.speechSynthesis.speak(utterance);
-    toast.success(`Previewing: ${activeStep.toUpperCase()}`);
+    // Small delay to ensure voices are loaded
+    setTimeout(() => {
+      window.speechSynthesis.speak(utterance);
+    }, 100);
   };
   
   const stopPreview = () => {

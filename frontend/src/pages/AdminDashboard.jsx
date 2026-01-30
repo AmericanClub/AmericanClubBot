@@ -750,17 +750,24 @@ function Modal({ children, onClose, title }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50"
+      className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50"
+      style={{ background: 'rgba(0, 0, 0, 0.5)' }}
       onClick={onClose}
     >
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white border border-gray-200 rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto"
+        className="glass-card p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
+        style={{
+          background: 'rgba(15, 10, 30, 0.9)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(167, 139, 250, 0.3)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 92, 246, 0.2)'
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-lg font-bold text-gray-800 mb-4">{title}</h3>
+        <h3 className="text-lg font-bold text-white neon-text mb-4">{title}</h3>
         {children}
       </motion.div>
     </motion.div>

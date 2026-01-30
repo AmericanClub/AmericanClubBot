@@ -150,7 +150,99 @@ const CALL_TYPES = [
 // Default step messages (Password Change 1 as default)
 const DEFAULT_STEPS = CALL_TYPES[0].steps;
 
-function App() {
+// Main App Wrapper with Authentication
+function AppWrapper() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Check for existing session on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      const savedToken = localStorage.getItem("token");
+      const savedUser = localStorage.getItem("user");
+      
+      if (savedToken && savedUser) {
+        try {
+          // Verify token is still valid
+          const response = await axios.get(`${API}/auth/me`, {
+            headers: { Authorization: `Bearer ${savedToken}` }
+          });
+          
+          setCurrentUser(response.data);
+          setToken(savedToken);
+          setIsAuthenticated(true);
+        } catch (error) {
+          // Token invalid or expired - clear storage
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          if (error.response?.status === 401) {
+            toast.error("Session expired, please login again");
+          }
+        }
+      }
+      setIsLoading(false);
+    };
+    
+    checkAuth();
+  }, []);
+
+  const handleLogin = (user, accessToken) => {
+    setCurrentUser(user);
+    setToken(accessToken);
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setCurrentUser(null);
+    setToken(null);
+    setIsAuthenticated(false);
+    toast.success("Logged out successfully");
+  };
+
+  // Show loading while checking auth
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // Not authenticated - show login
+  if (!isAuthenticated) {
+    return (
+      <>
+        <Toaster theme="dark" position="top-right" />
+        <AuthPage onLogin={handleLogin} />
+      </>
+    );
+  }
+
+  // Admin user - show admin dashboard
+  if (currentUser?.role === "admin") {
+    return (
+      <>
+        <Toaster theme="dark" position="top-right" />
+        <AdminDashboard user={currentUser} token={token} onLogout={handleLogout} />
+      </>
+    );
+  }
+
+  // Regular user - show call panel
+  return (
+    <>
+      <Toaster theme="dark" position="top-right" />
+      <UserCallPanel user={currentUser} token={token} onLogout={handleLogout} />
+    </>
+  );
+}
+
+// User Call Panel (renamed from App)
+function UserCallPanel({ user, token, onLogout }) {
   // Provider config state
   const [infobipConfigured, setInfobipConfigured] = useState(false);
   const [signalwireConfigured, setSignalwireConfigured] = useState(false);

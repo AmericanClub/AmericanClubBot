@@ -5,25 +5,30 @@
 @tailwind utilities;
 
 :root {
-    /* Dark Purple Glassmorphism Theme */
-    --bg-gradient-start: #0f0a1e;
-    --bg-gradient-mid: #1a1333;
-    --bg-gradient-end: #0d0819;
-    --glass-bg: rgba(255, 255, 255, 0.03);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-shadow: rgba(139, 92, 246, 0.1);
-    --color-primary: #a78bfa;
-    --color-primary-light: #c4b5fd;
-    --color-secondary: #22d3ee;
-    --color-accent: #f472b6;
-    --text-primary: #f8fafc;
+    /* Dark Navy Modern Theme */
+    --bg-primary: #0a0e1a;
+    --bg-secondary: #0f1629;
+    --bg-card: rgba(15, 23, 42, 0.8);
+    --bg-card-hover: rgba(22, 33, 56, 0.9);
+    --border-color: rgba(59, 130, 246, 0.15);
+    --border-color-light: rgba(59, 130, 246, 0.25);
+    --glass-shadow: rgba(59, 130, 246, 0.1);
+    --color-primary: #3b82f6;
+    --color-primary-light: #60a5fa;
+    --color-primary-dark: #2563eb;
+    --color-secondary: #06b6d4;
+    --color-accent: #22d3ee;
+    --color-success: #10b981;
+    --color-danger: #ef4444;
+    --color-warning: #f59e0b;
+    --text-primary: #f1f5f9;
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
 }
 
 * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(167, 139, 250, 0.3) transparent;
+    scrollbar-color: rgba(59, 130, 246, 0.3) transparent;
 }
 
 *::-webkit-scrollbar {
@@ -36,12 +41,12 @@
 }
 
 *::-webkit-scrollbar-thumb {
-    background: rgba(167, 139, 250, 0.3);
+    background: rgba(59, 130, 246, 0.3);
     border-radius: 3px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-    background: rgba(167, 139, 250, 0.5);
+    background: rgba(59, 130, 246, 0.5);
 }
 
 body {
@@ -49,7 +54,7 @@ body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+    background: var(--bg-primary);
     color: var(--text-primary);
     min-height: 100vh;
 }

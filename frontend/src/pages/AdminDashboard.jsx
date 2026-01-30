@@ -819,6 +819,128 @@ export default function AdminDashboard({ user, token, onLogout }) {
           </Modal>
         )}
       </AnimatePresence>
+
+      {/* Create Admin Modal */}
+      <AnimatePresence>
+        {showCreateAdmin && (
+          <Modal onClose={() => setShowCreateAdmin(false)} title="Create New Admin">
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-medium text-white/70 uppercase flex items-center gap-2">
+                  <UserIcon className="w-3 h-3" />
+                  Name
+                </label>
+                <Input
+                  value={newAdminName}
+                  onChange={(e) => setNewAdminName(e.target.value)}
+                  className="mt-1 glass-input"
+                  placeholder="Admin name"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-white/70 uppercase flex items-center gap-2">
+                  <Mail className="w-3 h-3" />
+                  Email
+                </label>
+                <Input
+                  type="email"
+                  value={newAdminEmail}
+                  onChange={(e) => setNewAdminEmail(e.target.value)}
+                  className="mt-1 glass-input"
+                  placeholder="admin@example.com"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-white/70 uppercase flex items-center gap-2">
+                  <Key className="w-3 h-3" />
+                  Password
+                </label>
+                <Input
+                  type="password"
+                  value={newAdminPassword}
+                  onChange={(e) => setNewAdminPassword(e.target.value)}
+                  className="mt-1 glass-input"
+                  placeholder="Enter password"
+                />
+              </div>
+              <p className="text-[10px] text-white/40">New admin will NOT have Super Admin privileges</p>
+              <Button
+                onClick={handleCreateAdmin}
+                disabled={isLoading || !newAdminName || !newAdminEmail || !newAdminPassword}
+                className="w-full text-white"
+                style={{
+                  background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+                  boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)'
+                }}
+              >
+                {isLoading ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : <Shield className="w-4 h-4 mr-2" />}
+                Create Admin
+              </Button>
+            </div>
+          </Modal>
+        )}
+      </AnimatePresence>
+
+      {/* Change Password Modal */}
+      <AnimatePresence>
+        {showChangePassword && (
+          <Modal onClose={() => { setShowChangePassword(false); setCurrentPassword(""); setNewPassword(""); setConfirmPassword(""); }} title="Change Password">
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-medium text-white/70 uppercase flex items-center gap-2">
+                  <Lock className="w-3 h-3" />
+                  Current Password
+                </label>
+                <Input
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="mt-1 glass-input"
+                  placeholder="Enter current password"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-white/70 uppercase flex items-center gap-2">
+                  <Key className="w-3 h-3" />
+                  New Password
+                </label>
+                <Input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="mt-1 glass-input"
+                  placeholder="Enter new password"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-white/70 uppercase flex items-center gap-2">
+                  <Key className="w-3 h-3" />
+                  Confirm New Password
+                </label>
+                <Input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="mt-1 glass-input"
+                  placeholder="Confirm new password"
+                />
+              </div>
+              <Button
+                onClick={handleChangePassword}
+                disabled={isLoading || !currentPassword || !newPassword || !confirmPassword}
+                className="w-full text-white"
+                style={{
+                  background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+                  boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)'
+                }}
+              >
+                {isLoading ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : <Lock className="w-4 h-4 mr-2" />}
+                Update Password
+              </Button>
+            </div>
+          </Modal>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

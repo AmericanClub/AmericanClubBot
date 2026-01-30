@@ -615,6 +615,12 @@ function UserCallPanel({ user, token, onLogout }) {
             setRecordingDuration(data.recording_duration);
             console.log("Recording available:", data.details);
           }
+          
+          // Handle credits deducted
+          if (data.event_type === "CREDITS_DEDUCTED") {
+            setUserCredits(data.credits_remaining);
+            toast.info(`${data.credits_deducted} credit(s) deducted. Remaining: ${data.credits_remaining}`);
+          }
         }
       } catch (e) {
         console.error("Error parsing event:", e);
@@ -627,10 +633,24 @@ function UserCallPanel({ user, token, onLogout }) {
     };
   }, [fetchCallHistory]);
 
-  // Start call
+  // User credits state
+  const [userCredits, setUserCredits] = useState(user?.credits || 0);
+
+  // Update credits when user prop changes
+  useEffect(() => {
+    setUserCredits(user?.credits || 0);
+  }, [user]);
+
+  // Start call with credit check
   const handleStartCall = async () => {
     if (!recipientNumber) {
       toast.error("Please enter recipient number");
+      return;
+    }
+
+    // Check credits on frontend (backend will double-check)
+    if (userCredits < 2) {
+      toast.error("Insufficient credits. Minimum 2 credits required to start a call.");
       return;
     }
 
@@ -643,10 +663,10 @@ function UserCallPanel({ user, token, onLogout }) {
     setRecordingDuration(null);
     
     try {
-      const response = await axios.post(`${API}/calls/initiate`, {
+      const response = await axios.post(`${API}/user/calls/initiate`, {
         config: {
           call_type: callType,
-          voice_model: voiceModel, // Send the voice ID directly (e.g., "Polly.Joanna-Neural")
+          voice_model: voiceModel,
           from_number: fromNumber,
           recipient_number: recipientNumber,
           recipient_name: recipientName,
@@ -655,20 +675,27 @@ function UserCallPanel({ user, token, onLogout }) {
           provider: selectedProvider,
         },
         steps: stepMessages,
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
 
-      const { call_id, provider, using_live, mode } = response.data;
+      const { call_id, provider, using_live, mode, user_credits } = response.data;
       setCurrentCallId(call_id);
       setIsCallActive(true);
       setCallStatus("PENDING");
       
+      if (user_credits !== undefined) {
+        setUserCredits(user_credits);
+      }
+      
       subscribeToEvents(call_id);
       
       const providerName = provider === "signalwire" ? "SignalWire" : "Infobip";
-      toast.success(using_live ? `IVR call started via ${providerName}` : `IVR call started (${mode || "Simulation"})`);
+      toast.success(using_live ? `Call started via ${providerName}` : `Call started (${mode || "Simulation"})`);
     } catch (error) {
       console.error("Error starting call:", error);
-      toast.error(error.response?.data?.detail || "Failed to start call");
+      const errorMsg = error.response?.data?.detail || "Failed to start call";
+      toast.error(errorMsg);
     } finally {
       setIsLoading(false);
     }

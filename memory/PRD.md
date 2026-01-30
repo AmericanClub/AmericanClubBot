@@ -41,7 +41,7 @@ Build a full-stack bot-calling website using Infobip with single-session IVR flo
 - API Key: `ad0edaa489d1f7bb2dae92c71d59e61c-b738bcf1-e03f-406f-9fb9-83e075195616`
 - Calls Configuration: `american-club`
 - Default Caller ID: `+18053653836`
-- Webhook URL: `https://callgenius-23.preview.emergentagent.com/api/calls-webhook/events`
+- Webhook URL: `https://clubbot-panel.preview.emergentagent.com/api/calls-webhook/events`
 
 ## Pending / Blocked ⏳
 

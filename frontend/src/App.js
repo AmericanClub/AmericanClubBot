@@ -1401,14 +1401,14 @@ function UserCallPanel({ user, token, onLogout }) {
                     className="flex-1 font-mono text-[10px] uppercase tracking-wider py-2 px-2 rounded-md transition-all duration-300"
                     style={{
                       background: activeStep === step 
-                        ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(168, 85, 247, 0.2))' 
-                        : 'transparent',
+                        ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.35), rgba(168, 85, 247, 0.25))' 
+                        : 'rgba(139, 92, 246, 0.08)',
                       border: activeStep === step 
-                        ? '1px solid rgba(139, 92, 246, 0.4)' 
-                        : '1px solid transparent',
-                      color: activeStep === step ? '#c4b5fd' : '#64748b',
+                        ? '1px solid rgba(167, 139, 250, 0.5)' 
+                        : '1px solid rgba(139, 92, 246, 0.15)',
+                      color: activeStep === step ? '#e9d5ff' : '#a78bfa',
                       boxShadow: activeStep === step 
-                        ? '0 0 15px rgba(139, 92, 246, 0.3)' 
+                        ? '0 0 20px rgba(139, 92, 246, 0.4)' 
                         : 'none',
                       ...(currentStep === step ? { boxShadow: '0 0 15px rgba(16, 185, 129, 0.5), inset 0 0 10px rgba(16, 185, 129, 0.2)' } : {})
                     }}
@@ -1436,7 +1436,7 @@ function UserCallPanel({ user, token, onLogout }) {
                     rows={2}
                     data-testid={`step-message-${step}`}
                   />
-                  <div className="mt-1 text-[9px] text-white/40 font-mono">
+                  <div className="mt-1 text-[9px] text-purple-300/60 font-mono">
                     Variables: {"{name}"}, {"{service}"}, {"{digits}"}
                   </div>
                 </TabsContent>

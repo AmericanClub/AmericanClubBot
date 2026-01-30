@@ -279,7 +279,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
             variant="ghost"
             size="sm"
             onClick={onLogout}
-            className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-500/10"
+            className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
           >
             <LogOut className="w-4 h-4 mr-2" />
             Logout
@@ -292,7 +292,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
         {/* Dashboard Tab */}
         {activeTab === "dashboard" && stats && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-white">Dashboard</h2>
+            <h2 className="text-2xl font-bold text-gray-800">Dashboard</h2>
             
             <div className="grid grid-cols-4 gap-4">
               <StatCard
@@ -300,19 +300,19 @@ export default function AdminDashboard({ user, token, onLogout }) {
                 label="Total Users"
                 value={stats.users.total}
                 subtext={`${stats.users.active} active`}
-                color="cyan"
+                color="violet"
               />
               <StatCard
                 icon={Phone}
                 label="Total Calls"
                 value={stats.calls.total}
-                color="purple"
+                color="teal"
               />
               <StatCard
                 icon={Coins}
                 label="Credits Used"
                 value={stats.credits.total_used}
-                color="yellow"
+                color="amber"
               />
               <StatCard
                 icon={Ticket}
@@ -329,14 +329,14 @@ export default function AdminDashboard({ user, token, onLogout }) {
         {activeTab === "users" && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-white">Users</h2>
-              <Button onClick={() => fetchUsers()} variant="outline" size="sm">
+              <h2 className="text-2xl font-bold text-gray-800">Users</h2>
+              <Button onClick={() => fetchUsers()} variant="outline" size="sm" className="border-gray-300 text-gray-600 hover:bg-gray-100">
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Refresh
               </Button>
             </div>
 
-            <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden">
+            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
               <table className="w-full">
                 <thead className="bg-slate-800/50">
                   <tr>

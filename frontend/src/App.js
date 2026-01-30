@@ -881,6 +881,39 @@ function App() {
                 </div>
               </div>
             )}
+            
+            {/* Recording Playback */}
+            {recordingUrl && callStatus === "FINISHED" && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-4 p-4 rounded-lg bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-purple-500/30"
+                data-testid="recording-player"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+                    <Play className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <div>
+                    <div className="font-mono text-xs text-purple-400 uppercase tracking-wider">Call Recording</div>
+                    <div className="font-mono text-sm text-slate-300">
+                      Duration: {recordingDuration ? `${recordingDuration}s` : "Available"}
+                    </div>
+                  </div>
+                </div>
+                <audio 
+                  controls 
+                  className="w-full h-10 rounded-lg"
+                  style={{ 
+                    filter: 'sepia(20%) saturate(70%) grayscale(0) brightness(100%) hue-rotate(220deg)'
+                  }}
+                  data-testid="recording-audio"
+                >
+                  <source src={recordingUrl} type="audio/mpeg" />
+                  Your browser does not support the audio element.
+                </audio>
+              </motion.div>
+            )}
         </div>
 
         {/* Right Panel - Call Setup */}

@@ -680,23 +680,29 @@ function Modal({ children, onClose, title }) {
   );
 }
 
-// Providers Tab Component
+// Providers Tab Component - Full Phone Number Management
 function ProvidersTab({ authHeaders }) {
   const [providers, setProviders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [editingProvider, setEditingProvider] = useState(null);
+  const [selectedProvider, setSelectedProvider] = useState(null);
+  
+  // Phone number management
+  const [showAddPhone, setShowAddPhone] = useState(false);
+  const [showEditPhone, setShowEditPhone] = useState(false);
+  const [editingPhone, setEditingPhone] = useState(null);
+  const [newPhoneNumber, setNewPhoneNumber] = useState("");
+  const [newPhoneLabel, setNewPhoneLabel] = useState("Main");
   
   // SignalWire form
   const [swProjectId, setSwProjectId] = useState("");
   const [swAuthToken, setSwAuthToken] = useState("");
   const [swSpaceUrl, setSwSpaceUrl] = useState("");
-  const [swPhoneNumber, setSwPhoneNumber] = useState("");
   
   // Infobip form
   const [ibApiKey, setIbApiKey] = useState("");
   const [ibBaseUrl, setIbBaseUrl] = useState("api.infobip.com");
   const [ibAppId, setIbAppId] = useState("");
-  const [ibPhoneNumber, setIbPhoneNumber] = useState("");
 
   const fetchProviders = async () => {
     try {
@@ -716,13 +722,11 @@ function ProvidersTab({ authHeaders }) {
   const handleSaveSignalWire = async () => {
     setIsLoading(true);
     try {
-      const phoneNumbers = swPhoneNumber ? [{ number: swPhoneNumber, label: "Main", is_active: true }] : [];
-      
       await axios.put(`${API}/admin/providers/signalwire?is_enabled=true`, {
         project_id: swProjectId,
         auth_token: swAuthToken,
         space_url: swSpaceUrl,
-        phone_numbers: phoneNumbers
+        phone_numbers: []
       }, { headers: authHeaders });
       
       toast.success("SignalWire configuration saved");
@@ -738,13 +742,11 @@ function ProvidersTab({ authHeaders }) {
   const handleSaveInfobip = async () => {
     setIsLoading(true);
     try {
-      const phoneNumbers = ibPhoneNumber ? [{ number: ibPhoneNumber, label: "Main", is_active: true }] : [];
-      
       await axios.put(`${API}/admin/providers/infobip?is_enabled=true`, {
         api_key: ibApiKey,
         base_url: ibBaseUrl,
         app_id: ibAppId || null,
-        phone_numbers: phoneNumbers
+        phone_numbers: []
       }, { headers: authHeaders });
       
       toast.success("Infobip configuration saved");
@@ -767,6 +769,93 @@ function ProvidersTab({ authHeaders }) {
     }
   };
 
+  // Phone number management functions
+  const handleAddPhoneNumber = async () => {
+    if (!selectedProvider || !newPhoneNumber) return;
+    
+    setIsLoading(true);
+    try {
+      await axios.post(`${API}/admin/providers/${selectedProvider}/phone-numbers`, {
+        number: newPhoneNumber,
+        label: newPhoneLabel || "Main",
+        is_active: true
+      }, { headers: authHeaders });
+      
+      toast.success("Phone number added");
+      setShowAddPhone(false);
+      setNewPhoneNumber("");
+      setNewPhoneLabel("Main");
+      fetchProviders();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to add phone number");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdatePhoneNumber = async () => {
+    if (!selectedProvider || !editingPhone) return;
+    
+    setIsLoading(true);
+    try {
+      await axios.put(`${API}/admin/providers/${selectedProvider}/phone-numbers/${editingPhone.id}`, {
+        number: newPhoneNumber,
+        label: newPhoneLabel,
+        is_active: editingPhone.is_active
+      }, { headers: authHeaders });
+      
+      toast.success("Phone number updated");
+      setShowEditPhone(false);
+      setEditingPhone(null);
+      setNewPhoneNumber("");
+      setNewPhoneLabel("Main");
+      fetchProviders();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to update phone number");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeletePhoneNumber = async (providerId, phoneId) => {
+    if (!window.confirm("Are you sure you want to delete this phone number?")) return;
+    
+    try {
+      await axios.delete(`${API}/admin/providers/${providerId}/phone-numbers/${phoneId}`, { headers: authHeaders });
+      toast.success("Phone number deleted");
+      fetchProviders();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to delete phone number");
+    }
+  };
+
+  const handleTogglePhoneActive = async (providerId, phone) => {
+    try {
+      await axios.put(`${API}/admin/providers/${providerId}/phone-numbers/${phone.id}`, {
+        is_active: !phone.is_active
+      }, { headers: authHeaders });
+      toast.success(`Phone number ${!phone.is_active ? 'activated' : 'deactivated'}`);
+      fetchProviders();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to update phone number");
+    }
+  };
+
+  const openEditPhone = (providerId, phone) => {
+    setSelectedProvider(providerId);
+    setEditingPhone(phone);
+    setNewPhoneNumber(phone.number);
+    setNewPhoneLabel(phone.label);
+    setShowEditPhone(true);
+  };
+
+  const openAddPhone = (providerId) => {
+    setSelectedProvider(providerId);
+    setNewPhoneNumber("");
+    setNewPhoneLabel("Main");
+    setShowAddPhone(true);
+  };
+
   if (isLoading && providers.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -785,129 +874,285 @@ function ProvidersTab({ authHeaders }) {
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* SignalWire Card */}
-        <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-xl p-5">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-                <Phone className="w-5 h-5 text-emerald-400" />
+        <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden">
+          <div className="p-5 border-b border-white/10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                  <Phone className="w-5 h-5 text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-white">SignalWire</h3>
+                  <p className="text-xs text-slate-400">Voice & SMS Provider</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-bold text-white">SignalWire</h3>
-                <p className="text-xs text-slate-400">Voice & SMS Provider</p>
+              <div className="flex items-center gap-2">
+                {providers.find(p => p.id === "signalwire")?.is_configured && (
+                  <button
+                    onClick={() => handleToggleProvider("signalwire")}
+                    className={`px-2 py-1 rounded text-xs font-medium ${
+                      providers.find(p => p.id === "signalwire")?.is_enabled
+                        ? "bg-emerald-500/20 text-emerald-400"
+                        : "bg-slate-500/20 text-slate-400"
+                    }`}
+                  >
+                    {providers.find(p => p.id === "signalwire")?.is_enabled ? "Enabled" : "Disabled"}
+                  </button>
+                )}
+                <Button
+                  onClick={() => setEditingProvider("signalwire")}
+                  variant="ghost"
+                  size="sm"
+                  className="text-slate-400 hover:text-white"
+                >
+                  <Settings className="w-4 h-4" />
+                </Button>
               </div>
             </div>
-            {providers.find(p => p.id === "signalwire")?.is_configured && (
-              <button
-                onClick={() => handleToggleProvider("signalwire")}
-                className={`px-2 py-1 rounded text-xs font-medium ${
-                  providers.find(p => p.id === "signalwire")?.is_enabled
-                    ? "bg-emerald-500/20 text-emerald-400"
-                    : "bg-slate-500/20 text-slate-400"
-                }`}
-              >
-                {providers.find(p => p.id === "signalwire")?.is_enabled ? "Enabled" : "Disabled"}
-              </button>
-            )}
           </div>
 
-          {providers.find(p => p.id === "signalwire")?.is_configured ? (
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-slate-400">Status:</span>
-                <span className="text-emerald-400">Configured</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400">Phone Numbers:</span>
-                <span className="text-white">{providers.find(p => p.id === "signalwire")?.phone_numbers?.length || 0}</span>
-              </div>
+          {/* Phone Numbers Section */}
+          <div className="p-5">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-medium text-slate-300">Phone Numbers</h4>
               <Button
-                onClick={() => setEditingProvider("signalwire")}
-                variant="outline"
+                onClick={() => openAddPhone("signalwire")}
                 size="sm"
-                className="w-full mt-3"
+                className="h-7 text-xs bg-emerald-500 hover:bg-emerald-600"
               >
-                <Edit className="w-4 h-4 mr-2" />
-                Edit Configuration
+                <Plus className="w-3 h-3 mr-1" />
+                Add Number
               </Button>
             </div>
-          ) : (
-            <div>
-              <p className="text-slate-400 text-sm mb-3">Not configured yet</p>
-              <Button
-                onClick={() => setEditingProvider("signalwire")}
-                className="w-full bg-emerald-500 hover:bg-emerald-600"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Configure
-              </Button>
-            </div>
-          )}
+            
+            {(providers.find(p => p.id === "signalwire")?.phone_numbers?.length || 0) === 0 ? (
+              <p className="text-slate-500 text-sm">No phone numbers configured</p>
+            ) : (
+              <div className="space-y-2">
+                {providers.find(p => p.id === "signalwire")?.phone_numbers?.map((phone) => (
+                  <div 
+                    key={phone.id || phone.number}
+                    className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/10"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${phone.is_active ? 'bg-emerald-400' : 'bg-slate-500'}`} />
+                      <div>
+                        <span className="font-mono text-sm text-white">{phone.number}</span>
+                        <span className="ml-2 text-xs text-slate-400">({phone.label})</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleTogglePhoneActive("signalwire", phone)}
+                        className={`h-7 w-7 p-0 ${phone.is_active ? 'text-emerald-400' : 'text-slate-500'}`}
+                        title={phone.is_active ? "Deactivate" : "Activate"}
+                      >
+                        {phone.is_active ? <UserCheck className="w-3 h-3" /> : <UserX className="w-3 h-3" />}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => openEditPhone("signalwire", phone)}
+                        className="h-7 w-7 p-0 text-slate-400 hover:text-white"
+                      >
+                        <Edit className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeletePhoneNumber("signalwire", phone.id)}
+                        className="h-7 w-7 p-0 text-red-400 hover:text-red-300"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Infobip Card */}
-        <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-xl p-5">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
-                <Phone className="w-5 h-5 text-orange-400" />
+        <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden">
+          <div className="p-5 border-b border-white/10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
+                  <Phone className="w-5 h-5 text-orange-400" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-white">Infobip</h3>
+                  <p className="text-xs text-slate-400">Voice & Messaging</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-bold text-white">Infobip</h3>
-                <p className="text-xs text-slate-400">Voice & Messaging</p>
+              <div className="flex items-center gap-2">
+                {providers.find(p => p.id === "infobip")?.is_configured && (
+                  <button
+                    onClick={() => handleToggleProvider("infobip")}
+                    className={`px-2 py-1 rounded text-xs font-medium ${
+                      providers.find(p => p.id === "infobip")?.is_enabled
+                        ? "bg-emerald-500/20 text-emerald-400"
+                        : "bg-slate-500/20 text-slate-400"
+                    }`}
+                  >
+                    {providers.find(p => p.id === "infobip")?.is_enabled ? "Enabled" : "Disabled"}
+                  </button>
+                )}
+                <Button
+                  onClick={() => setEditingProvider("infobip")}
+                  variant="ghost"
+                  size="sm"
+                  className="text-slate-400 hover:text-white"
+                >
+                  <Settings className="w-4 h-4" />
+                </Button>
               </div>
             </div>
-            {providers.find(p => p.id === "infobip")?.is_configured && (
-              <button
-                onClick={() => handleToggleProvider("infobip")}
-                className={`px-2 py-1 rounded text-xs font-medium ${
-                  providers.find(p => p.id === "infobip")?.is_enabled
-                    ? "bg-emerald-500/20 text-emerald-400"
-                    : "bg-slate-500/20 text-slate-400"
-                }`}
-              >
-                {providers.find(p => p.id === "infobip")?.is_enabled ? "Enabled" : "Disabled"}
-              </button>
-            )}
           </div>
 
-          {providers.find(p => p.id === "infobip")?.is_configured ? (
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-slate-400">Status:</span>
-                <span className="text-emerald-400">Configured</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400">Phone Numbers:</span>
-                <span className="text-white">{providers.find(p => p.id === "infobip")?.phone_numbers?.length || 0}</span>
-              </div>
+          {/* Phone Numbers Section */}
+          <div className="p-5">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-medium text-slate-300">Phone Numbers</h4>
               <Button
-                onClick={() => setEditingProvider("infobip")}
-                variant="outline"
+                onClick={() => openAddPhone("infobip")}
                 size="sm"
-                className="w-full mt-3"
+                className="h-7 text-xs bg-orange-500 hover:bg-orange-600"
               >
-                <Edit className="w-4 h-4 mr-2" />
-                Edit Configuration
+                <Plus className="w-3 h-3 mr-1" />
+                Add Number
               </Button>
             </div>
-          ) : (
-            <div>
-              <p className="text-slate-400 text-sm mb-3">Not configured yet</p>
-              <Button
-                onClick={() => setEditingProvider("infobip")}
-                className="w-full bg-orange-500 hover:bg-orange-600"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Configure
-              </Button>
-            </div>
-          )}
+            
+            {(providers.find(p => p.id === "infobip")?.phone_numbers?.length || 0) === 0 ? (
+              <p className="text-slate-500 text-sm">No phone numbers configured</p>
+            ) : (
+              <div className="space-y-2">
+                {providers.find(p => p.id === "infobip")?.phone_numbers?.map((phone) => (
+                  <div 
+                    key={phone.id || phone.number}
+                    className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/10"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${phone.is_active ? 'bg-emerald-400' : 'bg-slate-500'}`} />
+                      <div>
+                        <span className="font-mono text-sm text-white">{phone.number}</span>
+                        <span className="ml-2 text-xs text-slate-400">({phone.label})</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleTogglePhoneActive("infobip", phone)}
+                        className={`h-7 w-7 p-0 ${phone.is_active ? 'text-emerald-400' : 'text-slate-500'}`}
+                        title={phone.is_active ? "Deactivate" : "Activate"}
+                      >
+                        {phone.is_active ? <UserCheck className="w-3 h-3" /> : <UserX className="w-3 h-3" />}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => openEditPhone("infobip", phone)}
+                        className="h-7 w-7 p-0 text-slate-400 hover:text-white"
+                      >
+                        <Edit className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeletePhoneNumber("infobip", phone.id)}
+                        className="h-7 w-7 p-0 text-red-400 hover:text-red-300"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* SignalWire Edit Modal */}
+      {/* Add Phone Number Modal */}
+      <AnimatePresence>
+        {showAddPhone && (
+          <Modal onClose={() => setShowAddPhone(false)} title={`Add Phone Number - ${selectedProvider?.toUpperCase()}`}>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-medium text-slate-400 uppercase">Phone Number *</label>
+                <Input
+                  value={newPhoneNumber}
+                  onChange={(e) => setNewPhoneNumber(e.target.value)}
+                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  placeholder="+1234567890"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-slate-400 uppercase">Label</label>
+                <Input
+                  value={newPhoneLabel}
+                  onChange={(e) => setNewPhoneLabel(e.target.value)}
+                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  placeholder="Main, Backup, Sales, etc."
+                />
+              </div>
+              <Button
+                onClick={handleAddPhoneNumber}
+                disabled={isLoading || !newPhoneNumber}
+                className="w-full bg-cyan-500 hover:bg-cyan-600"
+              >
+                {isLoading ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : null}
+                Add Phone Number
+              </Button>
+            </div>
+          </Modal>
+        )}
+      </AnimatePresence>
+
+      {/* Edit Phone Number Modal */}
+      <AnimatePresence>
+        {showEditPhone && editingPhone && (
+          <Modal onClose={() => { setShowEditPhone(false); setEditingPhone(null); }} title="Edit Phone Number">
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-medium text-slate-400 uppercase">Phone Number *</label>
+                <Input
+                  value={newPhoneNumber}
+                  onChange={(e) => setNewPhoneNumber(e.target.value)}
+                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  placeholder="+1234567890"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-slate-400 uppercase">Label</label>
+                <Input
+                  value={newPhoneLabel}
+                  onChange={(e) => setNewPhoneLabel(e.target.value)}
+                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  placeholder="Main, Backup, Sales, etc."
+                />
+              </div>
+              <Button
+                onClick={handleUpdatePhoneNumber}
+                disabled={isLoading || !newPhoneNumber}
+                className="w-full bg-cyan-500 hover:bg-cyan-600"
+              >
+                {isLoading ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : null}
+                Save Changes
+              </Button>
+            </div>
+          </Modal>
+        )}
+      </AnimatePresence>
+
+      {/* SignalWire Config Modal */}
       <AnimatePresence>
         {editingProvider === "signalwire" && (
           <Modal onClose={() => setEditingProvider(null)} title="Configure SignalWire">
@@ -940,15 +1185,9 @@ function ProvidersTab({ authHeaders }) {
                   placeholder="your-space.signalwire.com"
                 />
               </div>
-              <div>
-                <label className="text-xs font-medium text-slate-400 uppercase">Phone Number</label>
-                <Input
-                  value={swPhoneNumber}
-                  onChange={(e) => setSwPhoneNumber(e.target.value)}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
-                  placeholder="+1234567890"
-                />
-              </div>
+              <p className="text-xs text-slate-500">
+                Note: Add phone numbers after saving credentials using the "Add Number" button.
+              </p>
               <Button
                 onClick={handleSaveSignalWire}
                 disabled={isLoading || !swProjectId || !swAuthToken || !swSpaceUrl}
@@ -962,7 +1201,7 @@ function ProvidersTab({ authHeaders }) {
         )}
       </AnimatePresence>
 
-      {/* Infobip Edit Modal */}
+      {/* Infobip Config Modal */}
       <AnimatePresence>
         {editingProvider === "infobip" && (
           <Modal onClose={() => setEditingProvider(null)} title="Configure Infobip">
@@ -995,15 +1234,9 @@ function ProvidersTab({ authHeaders }) {
                   placeholder="App ID from Infobip"
                 />
               </div>
-              <div>
-                <label className="text-xs font-medium text-slate-400 uppercase">Phone Number</label>
-                <Input
-                  value={ibPhoneNumber}
-                  onChange={(e) => setIbPhoneNumber(e.target.value)}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
-                  placeholder="+1234567890"
-                />
-              </div>
+              <p className="text-xs text-slate-500">
+                Note: Add phone numbers after saving credentials using the "Add Number" button.
+              </p>
               <Button
                 onClick={handleSaveInfobip}
                 disabled={isLoading || !ibApiKey}

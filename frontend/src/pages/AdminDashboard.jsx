@@ -976,26 +976,27 @@ function ProvidersTab({ authHeaders }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* SignalWire Card */}
-        <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden">
-          <div className="p-5 border-b border-gray-200">
+        <div className="glass-card overflow-hidden">
+          <div className="p-5" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center"
+                  style={{ boxShadow: '0 0 15px rgba(16, 185, 129, 0.3)' }}>
                   <Phone className="w-5 h-5 text-emerald-400" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-800">SignalWire</h3>
-                  <p className="text-xs text-gray-500">Voice & SMS Provider</p>
+                  <h3 className="font-bold text-white">SignalWire</h3>
+                  <p className="text-xs text-white/60">Voice & SMS Provider</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 {providers.find(p => p.id === "signalwire")?.is_configured && (
                   <button
                     onClick={() => handleToggleProvider("signalwire")}
-                    className={`px-2 py-1 rounded text-xs font-medium ${
+                    className={`px-2 py-1 rounded text-xs font-medium status-glow ${
                       providers.find(p => p.id === "signalwire")?.is_enabled
                         ? "bg-emerald-500/20 text-emerald-400"
-                        : "bg-slate-500/20 text-gray-500"
+                        : "bg-slate-500/20 text-white/60"
                     }`}
                   >
                     {providers.find(p => p.id === "signalwire")?.is_enabled ? "Enabled" : "Disabled"}
@@ -1005,7 +1006,7 @@ function ProvidersTab({ authHeaders }) {
                   onClick={() => setEditingProvider("signalwire")}
                   variant="ghost"
                   size="sm"
-                  className="text-gray-500 hover:text-gray-800"
+                  className="text-white/60 hover:text-white hover:bg-white/10"
                 >
                   <Settings className="w-4 h-4" />
                 </Button>

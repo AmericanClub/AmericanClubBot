@@ -1222,7 +1222,7 @@ function UserCallPanel({ user, token, onLogout }) {
                             value={phone.number}
                             className="font-mono text-xs"
                           >
-                            {phone.number} ({phone.label})
+                            {phone.number}
                           </SelectItem>
                         ))}
                     </SelectContent>

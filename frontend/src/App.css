@@ -28,8 +28,8 @@
 .main-grid {
     display: grid;
     grid-template-columns: 1fr;
-    height: 100vh;
-    max-height: 100vh;
+    height: calc(100vh - 3.5rem);
+    max-height: calc(100vh - 3.5rem);
     position: relative;
     z-index: 1;
 }

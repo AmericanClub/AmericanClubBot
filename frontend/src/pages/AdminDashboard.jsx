@@ -1137,24 +1137,24 @@ function ProvidersTab({ authHeaders }) {
             </div>
             
             {(providers.find(p => p.id === "infobip")?.phone_numbers?.length || 0) === 0 ? (
-              <p className="text-gray-400 text-sm">No phone numbers configured</p>
+              <p className="text-white/40 text-sm">No phone numbers configured</p>
             ) : (
               <div className="space-y-2">
                 {providers.find(p => p.id === "infobip")?.phone_numbers?.map((phone) => (
                   <div 
                     key={phone.id || phone.number}
-                    className="flex items-center justify-between p-2 rounded-lg bg-gray-50 border border-gray-200"
+                    className="flex items-center justify-between p-2 rounded-lg bg-gray-50 border border-white/10"
                   >
                     <div className="flex items-center gap-2">
                       <span className={`w-2 h-2 rounded-full ${phone.is_active ? 'bg-emerald-400' : 'bg-slate-500'}`} />
-                      <span className="font-mono text-sm text-gray-800">{phone.number}</span>
+                      <span className="font-mono text-sm text-white">{phone.number}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleTogglePhoneActive("infobip", phone)}
-                        className={`h-7 w-7 p-0 ${phone.is_active ? 'text-emerald-400' : 'text-gray-400'}`}
+                        className={`h-7 w-7 p-0 ${phone.is_active ? 'text-emerald-400' : 'text-white/40'}`}
                         title={phone.is_active ? "Deactivate" : "Activate"}
                       >
                         {phone.is_active ? <UserCheck className="w-3 h-3" /> : <UserX className="w-3 h-3" />}
@@ -1163,7 +1163,7 @@ function ProvidersTab({ authHeaders }) {
                         variant="ghost"
                         size="sm"
                         onClick={() => openEditPhone("infobip", phone)}
-                        className="h-7 w-7 p-0 text-gray-500 hover:text-gray-800"
+                        className="h-7 w-7 p-0 text-white/60 hover:text-white"
                       >
                         <Edit className="w-3 h-3" />
                       </Button>

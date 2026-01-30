@@ -1089,18 +1089,18 @@ function ProvidersTab({ authHeaders }) {
                   <Phone className="w-5 h-5 text-orange-400" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-800">Infobip</h3>
-                  <p className="text-xs text-gray-500">Voice & Messaging</p>
+                  <h3 className="font-bold text-white">Infobip</h3>
+                  <p className="text-xs text-white/60">Voice & Messaging</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 {providers.find(p => p.id === "infobip")?.is_configured && (
                   <button
                     onClick={() => handleToggleProvider("infobip")}
-                    className={`px-2 py-1 rounded text-xs font-medium ${
+                    className={`px-2 py-1 rounded text-xs font-medium status-glow ${
                       providers.find(p => p.id === "infobip")?.is_enabled
                         ? "bg-emerald-500/20 text-emerald-400"
-                        : "bg-slate-500/20 text-gray-500"
+                        : "bg-slate-500/20 text-white/60"
                     }`}
                   >
                     {providers.find(p => p.id === "infobip")?.is_enabled ? "Enabled" : "Disabled"}
@@ -1110,7 +1110,7 @@ function ProvidersTab({ authHeaders }) {
                   onClick={() => setEditingProvider("infobip")}
                   variant="ghost"
                   size="sm"
-                  className="text-gray-500 hover:text-gray-800"
+                  className="text-white/60 hover:text-white hover:bg-white/10"
                 >
                   <Settings className="w-4 h-4" />
                 </Button>
@@ -1121,11 +1121,15 @@ function ProvidersTab({ authHeaders }) {
           {/* Phone Numbers Section */}
           <div className="p-5">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-medium text-gray-600">Phone Numbers</h4>
+              <h4 className="text-sm font-medium text-white/70">Phone Numbers</h4>
               <Button
                 onClick={() => openAddPhone("infobip")}
                 size="sm"
-                className="h-7 text-xs bg-orange-500 hover:bg-orange-600"
+                className="h-7 text-xs text-white"
+                style={{
+                  background: 'linear-gradient(135deg, #f97316, #ea580c)',
+                  boxShadow: '0 0 15px rgba(249, 115, 22, 0.3)'
+                }}
               >
                 <Plus className="w-3 h-3 mr-1" />
                 Add Number

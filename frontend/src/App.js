@@ -1014,11 +1014,12 @@ function App() {
               <div className="flex items-end">
                 <Button 
                   variant="outline"
-                  className="w-full glass-input border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 font-mono text-[10px] uppercase tracking-wider"
+                  className={`w-full glass-input border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 font-mono text-[10px] uppercase tracking-wider ${isPreviewing ? 'bg-cyan-500/20' : ''}`}
                   data-testid="preview-voice-btn"
+                  onClick={isPreviewing ? stopPreview : previewVoice}
                 >
-                  <Volume2 className="w-3 h-3 mr-1" />
-                  Preview
+                  <Volume2 className={`w-3 h-3 mr-1 ${isPreviewing ? 'animate-pulse' : ''}`} />
+                  {isPreviewing ? 'Stop' : 'Preview'}
                 </Button>
               </div>
             </div>

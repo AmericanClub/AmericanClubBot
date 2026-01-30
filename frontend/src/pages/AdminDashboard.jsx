@@ -80,6 +80,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
     try {
       const response = await axios.get(`${API}/admin/users`, { headers: authHeaders });
       setUsers(response.data.users);
+      setIsSuperAdmin(response.data.current_admin_is_super || false);
     } catch (error) {
       console.error("Error fetching users:", error);
     }
@@ -94,6 +95,33 @@ export default function AdminDashboard({ user, token, onLogout }) {
       console.error("Error fetching invite codes:", error);
     }
   }, [token]);
+
+  // Create new admin
+  const handleCreateAdmin = async () => {
+    if (!newAdminName || !newAdminEmail || !newAdminPassword) {
+      toast.error("All fields are required");
+      return;
+    }
+    
+    setIsLoading(true);
+    try {
+      await axios.post(`${API}/admin/create-admin`, {
+        name: newAdminName,
+        email: newAdminEmail,
+        password: newAdminPassword
+      }, { headers: authHeaders });
+      
+      toast.success(`Admin ${newAdminName} created successfully!`);
+      setShowCreateAdmin(false);
+      setNewAdminName("");
+      setNewAdminEmail("");
+      setNewAdminPassword("");
+      fetchUsers();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to create admin");
+    }
+    setIsLoading(false);
+  };
 
   useEffect(() => {
     fetchStats();

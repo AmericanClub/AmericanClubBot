@@ -217,7 +217,7 @@ export default function AuthPage({ onLogin }) {
         {/* Footer note */}
         <p className="text-center text-slate-500 text-xs mt-6">
           {isLogin 
-            ? "Sign in to access your voice bot dashboard" 
+            ? "Sign in to access American Club dashboard" 
             : "Invite code required to create an account"}
         </p>
       </motion.div>

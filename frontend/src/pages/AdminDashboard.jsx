@@ -267,7 +267,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
         {/* User info */}
         <div className="border-t border-gray-200 pt-4 mt-4">
           <div className="flex items-center gap-3 px-2 mb-3">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-md shadow-violet-200">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-gray-800 text-sm font-bold shadow-md shadow-violet-200">
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
@@ -338,28 +338,28 @@ export default function AdminDashboard({ user, token, onLogout }) {
 
             <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
               <table className="w-full">
-                <thead className="bg-slate-800/50">
+                <thead className="bg-gray-100/50">
                   <tr>
-                    <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">User</th>
-                    <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Role</th>
-                    <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Credits</th>
-                    <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Status</th>
-                    <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Invite Code</th>
-                    <th className="text-right text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Actions</th>
+                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">User</th>
+                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Role</th>
+                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Credits</th>
+                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Status</th>
+                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Invite Code</th>
+                    <th className="text-right text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {users.map((u) => (
-                    <tr key={u.id} className="hover:bg-white/5">
+                    <tr key={u.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3">
                         <div>
-                          <p className="text-sm font-medium text-white">{u.name}</p>
-                          <p className="text-xs text-slate-400">{u.email}</p>
+                          <p className="text-sm font-medium text-gray-800">{u.name}</p>
+                          <p className="text-xs text-gray-500">{u.email}</p>
                         </div>
                       </td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex px-2 py-0.5 text-[10px] font-medium rounded-full ${
-                          u.role === "admin" ? "bg-purple-500/20 text-purple-400" : "bg-slate-500/20 text-slate-400"
+                          u.role === "admin" ? "bg-purple-500/20 text-purple-400" : "bg-slate-500/20 text-gray-500"
                         }`}>
                           {u.role.toUpperCase()}
                         </span>
@@ -375,7 +375,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="text-xs font-mono text-slate-400">{u.invite_code_used || "-"}</span>
+                        <span className="text-xs font-mono text-gray-500">{u.invite_code_used || "-"}</span>
                       </td>
                       <td className="px-4 py-3 text-right">
                         {u.role !== "admin" && (
@@ -384,7 +384,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
                               variant="ghost"
                               size="sm"
                               onClick={() => openEditUser(u)}
-                              className="text-slate-400 hover:text-white"
+                              className="text-gray-500 hover:text-gray-800"
                               title="Edit User"
                             >
                               <Edit className="w-4 h-4" />
@@ -434,34 +434,34 @@ export default function AdminDashboard({ user, token, onLogout }) {
         {activeTab === "invite-codes" && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-white">Invite Codes</h2>
+              <h2 className="text-2xl font-bold text-gray-800">Invite Codes</h2>
               <Button onClick={() => setShowCreateCode(true)} className="bg-cyan-500 hover:bg-cyan-600">
                 <Plus className="w-4 h-4 mr-2" />
                 Create Code
               </Button>
             </div>
 
-            <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden">
+            <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden">
               <table className="w-full">
-                <thead className="bg-slate-800/50">
+                <thead className="bg-gray-100/50">
                   <tr>
-                    <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Code</th>
-                    <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Credits</th>
-                    <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Status</th>
-                    <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Used By</th>
-                    <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Notes</th>
-                    <th className="text-right text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Actions</th>
+                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Code</th>
+                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Credits</th>
+                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Status</th>
+                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Used By</th>
+                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Notes</th>
+                    <th className="text-right text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {inviteCodes.map((code) => (
-                    <tr key={code.id} className="hover:bg-white/5">
+                    <tr key={code.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-sm text-white">{code.code}</span>
+                          <span className="font-mono text-sm text-gray-800">{code.code}</span>
                           <button
                             onClick={() => copyCode(code.code)}
-                            className="text-slate-400 hover:text-white"
+                            className="text-gray-500 hover:text-gray-800"
                           >
                             {copiedCode === code.code ? (
                               <Check className="w-3 h-3 text-emerald-400" />
@@ -476,7 +476,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
                       </td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex px-2 py-0.5 text-[10px] font-medium rounded-full ${
-                          code.is_used ? "bg-slate-500/20 text-slate-400" : "bg-emerald-500/20 text-emerald-400"
+                          code.is_used ? "bg-slate-500/20 text-gray-500" : "bg-emerald-500/20 text-emerald-400"
                         }`}>
                           {code.is_used ? "Used" : "Available"}
                         </span>
@@ -484,15 +484,15 @@ export default function AdminDashboard({ user, token, onLogout }) {
                       <td className="px-4 py-3">
                         {code.used_by_name ? (
                           <div>
-                            <p className="text-xs text-white">{code.used_by_name}</p>
-                            <p className="text-[10px] text-slate-400">{code.used_by_email}</p>
+                            <p className="text-xs text-gray-800">{code.used_by_name}</p>
+                            <p className="text-[10px] text-gray-500">{code.used_by_email}</p>
                           </div>
                         ) : (
-                          <span className="text-xs text-slate-500">-</span>
+                          <span className="text-xs text-gray-400">-</span>
                         )}
                       </td>
                       <td className="px-4 py-3">
-                        <span className="text-xs text-slate-400">{code.notes || "-"}</span>
+                        <span className="text-xs text-gray-500">{code.notes || "-"}</span>
                       </td>
                       <td className="px-4 py-3 text-right">
                         <Button
@@ -526,21 +526,21 @@ export default function AdminDashboard({ user, token, onLogout }) {
           <Modal onClose={() => setShowCreateCode(false)} title="Create Invite Code">
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-medium text-slate-400 uppercase">Credits</label>
+                <label className="text-xs font-medium text-gray-500 uppercase">Credits</label>
                 <Input
                   type="number"
                   value={newCodeCredits}
                   onChange={(e) => setNewCodeCredits(parseInt(e.target.value) || 0)}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
                   min={0}
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-slate-400 uppercase">Notes (optional)</label>
+                <label className="text-xs font-medium text-gray-500 uppercase">Notes (optional)</label>
                 <Input
                   value={newCodeNotes}
                   onChange={(e) => setNewCodeNotes(e.target.value)}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
                   placeholder="e.g., For new employee"
                 />
               </div>
@@ -562,26 +562,26 @@ export default function AdminDashboard({ user, token, onLogout }) {
         {showAddCredits && selectedUser && (
           <Modal onClose={() => { setShowAddCredits(false); setSelectedUser(null); }} title={`Add Credits to ${selectedUser.name}`}>
             <div className="space-y-4">
-              <div className="bg-slate-800 rounded-lg p-3">
-                <p className="text-xs text-slate-400">Current Balance</p>
+              <div className="bg-gray-100 rounded-lg p-3">
+                <p className="text-xs text-gray-500">Current Balance</p>
                 <p className="text-2xl font-mono text-cyan-400">{selectedUser.credits} credits</p>
               </div>
               <div>
-                <label className="text-xs font-medium text-slate-400 uppercase">Amount to Add</label>
+                <label className="text-xs font-medium text-gray-500 uppercase">Amount to Add</label>
                 <Input
                   type="number"
                   value={creditAmount}
                   onChange={(e) => setCreditAmount(parseInt(e.target.value) || 0)}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
                   min={1}
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-slate-400 uppercase">Reason (optional)</label>
+                <label className="text-xs font-medium text-gray-500 uppercase">Reason (optional)</label>
                 <Input
                   value={creditReason}
                   onChange={(e) => setCreditReason(e.target.value)}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
                   placeholder="e.g., Bonus, Promo"
                 />
               </div>
@@ -604,19 +604,19 @@ export default function AdminDashboard({ user, token, onLogout }) {
           <Modal onClose={() => { setShowEditUser(false); setSelectedUser(null); setEditPassword(""); }} title={`Edit User: ${selectedUser.name}`}>
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-medium text-slate-400 uppercase flex items-center gap-2">
+                <label className="text-xs font-medium text-gray-500 uppercase flex items-center gap-2">
                   <UserIcon className="w-3 h-3" />
                   Name
                 </label>
                 <Input
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
                   placeholder="User name"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-slate-400 uppercase flex items-center gap-2">
+                <label className="text-xs font-medium text-gray-500 uppercase flex items-center gap-2">
                   <Mail className="w-3 h-3" />
                   Email
                 </label>
@@ -624,12 +624,12 @@ export default function AdminDashboard({ user, token, onLogout }) {
                   type="email"
                   value={editEmail}
                   onChange={(e) => setEditEmail(e.target.value)}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
                   placeholder="user@example.com"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-slate-400 uppercase flex items-center gap-2">
+                <label className="text-xs font-medium text-gray-500 uppercase flex items-center gap-2">
                   <Key className="w-3 h-3" />
                   New Password
                 </label>
@@ -637,10 +637,10 @@ export default function AdminDashboard({ user, token, onLogout }) {
                   type="password"
                   value={editPassword}
                   onChange={(e) => setEditPassword(e.target.value)}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
                   placeholder="Leave blank to keep current"
                 />
-                <p className="text-[10px] text-slate-500 mt-1">User will be logged out if password is changed</p>
+                <p className="text-[10px] text-gray-400 mt-1">User will be logged out if password is changed</p>
               </div>
               <Button
                 onClick={handleEditUser}
@@ -671,10 +671,10 @@ function StatCard({ icon: Icon, label, value, subtext, color }) {
     <div className={`bg-gradient-to-br ${colors[color]} border rounded-xl p-4`}>
       <div className="flex items-center gap-3">
         <Icon className="w-5 h-5" />
-        <span className="text-xs font-medium text-slate-400 uppercase">{label}</span>
+        <span className="text-xs font-medium text-gray-500 uppercase">{label}</span>
       </div>
-      <p className="text-3xl font-bold text-white mt-2">{value}</p>
-      {subtext && <p className="text-xs text-slate-400 mt-1">{subtext}</p>}
+      <p className="text-3xl font-bold text-gray-800 mt-2">{value}</p>
+      {subtext && <p className="text-xs text-gray-500 mt-1">{subtext}</p>}
     </div>
   );
 }
@@ -693,10 +693,10 @@ function Modal({ children, onClose, title }) {
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-slate-900 border border-white/10 rounded-xl p-6 w-full max-w-md shadow-xl max-h-[90vh] overflow-y-auto"
+        className="bg-slate-900 border border-gray-200 rounded-xl p-6 w-full max-w-md shadow-xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-lg font-bold text-white mb-4">{title}</h3>
+        <h3 className="text-lg font-bold text-gray-800 mb-4">{title}</h3>
         {children}
       </motion.div>
     </motion.div>
@@ -890,7 +890,7 @@ function ProvidersTab({ authHeaders }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white">Provider Settings</h2>
+        <h2 className="text-2xl font-bold text-gray-800">Provider Settings</h2>
         <Button onClick={fetchProviders} variant="outline" size="sm">
           <RefreshCw className="w-4 h-4 mr-2" />
           Refresh
@@ -899,16 +899,16 @@ function ProvidersTab({ authHeaders }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* SignalWire Card */}
-        <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden">
-          <div className="p-5 border-b border-white/10">
+        <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden">
+          <div className="p-5 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
                   <Phone className="w-5 h-5 text-emerald-400" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-white">SignalWire</h3>
-                  <p className="text-xs text-slate-400">Voice & SMS Provider</p>
+                  <h3 className="font-bold text-gray-800">SignalWire</h3>
+                  <p className="text-xs text-gray-500">Voice & SMS Provider</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -918,7 +918,7 @@ function ProvidersTab({ authHeaders }) {
                     className={`px-2 py-1 rounded text-xs font-medium ${
                       providers.find(p => p.id === "signalwire")?.is_enabled
                         ? "bg-emerald-500/20 text-emerald-400"
-                        : "bg-slate-500/20 text-slate-400"
+                        : "bg-slate-500/20 text-gray-500"
                     }`}
                   >
                     {providers.find(p => p.id === "signalwire")?.is_enabled ? "Enabled" : "Disabled"}
@@ -928,7 +928,7 @@ function ProvidersTab({ authHeaders }) {
                   onClick={() => setEditingProvider("signalwire")}
                   variant="ghost"
                   size="sm"
-                  className="text-slate-400 hover:text-white"
+                  className="text-gray-500 hover:text-gray-800"
                 >
                   <Settings className="w-4 h-4" />
                 </Button>
@@ -939,7 +939,7 @@ function ProvidersTab({ authHeaders }) {
           {/* Phone Numbers Section */}
           <div className="p-5">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-medium text-slate-300">Phone Numbers</h4>
+              <h4 className="text-sm font-medium text-gray-600">Phone Numbers</h4>
               <Button
                 onClick={() => openAddPhone("signalwire")}
                 size="sm"
@@ -951,24 +951,24 @@ function ProvidersTab({ authHeaders }) {
             </div>
             
             {(providers.find(p => p.id === "signalwire")?.phone_numbers?.length || 0) === 0 ? (
-              <p className="text-slate-500 text-sm">No phone numbers configured</p>
+              <p className="text-gray-400 text-sm">No phone numbers configured</p>
             ) : (
               <div className="space-y-2">
                 {providers.find(p => p.id === "signalwire")?.phone_numbers?.map((phone) => (
                   <div 
                     key={phone.id || phone.number}
-                    className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/10"
+                    className="flex items-center justify-between p-2 rounded-lg bg-gray-50 border border-gray-200"
                   >
                     <div className="flex items-center gap-2">
                       <span className={`w-2 h-2 rounded-full ${phone.is_active ? 'bg-emerald-400' : 'bg-slate-500'}`} />
-                      <span className="font-mono text-sm text-white">{phone.number}</span>
+                      <span className="font-mono text-sm text-gray-800">{phone.number}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleTogglePhoneActive("signalwire", phone)}
-                        className={`h-7 w-7 p-0 ${phone.is_active ? 'text-emerald-400' : 'text-slate-500'}`}
+                        className={`h-7 w-7 p-0 ${phone.is_active ? 'text-emerald-400' : 'text-gray-400'}`}
                         title={phone.is_active ? "Deactivate" : "Activate"}
                       >
                         {phone.is_active ? <UserCheck className="w-3 h-3" /> : <UserX className="w-3 h-3" />}
@@ -977,7 +977,7 @@ function ProvidersTab({ authHeaders }) {
                         variant="ghost"
                         size="sm"
                         onClick={() => openEditPhone("signalwire", phone)}
-                        className="h-7 w-7 p-0 text-slate-400 hover:text-white"
+                        className="h-7 w-7 p-0 text-gray-500 hover:text-gray-800"
                       >
                         <Edit className="w-3 h-3" />
                       </Button>
@@ -998,16 +998,16 @@ function ProvidersTab({ authHeaders }) {
         </div>
 
         {/* Infobip Card */}
-        <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden">
-          <div className="p-5 border-b border-white/10">
+        <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden">
+          <div className="p-5 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
                   <Phone className="w-5 h-5 text-orange-400" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-white">Infobip</h3>
-                  <p className="text-xs text-slate-400">Voice & Messaging</p>
+                  <h3 className="font-bold text-gray-800">Infobip</h3>
+                  <p className="text-xs text-gray-500">Voice & Messaging</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -1017,7 +1017,7 @@ function ProvidersTab({ authHeaders }) {
                     className={`px-2 py-1 rounded text-xs font-medium ${
                       providers.find(p => p.id === "infobip")?.is_enabled
                         ? "bg-emerald-500/20 text-emerald-400"
-                        : "bg-slate-500/20 text-slate-400"
+                        : "bg-slate-500/20 text-gray-500"
                     }`}
                   >
                     {providers.find(p => p.id === "infobip")?.is_enabled ? "Enabled" : "Disabled"}
@@ -1027,7 +1027,7 @@ function ProvidersTab({ authHeaders }) {
                   onClick={() => setEditingProvider("infobip")}
                   variant="ghost"
                   size="sm"
-                  className="text-slate-400 hover:text-white"
+                  className="text-gray-500 hover:text-gray-800"
                 >
                   <Settings className="w-4 h-4" />
                 </Button>
@@ -1038,7 +1038,7 @@ function ProvidersTab({ authHeaders }) {
           {/* Phone Numbers Section */}
           <div className="p-5">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-medium text-slate-300">Phone Numbers</h4>
+              <h4 className="text-sm font-medium text-gray-600">Phone Numbers</h4>
               <Button
                 onClick={() => openAddPhone("infobip")}
                 size="sm"
@@ -1050,24 +1050,24 @@ function ProvidersTab({ authHeaders }) {
             </div>
             
             {(providers.find(p => p.id === "infobip")?.phone_numbers?.length || 0) === 0 ? (
-              <p className="text-slate-500 text-sm">No phone numbers configured</p>
+              <p className="text-gray-400 text-sm">No phone numbers configured</p>
             ) : (
               <div className="space-y-2">
                 {providers.find(p => p.id === "infobip")?.phone_numbers?.map((phone) => (
                   <div 
                     key={phone.id || phone.number}
-                    className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/10"
+                    className="flex items-center justify-between p-2 rounded-lg bg-gray-50 border border-gray-200"
                   >
                     <div className="flex items-center gap-2">
                       <span className={`w-2 h-2 rounded-full ${phone.is_active ? 'bg-emerald-400' : 'bg-slate-500'}`} />
-                      <span className="font-mono text-sm text-white">{phone.number}</span>
+                      <span className="font-mono text-sm text-gray-800">{phone.number}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleTogglePhoneActive("infobip", phone)}
-                        className={`h-7 w-7 p-0 ${phone.is_active ? 'text-emerald-400' : 'text-slate-500'}`}
+                        className={`h-7 w-7 p-0 ${phone.is_active ? 'text-emerald-400' : 'text-gray-400'}`}
                         title={phone.is_active ? "Deactivate" : "Activate"}
                       >
                         {phone.is_active ? <UserCheck className="w-3 h-3" /> : <UserX className="w-3 h-3" />}
@@ -1076,7 +1076,7 @@ function ProvidersTab({ authHeaders }) {
                         variant="ghost"
                         size="sm"
                         onClick={() => openEditPhone("infobip", phone)}
-                        className="h-7 w-7 p-0 text-slate-400 hover:text-white"
+                        className="h-7 w-7 p-0 text-gray-500 hover:text-gray-800"
                       >
                         <Edit className="w-3 h-3" />
                       </Button>
@@ -1103,11 +1103,11 @@ function ProvidersTab({ authHeaders }) {
           <Modal onClose={() => setShowAddPhone(false)} title={`Add Phone Number - ${selectedProvider?.toUpperCase()}`}>
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-medium text-slate-400 uppercase">Phone Number *</label>
+                <label className="text-xs font-medium text-gray-500 uppercase">Phone Number *</label>
                 <Input
                   value={newPhoneNumber}
                   onChange={(e) => setNewPhoneNumber(e.target.value)}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
                   placeholder="+1234567890"
                 />
               </div>
@@ -1130,11 +1130,11 @@ function ProvidersTab({ authHeaders }) {
           <Modal onClose={() => { setShowEditPhone(false); setEditingPhone(null); }} title="Edit Phone Number">
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-medium text-slate-400 uppercase">Phone Number *</label>
+                <label className="text-xs font-medium text-gray-500 uppercase">Phone Number *</label>
                 <Input
                   value={newPhoneNumber}
                   onChange={(e) => setNewPhoneNumber(e.target.value)}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
                   placeholder="+1234567890"
                 />
               </div>
@@ -1157,34 +1157,34 @@ function ProvidersTab({ authHeaders }) {
           <Modal onClose={() => setEditingProvider(null)} title="Configure SignalWire">
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-medium text-slate-400 uppercase">Project ID *</label>
+                <label className="text-xs font-medium text-gray-500 uppercase">Project ID *</label>
                 <Input
                   value={swProjectId}
                   onChange={(e) => setSwProjectId(e.target.value)}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
                   placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-slate-400 uppercase">Auth Token *</label>
+                <label className="text-xs font-medium text-gray-500 uppercase">Auth Token *</label>
                 <Input
                   type="password"
                   value={swAuthToken}
                   onChange={(e) => setSwAuthToken(e.target.value)}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
                   placeholder="PTxxxxxxxxxxxxxxxxxxxxxxxxxx"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-slate-400 uppercase">Space URL *</label>
+                <label className="text-xs font-medium text-gray-500 uppercase">Space URL *</label>
                 <Input
                   value={swSpaceUrl}
                   onChange={(e) => setSwSpaceUrl(e.target.value)}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
                   placeholder="your-space.signalwire.com"
                 />
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-gray-400">
                 Note: Add phone numbers after saving credentials using the "Add Number" button.
               </p>
               <Button
@@ -1206,34 +1206,34 @@ function ProvidersTab({ authHeaders }) {
           <Modal onClose={() => setEditingProvider(null)} title="Configure Infobip">
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-medium text-slate-400 uppercase">API Key *</label>
+                <label className="text-xs font-medium text-gray-500 uppercase">API Key *</label>
                 <Input
                   type="password"
                   value={ibApiKey}
                   onChange={(e) => setIbApiKey(e.target.value)}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
                   placeholder="Your Infobip API Key"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-slate-400 uppercase">Base URL</label>
+                <label className="text-xs font-medium text-gray-500 uppercase">Base URL</label>
                 <Input
                   value={ibBaseUrl}
                   onChange={(e) => setIbBaseUrl(e.target.value)}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
                   placeholder="api.infobip.com"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-slate-400 uppercase">App ID (optional)</label>
+                <label className="text-xs font-medium text-gray-500 uppercase">App ID (optional)</label>
                 <Input
                   value={ibAppId}
                   onChange={(e) => setIbAppId(e.target.value)}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-gray-100 border-gray-300 text-gray-800"
                   placeholder="App ID from Infobip"
                 />
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-gray-400">
                 Note: Add phone numbers after saving credentials using the "Add Number" button.
               </p>
               <Button

@@ -23,7 +23,9 @@ import {
   Check,
   ThumbsUp,
   ThumbsDown,
-  Keyboard
+  Keyboard,
+  LogOut,
+  Coins
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +41,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+
+// Import pages
+import AuthPage from "@/pages/AuthPage";
+import AdminDashboard from "@/pages/AdminDashboard";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;

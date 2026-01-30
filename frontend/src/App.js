@@ -1208,14 +1208,35 @@ function UserCallPanel({ user, token, onLogout }) {
                 <label className="form-label">
                   Caller ID
                 </label>
-                <Input
-                  type="text"
-                  value={fromNumber}
-                  onChange={(e) => setFromNumber(e.target.value)}
-                  className="glass-input font-mono text-cyan-100"
-                  placeholder="+18085821342"
-                  data-testid="from-number-input"
-                />
+                {availablePhoneNumbers.filter(n => n.provider_id === selectedProvider).length > 0 ? (
+                  <Select value={fromNumber} onValueChange={setFromNumber}>
+                    <SelectTrigger className="glass-input font-mono text-cyan-100" data-testid="from-number-select">
+                      <SelectValue placeholder="Select Caller ID" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-900 border-slate-800">
+                      {availablePhoneNumbers
+                        .filter(n => n.provider_id === selectedProvider)
+                        .map((phone) => (
+                          <SelectItem 
+                            key={phone.id || phone.number} 
+                            value={phone.number}
+                            className="font-mono text-xs"
+                          >
+                            {phone.number} ({phone.label})
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    type="text"
+                    value={fromNumber}
+                    onChange={(e) => setFromNumber(e.target.value)}
+                    className="glass-input font-mono text-cyan-100"
+                    placeholder="+18085821342"
+                    data-testid="from-number-input"
+                  />
+                )}
               </div>
               
               <div>

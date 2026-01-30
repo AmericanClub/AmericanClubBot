@@ -138,12 +138,12 @@
     font-family: 'Outfit', sans-serif;
     font-size: 0.875rem;
     font-weight: 600;
-    color: #a78bfa;
+    color: #c4b5fd;
     margin-bottom: 0.875rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    text-shadow: 0 0 20px rgba(167, 139, 250, 0.3);
+    text-shadow: 0 0 20px rgba(167, 139, 250, 0.4);
 }
 
 .form-grid {

@@ -227,17 +227,42 @@ export default function AdminDashboard({ user, token, onLogout }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-violet-50">
+    <div className="min-h-screen relative overflow-hidden"
+      style={{
+        background: 'linear-gradient(-45deg, #0f0a1e, #1e1145, #2d1b69, #1a1333)',
+        backgroundSize: '400% 400%',
+        animation: 'gradientShift 15s ease infinite'
+      }}>
+      
+      {/* Background orbs */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/4 right-0 w-[500px] h-[500px] rounded-full opacity-20"
+          style={{ background: 'radial-gradient(circle, rgba(139, 92, 246, 0.5) 0%, transparent 70%)' }} />
+        <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] rounded-full opacity-15"
+          style={{ background: 'radial-gradient(circle, rgba(34, 211, 238, 0.5) 0%, transparent 70%)' }} />
+      </div>
+
       {/* Sidebar */}
-      <div className="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 p-4 flex flex-col shadow-sm">
+      <div className="fixed left-0 top-0 h-full w-64 p-4 flex flex-col z-20"
+        style={{
+          background: 'rgba(255, 255, 255, 0.02)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderRight: '1px solid rgba(255, 255, 255, 0.05)'
+        }}>
         {/* Logo */}
         <div className="flex items-center gap-3 mb-8 px-2">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center overflow-hidden shadow-md shadow-violet-200">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden"
+            style={{
+              background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(168, 85, 247, 0.2))',
+              border: '1px solid rgba(167, 139, 250, 0.3)',
+              boxShadow: '0 0 20px rgba(139, 92, 246, 0.3)'
+            }}>
             <img src="/logo.png" alt="American Club" className="w-7 h-7 object-contain" />
           </div>
           <div>
-            <h1 className="font-bold text-gray-800 text-sm">American Club</h1>
-            <p className="text-[10px] text-violet-500 font-semibold">ADMIN PANEL</p>
+            <h1 className="font-bold text-white text-sm" style={{ textShadow: '0 0 20px rgba(167, 139, 250, 0.3)' }}>American Club</h1>
+            <p className="text-[10px] text-purple-400 font-semibold">ADMIN PANEL</p>
           </div>
         </div>
 
@@ -252,27 +277,33 @@ export default function AdminDashboard({ user, token, onLogout }) {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
-                activeTab === item.id
-                  ? "bg-violet-100 text-violet-700 font-medium"
-                  : "text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-              }`}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300`}
+              style={{
+                background: activeTab === item.id ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.1))' : 'transparent',
+                border: activeTab === item.id ? '1px solid rgba(139, 92, 246, 0.3)' : '1px solid transparent',
+                color: activeTab === item.id ? '#a78bfa' : '#94a3b8',
+                boxShadow: activeTab === item.id ? '0 0 20px rgba(139, 92, 246, 0.2)' : 'none'
+              }}
             >
               <item.icon className="w-4 h-4" />
-              <span className="text-sm">{item.label}</span>
+              <span className="text-sm font-medium">{item.label}</span>
             </button>
           ))}
         </nav>
 
         {/* User info */}
-        <div className="border-t border-gray-200 pt-4 mt-4">
+        <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)' }} className="pt-4 mt-4">
           <div className="flex items-center gap-3 px-2 mb-3">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-gray-800 text-sm font-bold shadow-md shadow-violet-200">
+            <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold"
+              style={{
+                background: 'linear-gradient(135deg, #8b5cf6, #a855f7)',
+                boxShadow: '0 0 20px rgba(139, 92, 246, 0.4)'
+              }}>
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-800 truncate">{user.name}</p>
-              <p className="text-[10px] text-gray-500 truncate">{user.email}</p>
+              <p className="text-sm font-semibold text-white truncate">{user.name}</p>
+              <p className="text-[10px] text-white/50 truncate">{user.email}</p>
             </div>
           </div>
           <Button

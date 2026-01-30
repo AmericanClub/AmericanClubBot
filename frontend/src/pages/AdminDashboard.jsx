@@ -18,7 +18,11 @@ import {
   MoreVertical,
   UserCheck,
   UserX,
-  Coins
+  Coins,
+  Edit,
+  Key,
+  Mail,
+  User as UserIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,6 +41,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
   // Modal states
   const [showCreateCode, setShowCreateCode] = useState(false);
   const [showAddCredits, setShowAddCredits] = useState(false);
+  const [showEditUser, setShowEditUser] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   
   // Form states
@@ -44,6 +49,11 @@ export default function AdminDashboard({ user, token, onLogout }) {
   const [newCodeNotes, setNewCodeNotes] = useState("");
   const [creditAmount, setCreditAmount] = useState(10);
   const [creditReason, setCreditReason] = useState("");
+  
+  // Edit user form states
+  const [editName, setEditName] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+  const [editPassword, setEditPassword] = useState("");
   
   const authHeaders = { Authorization: `Bearer ${token}` };
 

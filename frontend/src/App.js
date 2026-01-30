@@ -1389,8 +1389,8 @@ function UserCallPanel({ user, token, onLogout }) {
             <Tabs value={activeStep} onValueChange={setActiveStep} className="w-full">
               <TabsList className="w-full p-1 rounded-lg h-auto flex gap-1" 
                 style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)'
+                  background: 'rgba(139, 92, 246, 0.08)',
+                  border: '1px solid rgba(139, 92, 246, 0.2)'
                 }}
                 data-testid="call-steps-tabs"
               >

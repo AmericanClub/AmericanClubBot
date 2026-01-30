@@ -731,16 +731,51 @@ function App() {
 
         {/* Right Panel - Call Setup */}
         <div className="setup-panel" data-testid="setup-panel">
+          {/* Provider Tabs */}
+          <div className="flex items-center gap-2 mb-3" data-testid="provider-tabs">
+            <button
+              onClick={() => setSelectedProvider("infobip")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-mono text-[10px] uppercase tracking-wider transition-all ${
+                selectedProvider === "infobip"
+                  ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/50"
+                  : "bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10"
+              }`}
+              data-testid="provider-ch1"
+            >
+              <span className={`w-2 h-2 rounded-full ${infobipConfigured ? "bg-emerald-400" : "bg-yellow-400"}`} />
+              CH: 1 (Infobip)
+            </button>
+            <button
+              onClick={() => setSelectedProvider("signalwire")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-mono text-[10px] uppercase tracking-wider transition-all ${
+                selectedProvider === "signalwire"
+                  ? "bg-purple-500/20 text-purple-400 border border-purple-500/50"
+                  : "bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10"
+              }`}
+              data-testid="provider-ch2"
+            >
+              <span className={`w-2 h-2 rounded-full ${signalwireConfigured ? "bg-emerald-400" : "bg-yellow-400"}`} />
+              CH: 2 (SignalWire)
+            </button>
+          </div>
+
           {/* Header */}
           <div className="flex items-center justify-between mb-3">
             <h1 className="font-heading text-lg font-bold text-white">
               Voice Bot Control
             </h1>
             <Badge 
-              variant={infobipConfigured ? "default" : "secondary"}
-              className={`text-[10px] px-2 py-0.5 ${infobipConfigured ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"}`}
+              variant="default"
+              className={`text-[10px] px-2 py-0.5 ${
+                selectedProvider === "signalwire" 
+                  ? (signalwireConfigured ? "bg-purple-500/20 text-purple-400 border-purple-500/30" : "bg-yellow-500/20 text-yellow-400 border-yellow-500/30")
+                  : (infobipConfigured ? "bg-cyan-500/20 text-cyan-400 border-cyan-500/30" : "bg-yellow-500/20 text-yellow-400 border-yellow-500/30")
+              }`}
             >
-              {infobipConfigured ? "Infobip" : "Simulation"}
+              {selectedProvider === "signalwire" 
+                ? (signalwireConfigured ? "SignalWire" : "Simulation")
+                : (infobipConfigured ? "Infobip" : "Simulation")
+              }
             </Badge>
           </div>
           

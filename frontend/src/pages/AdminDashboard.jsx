@@ -248,6 +248,29 @@ export default function AdminDashboard({ user, token, onLogout }) {
     !seenAlertIds.includes(log.id)
   ).length;
 
+  // Filtered users based on search
+  const filteredUsers = users.filter(user => {
+    if (!userSearch) return true;
+    const search = userSearch.toLowerCase();
+    return (
+      user.name?.toLowerCase().includes(search) ||
+      user.email?.toLowerCase().includes(search) ||
+      user.role?.toLowerCase().includes(search)
+    );
+  });
+
+  // Filtered security logs based on search
+  const filteredSecurityLogs = securityLogs.filter(log => {
+    if (!securitySearch) return true;
+    const search = securitySearch.toLowerCase();
+    return (
+      log.event_type?.toLowerCase().includes(search) ||
+      log.ip?.toLowerCase().includes(search) ||
+      log.severity?.toLowerCase().includes(search) ||
+      log.details?.email?.toLowerCase().includes(search)
+    );
+  });
+
   // Mark all current dangerous alerts as seen
   const markAlertsAsSeen = () => {
     const dangerousIds = securityLogs

@@ -881,8 +881,8 @@ function UserCallPanel({ user, token, onLogout }) {
           WebkitBackdropFilter: 'blur(20px)',
           borderBottom: '1px solid rgba(59, 130, 246, 0.15)'
         }}>
-        <div className="main-grid py-3">
-          {/* Left side - aligns with logs panel */}
+        <div className="flex items-center justify-between py-3 px-6">
+          {/* Left side - Logo */}
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden"
               style={{
@@ -898,8 +898,8 @@ function UserCallPanel({ user, token, onLogout }) {
             </div>
           </div>
           
-          {/* Right side - aligns with control panel */}
-          <div className="flex items-center justify-end gap-4">
+          {/* Right side - Credits & User */}
+          <div className="flex items-center gap-4">
             {/* Credits Display */}
             <div className="flex items-center gap-2 rounded-lg px-4 py-2"
               style={{

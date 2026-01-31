@@ -497,6 +497,68 @@ export default function AdminDashboard({ user, token, onLogout }) {
                 color="emerald"
               />
             </div>
+
+            {/* Security Alerts Card - Only for Super Admin */}
+            {isSuperAdmin && dangerousEvents.length > 0 && (
+              <div className="rounded-xl overflow-hidden" style={{ 
+                background: 'rgba(239, 68, 68, 0.05)', 
+                border: '1px solid rgba(239, 68, 68, 0.2)' 
+              }}>
+                <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(239, 68, 68, 0.15)' }}>
+                  <div className="flex items-center gap-2">
+                    <ShieldAlert className="w-5 h-5 text-red-400" />
+                    <h3 className="text-sm font-bold text-red-400">SECURITY ALERTS</h3>
+                    <span className="px-2 py-0.5 text-[10px] font-bold bg-red-500/20 text-red-400 rounded-full border border-red-500/30">
+                      {dangerousEvents.length} new
+                    </span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setActiveTab("security")}
+                    className="text-red-400 hover:text-red-300 hover:bg-red-500/10 text-xs"
+                  >
+                    View All
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </div>
+                <div className="divide-y divide-red-500/10">
+                  {dangerousEvents.map((event) => (
+                    <div key={event.id} className="px-4 py-3 flex items-center gap-4 hover:bg-red-500/5 transition-colors">
+                      <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
+                        event.severity === 'critical' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                        event.severity === 'high' ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' :
+                        'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                      }`}>
+                        {event.severity}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-white font-medium truncate">
+                          {event.event_type.replace(/_/g, ' ').toUpperCase()}
+                        </p>
+                        <p className="text-xs text-slate-400">
+                          {event.details?.email || event.ip} • {new Date(event.timestamp).toLocaleString()}
+                        </p>
+                      </div>
+                      <AlertTriangle className={`w-4 h-4 flex-shrink-0 ${
+                        event.severity === 'high' || event.severity === 'critical' ? 'text-red-400' : 'text-yellow-400'
+                      }`} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* No alerts message */}
+            {isSuperAdmin && dangerousEvents.length === 0 && (
+              <div className="rounded-xl p-4 flex items-center gap-3" style={{ 
+                background: 'rgba(16, 185, 129, 0.05)', 
+                border: '1px solid rgba(16, 185, 129, 0.2)' 
+              }}>
+                <Shield className="w-5 h-5 text-emerald-400" />
+                <p className="text-sm text-emerald-400">All systems secure. No security alerts.</p>
+              </div>
+            )}
           </div>
         )}
 

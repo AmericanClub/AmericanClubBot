@@ -50,6 +50,11 @@ export default function AdminDashboard({ user, token, onLogout }) {
   // Security logs state (Super Admin only)
   const [securityLogs, setSecurityLogs] = useState([]);
   const [securityStats, setSecurityStats] = useState(null);
+  const [seenAlertIds, setSeenAlertIds] = useState(() => {
+    // Load seen alerts from localStorage
+    const saved = localStorage.getItem('seenSecurityAlerts');
+    return saved ? JSON.parse(saved) : [];
+  });
   
   // Modal states
   const [showCreateCode, setShowCreateCode] = useState(false);

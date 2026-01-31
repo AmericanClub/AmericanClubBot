@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Phone, Mail, Lock, User, Ticket, Loader2, Eye, EyeOff, Sparkles } from "lucide-react";
+import { Phone, Mail, Lock, User, Ticket, Loader2, Eye, EyeOff, Sparkles, ShieldCheck, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -18,6 +18,34 @@ export default function AuthPage({ onLogin }) {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [inviteCode, setInviteCode] = useState("");
+  
+  // CAPTCHA state
+  const [captchaId, setCaptchaId] = useState("");
+  const [captchaQuestion, setCaptchaQuestion] = useState("");
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
+  const [captchaLoading, setCaptchaLoading] = useState(false);
+
+  // Fetch CAPTCHA on mount and when switching to login
+  const fetchCaptcha = useCallback(async () => {
+    setCaptchaLoading(true);
+    try {
+      const response = await axios.get(`${API}/auth/captcha`);
+      setCaptchaId(response.data.captcha_id);
+      setCaptchaQuestion(response.data.question);
+      setCaptchaAnswer("");
+    } catch (error) {
+      console.error("Failed to fetch captcha:", error);
+      toast.error("Failed to load security check");
+    } finally {
+      setCaptchaLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isLogin) {
+      fetchCaptcha();
+    }
+  }, [isLogin, fetchCaptcha]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,7 +53,19 @@ export default function AuthPage({ onLogin }) {
 
     try {
       if (isLogin) {
-        const response = await axios.post(`${API}/auth/login`, { email, password });
+        // Validate CAPTCHA answer
+        if (!captchaAnswer) {
+          toast.error("Please answer the security check");
+          setIsLoading(false);
+          return;
+        }
+        
+        const response = await axios.post(`${API}/auth/login`, { 
+          email, 
+          password,
+          captcha_id: captchaId,
+          captcha_answer: parseInt(captchaAnswer)
+        });
         const { access_token, user } = response.data;
         localStorage.setItem("token", access_token);
         localStorage.setItem("user", JSON.stringify(user));
@@ -49,6 +89,10 @@ export default function AuthPage({ onLogin }) {
     } catch (error) {
       const message = error.response?.data?.detail || "Authentication failed";
       toast.error(message);
+      // Refresh CAPTCHA on failed login attempt
+      if (isLogin) {
+        fetchCaptcha();
+      }
     } finally {
       setIsLoading(false);
     }
@@ -205,10 +249,55 @@ export default function AuthPage({ onLogin }) {
               </div>
             </div>
 
+            {/* Security Check / CAPTCHA - Only for Login */}
+            {isLogin && (
+              <div className="space-y-2 pt-2">
+                <label className="text-xs font-semibold text-cyan-400 uppercase tracking-wider flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4" />
+                  Security Check *
+                </label>
+                <div className="flex gap-2">
+                  <div 
+                    className="flex-1 flex items-center justify-center py-3 rounded-lg font-mono text-lg"
+                    style={{
+                      background: 'rgba(6, 182, 212, 0.1)',
+                      border: '1px solid rgba(6, 182, 212, 0.3)'
+                    }}
+                  >
+                    {captchaLoading ? (
+                      <RefreshCw className="w-5 h-5 animate-spin text-cyan-400" />
+                    ) : (
+                      <span className="text-cyan-300 font-bold tracking-wider">{captchaQuestion}</span>
+                    )}
+                  </div>
+                  <Input
+                    type="number"
+                    placeholder="Answer"
+                    value={captchaAnswer}
+                    onChange={(e) => setCaptchaAnswer(e.target.value)}
+                    className="w-24 bg-slate-900/50 border-slate-700/50 text-white text-center font-mono text-lg placeholder:text-slate-500 focus:border-cyan-500/50 focus:ring-cyan-500/20 rounded-lg h-12"
+                    required={isLogin}
+                    data-testid="captcha-answer"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={fetchCaptcha}
+                    disabled={captchaLoading}
+                    className="h-12 w-12 border-slate-700 text-slate-400 hover:text-cyan-400 hover:border-cyan-500/50 hover:bg-cyan-500/10"
+                    title="Refresh security check"
+                  >
+                    <RefreshCw className={`w-4 h-4 ${captchaLoading ? 'animate-spin' : ''}`} />
+                  </Button>
+                </div>
+              </div>
+            )}
+
             {/* Submit Button */}
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || (isLogin && captchaLoading)}
               className="w-full font-semibold py-3 mt-6 rounded-lg h-12 text-white bg-blue-600 hover:bg-blue-700 transition-colors"
               style={{
                 boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'

@@ -862,6 +862,25 @@ async def get_security_logs_endpoint(
     return {"logs": logs, "count": len(logs)}
 
 
+@security_router.delete("/logs")
+async def clear_security_logs_endpoint(current_admin: dict = Depends(get_super_admin)):
+    """Clear all security logs (Super Admin only)"""
+    from security_advanced import security_logs
+    cleared_count = len(security_logs)
+    security_logs.clear()
+    
+    # Log the clear action itself
+    log_security_event(
+        event_type="security_logs_cleared",
+        ip="system",
+        details={"cleared_by": current_admin["email"], "cleared_count": cleared_count},
+        user_id=current_admin["id"],
+        severity="medium"
+    )
+    
+    return {"message": f"Cleared {cleared_count} security logs"}
+
+
 @security_router.get("/stats")
 async def get_security_stats_endpoint(current_admin: dict = Depends(get_super_admin)):
     """Get security statistics (Super Admin only)"""

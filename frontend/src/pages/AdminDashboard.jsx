@@ -47,6 +47,10 @@ export default function AdminDashboard({ user, token, onLogout }) {
   // Use user prop to determine if super admin (set immediately on load)
   const isSuperAdmin = user?.is_super_admin || false;
   
+  // Security logs state (Super Admin only)
+  const [securityLogs, setSecurityLogs] = useState([]);
+  const [securityStats, setSecurityStats] = useState(null);
+  
   // Modal states
   const [showCreateCode, setShowCreateCode] = useState(false);
   const [showAddCredits, setShowAddCredits] = useState(false);

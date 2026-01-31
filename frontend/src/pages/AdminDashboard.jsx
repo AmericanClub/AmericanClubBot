@@ -1201,6 +1201,7 @@ function Modal({ children, onClose, title }) {
 function ProvidersTab({ authHeaders }) {
   const [providers, setProviders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [editingProvider, setEditingProvider] = useState(null);
   const [selectedProvider, setSelectedProvider] = useState(null);
   

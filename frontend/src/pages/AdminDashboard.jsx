@@ -653,11 +653,11 @@ export default function AdminDashboard({ user, token, onLogout }) {
               </div>
             </div>
 
-            <div className="rounded-xl">
+            <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(59, 130, 246, 0.15)' }}>
               <table className="w-full">
-                <thead className="rounded-xl-header">
-                  <tr>
-                    <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Code</th>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid rgba(59, 130, 246, 0.15)' }}>
+                    <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Code</th>
                     <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Credits</th>
                     <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Status</th>
                     <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Used By</th>

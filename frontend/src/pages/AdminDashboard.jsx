@@ -687,21 +687,44 @@ export default function AdminDashboard({ user, token, onLogout }) {
               </div>
             </div>
 
+            {/* Search Box */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              <Input
+                type="text"
+                placeholder="Search by name, email, or role..."
+                value={userSearch}
+                onChange={(e) => setUserSearch(e.target.value)}
+                className="pl-10 bg-slate-900/50 border-slate-700/50 text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-blue-500/20 rounded-lg h-10"
+              />
+              {userSearch && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+                  {filteredUsers.length} result{filteredUsers.length !== 1 ? 's' : ''}
+                </span>
+              )}
+            </div>
+
             <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(59, 130, 246, 0.15)' }}>
               <table className="w-full">
-                <thead className="rounded-xl-header">
-                  <tr>
-                    <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">User</th>
-                    <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Role</th>
-                    <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Credits</th>
-                    <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Status</th>
-                    <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Invite Code</th>
-                    <th className="text-right text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Actions</th>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid rgba(59, 130, 246, 0.15)' }}>
+                    <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">User</th>
+                    <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Role</th>
+                    <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Credits</th>
+                    <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Status</th>
+                    <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Invite Code</th>
+                    <th className="text-right text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
-                  {users.map((u) => (
-                    <tr key={u.id} className="rounded-xl-row">
+                <tbody>
+                  {filteredUsers.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
+                        {userSearch ? `No users found matching "${userSearch}"` : 'No users found'}
+                      </td>
+                    </tr>
+                  ) : filteredUsers.map((u) => (
+                    <tr key={u.id} style={{ borderBottom: '1px solid rgba(59, 130, 246, 0.1)' }} className="hover:bg-white/5">
                       <td className="px-4 py-3">
                         <div>
                           <p className="text-sm font-medium text-white">{u.name}</p>

@@ -15,6 +15,12 @@ from auth import (
     get_current_user, get_current_admin, get_current_active_user
 )
 
+from security import (
+    check_rate_limit, record_login_attempt, 
+    generate_captcha, verify_captcha, get_rate_limit_info,
+    get_client_ip as security_get_client_ip
+)
+
 auth_router = APIRouter(prefix="/auth", tags=["Authentication"])
 admin_router = APIRouter(prefix="/admin", tags=["Admin"])
 
@@ -31,6 +37,35 @@ class AdminCreateRequest(BaseModel):
     name: str
     email: EmailStr
     password: str
+
+
+# Pydantic model for login with CAPTCHA
+class LoginWithCaptcha(BaseModel):
+    email: EmailStr
+    password: str
+    captcha_id: str
+    captcha_answer: int
+
+
+# ==================
+# Security Endpoints
+# ==================
+
+@auth_router.get("/captcha")
+async def get_captcha():
+    """Generate a new CAPTCHA challenge"""
+    captcha_id, question, _ = generate_captcha()
+    return {
+        "captcha_id": captcha_id,
+        "question": question
+    }
+
+
+@auth_router.get("/rate-limit-status")
+async def get_rate_limit_status(request: Request):
+    """Get current rate limit status for the client IP"""
+    ip = security_get_client_ip(request)
+    return get_rate_limit_info(ip)
 
 
 # ==================

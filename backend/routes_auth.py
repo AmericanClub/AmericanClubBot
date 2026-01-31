@@ -195,6 +195,12 @@ async def login(user_data: LoginWithCaptcha, request: Request):
     # Check rate limit first
     is_allowed, blocked_seconds = check_rate_limit(ip)
     if not is_allowed:
+        log_security_event(
+            event_type="rate_limit_exceeded",
+            ip=ip,
+            details={"email": user_data.email, "blocked_seconds": blocked_seconds},
+            severity="high"
+        )
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail=f"Too many login attempts. Please try again in {blocked_seconds} seconds."
@@ -203,6 +209,12 @@ async def login(user_data: LoginWithCaptcha, request: Request):
     # Verify CAPTCHA
     if not verify_captcha(user_data.captcha_id, user_data.captcha_answer):
         record_login_attempt(ip, success=False)
+        log_security_event(
+            event_type="captcha_failed",
+            ip=ip,
+            details={"email": user_data.email},
+            severity="low"
+        )
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid or expired security check answer"
@@ -213,6 +225,12 @@ async def login(user_data: LoginWithCaptcha, request: Request):
     
     if not user:
         record_login_attempt(ip, success=False)
+        log_security_event(
+            event_type="login_failed_unknown_user",
+            ip=ip,
+            details={"email": user_data.email},
+            severity="medium"
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"
@@ -221,6 +239,13 @@ async def login(user_data: LoginWithCaptcha, request: Request):
     # Verify password
     if not verify_password(user_data.password, user["password"]):
         record_login_attempt(ip, success=False)
+        log_security_event(
+            event_type="login_failed_wrong_password",
+            ip=ip,
+            details={"email": user_data.email, "user_id": user["id"]},
+            user_id=user["id"],
+            severity="medium"
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"

@@ -873,67 +873,101 @@ function UserCallPanel({ user, token, onLogout }) {
 
   return (
     <div className="app-container" data-testid="app-container">
-      {/* User Header Bar */}
-      <div className="fixed top-0 left-0 right-0 z-50"
-        style={{
+      {/* User Header Bar - Premium Modern */}
+      <div className="fixed top-0 left-0 right-0 z-50">
+        {/* Gradient Accent Strip */}
+        <div className="h-[3px] w-full" style={{
+          background: 'linear-gradient(90deg, #3b82f6 0%, #06b6d4 25%, #8b5cf6 50%, #06b6d4 75%, #3b82f6 100%)',
+          backgroundSize: '200% 100%',
+          animation: 'shimmer 3s linear infinite'
+        }} />
+        
+        {/* Main Header Content */}
+        <div style={{
           background: 'linear-gradient(180deg, rgba(10, 14, 26, 0.98) 0%, rgba(10, 14, 26, 0.95) 100%)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(59, 130, 246, 0.15)'
+          borderBottom: '1px solid rgba(59, 130, 246, 0.1)',
+          boxShadow: '0 4px 30px rgba(0, 0, 0, 0.3), 0 0 40px rgba(59, 130, 246, 0.05)'
         }}>
-        <div className="flex items-center justify-between py-3 px-6">
-          {/* Left side - Logo */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden"
-              style={{
-                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1))',
-                border: '1px solid rgba(59, 130, 246, 0.3)',
-                boxShadow: '0 0 20px rgba(59, 130, 246, 0.2)'
-              }}>
-              <img src="/logo.png" alt="American Club" className="w-7 h-7 object-contain" />
-            </div>
-            <div>
-              <h1 className="font-bold text-white text-sm" style={{ textShadow: '0 0 20px rgba(96, 165, 250, 0.3)' }}>American Club</h1>
-              <p className="text-[10px] text-blue-400/70">IVR Call System</p>
-            </div>
-          </div>
-          
-          {/* Right side - Credits & User */}
-          <div className="flex items-center gap-4">
-            {/* Credits Display */}
-            <div className="flex items-center gap-2 rounded-lg px-4 py-2"
-              style={{
-                background: 'rgba(251, 191, 36, 0.1)',
-                border: '1px solid rgba(251, 191, 36, 0.25)'
-              }}>
-              <Coins className="w-4 h-4 text-yellow-400" />
+          <div className="flex items-center justify-between py-3 px-6">
+            {/* Left side - Logo with Ring Glow */}
+            <div className="flex items-center gap-3 group">
+              <div className="relative">
+                {/* Outer glow ring */}
+                <div className="absolute -inset-1 rounded-xl opacity-75 group-hover:opacity-100 transition-opacity duration-300"
+                  style={{
+                    background: 'linear-gradient(135deg, #3b82f6, #06b6d4)',
+                    filter: 'blur(8px)'
+                  }} />
+                {/* Logo container */}
+                <div className="relative w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.95))',
+                    border: '1px solid rgba(59, 130, 246, 0.4)',
+                    boxShadow: 'inset 0 0 20px rgba(59, 130, 246, 0.1)'
+                  }}>
+                  <img src="/logo.png" alt="American Club" className="w-7 h-7 object-contain relative z-10" />
+                </div>
+              </div>
               <div>
-                <span className="font-mono text-lg font-bold text-yellow-400" data-testid="user-credits">{userCredits}</span>
-                <span className="text-[10px] text-yellow-500/70 ml-1">credits</span>
+                <h1 className="font-bold text-white text-sm tracking-wide" 
+                  style={{ textShadow: '0 0 20px rgba(96, 165, 250, 0.4)' }}>
+                  American Club
+                </h1>
+                <p className="text-[10px] text-blue-400/80 font-medium tracking-wider uppercase">IVR Call System</p>
               </div>
             </div>
-            {/* User Info */}
-            <div className="flex items-center gap-3">
-              <div className="text-right">
-                <p className="text-sm font-semibold text-white">{user?.name}</p>
-                <p className="text-[10px] text-slate-500">{user?.email}</p>
-              </div>
-              <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold"
+            
+            {/* Right side - Credits & User */}
+            <div className="flex items-center gap-4">
+              {/* Credits Display - Enhanced */}
+              <div className="flex items-center gap-2 rounded-xl px-4 py-2 transition-all duration-300 hover:scale-105"
                 style={{
-                  background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
-                  boxShadow: '0 0 15px rgba(59, 130, 246, 0.3)'
+                  background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(251, 191, 36, 0.05))',
+                  border: '1px solid rgba(251, 191, 36, 0.3)',
+                  boxShadow: '0 0 20px rgba(251, 191, 36, 0.1), inset 0 0 20px rgba(251, 191, 36, 0.05)'
                 }}>
-                {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                <Coins className="w-4 h-4 text-yellow-400" style={{ filter: 'drop-shadow(0 0 4px rgba(251, 191, 36, 0.5))' }} />
+                <div>
+                  <span className="font-mono text-lg font-bold text-yellow-400" data-testid="user-credits"
+                    style={{ textShadow: '0 0 10px rgba(251, 191, 36, 0.3)' }}>{userCredits}</span>
+                  <span className="text-[10px] text-yellow-500/70 ml-1 uppercase tracking-wider">credits</span>
+                </div>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onLogout}
-                className="text-slate-500 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20"
-                data-testid="logout-btn"
-              >
-                <LogOut className="w-4 h-4" />
-              </Button>
+              
+              {/* User Info - Enhanced */}
+              <div className="flex items-center gap-3">
+                <div className="text-right">
+                  <p className="text-sm font-semibold text-white">{user?.name}</p>
+                  <p className="text-[10px] text-slate-400">{user?.email}</p>
+                </div>
+                {/* Avatar with glow */}
+                <div className="relative group/avatar">
+                  <div className="absolute -inset-0.5 rounded-full opacity-60 group-hover/avatar:opacity-100 transition-opacity duration-300"
+                    style={{
+                      background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+                      filter: 'blur(4px)'
+                    }} />
+                  <div className="relative w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                    style={{
+                      background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+                      boxShadow: 'inset 0 0 10px rgba(255, 255, 255, 0.1)'
+                    }}>
+                    {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                  </div>
+                </div>
+                {/* Logout button - Enhanced */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onLogout}
+                  className="text-slate-400 hover:text-red-400 hover:bg-red-500/10 border border-slate-700/50 hover:border-red-500/30 rounded-lg transition-all duration-300"
+                  data-testid="logout-btn"
+                >
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </div>

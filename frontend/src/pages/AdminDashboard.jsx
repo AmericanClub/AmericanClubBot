@@ -382,7 +382,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
             { id: "users", label: "Users", icon: Users },
             { id: "invite-codes", label: "Invite Codes", icon: Ticket },
             { id: "providers", label: "Providers", icon: Settings },
-            ...(isSuperAdmin ? [{ id: "security", label: "Security", icon: ShieldAlert }] : []),
+            ...(isSuperAdmin ? [{ id: "security", label: "Security", icon: ShieldAlert, badge: highSeverityCount }] : []),
           ].map((item) => (
             <button
               key={item.id}
@@ -398,7 +398,12 @@ export default function AdminDashboard({ user, token, onLogout }) {
               }}
             >
               <item.icon className="w-4 h-4" />
-              <span className="text-sm font-medium">{item.label}</span>
+              <span className="text-sm font-medium flex-1 text-left">{item.label}</span>
+              {item.badge > 0 && (
+                <span className="px-1.5 py-0.5 text-[10px] font-bold bg-red-500 text-white rounded-full min-w-[18px] text-center animate-pulse">
+                  {item.badge}
+                </span>
+              )}
             </button>
           ))}
         </nav>

@@ -253,6 +253,13 @@ async def login(user_data: LoginWithCaptcha, request: Request):
     
     # Check if active
     if not user.get("is_active", False):
+        log_security_event(
+            event_type="login_blocked_disabled_account",
+            ip=ip,
+            details={"email": user_data.email, "user_id": user["id"]},
+            user_id=user["id"],
+            severity="medium"
+        )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Account is disabled"
@@ -260,6 +267,15 @@ async def login(user_data: LoginWithCaptcha, request: Request):
     
     # Successful login - reset rate limit
     record_login_attempt(ip, success=True)
+    
+    # Log successful login
+    log_security_event(
+        event_type="login_success",
+        ip=ip,
+        details={"email": user_data.email, "role": user["role"]},
+        user_id=user["id"],
+        severity="low"
+    )
     
     # Create new session (this invalidates any previous session)
     token, session_id = create_access_token(

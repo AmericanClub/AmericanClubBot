@@ -21,8 +21,14 @@ from security import (
     get_client_ip as security_get_client_ip
 )
 
+from security_advanced import (
+    get_security_logs, get_security_stats, log_security_event,
+    scan_for_attacks, sanitize_dict, validate_password_strength
+)
+
 auth_router = APIRouter(prefix="/auth", tags=["Authentication"])
 admin_router = APIRouter(prefix="/admin", tags=["Admin"])
+security_router = APIRouter(prefix="/security", tags=["Security"])
 
 
 # Additional Pydantic models for admin user edit

@@ -45,6 +45,7 @@ class LoginWithCaptcha(BaseModel):
     password: str
     captcha_id: str
     captcha_answer: int
+    hp_field: Optional[str] = None  # Honeypot field - should always be empty
 
 
 # ==================

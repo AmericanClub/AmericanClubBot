@@ -873,7 +873,7 @@ function UserCallPanel({ user, token, onLogout }) {
 
   return (
     <div className="app-container" data-testid="app-container">
-      {/* User Header Bar - Premium Modern */}
+      {/* User Header Bar - Premium Glass Morphism */}
       <div className="fixed top-0 left-0 right-0 z-50">
         {/* Gradient Accent Strip */}
         <div className="h-[3px] w-full" style={{
@@ -882,88 +882,143 @@ function UserCallPanel({ user, token, onLogout }) {
           animation: 'shimmer 3s linear infinite'
         }} />
         
-        {/* Main Header Content */}
-        <div style={{
-          background: 'linear-gradient(180deg, rgba(10, 14, 26, 0.98) 0%, rgba(10, 14, 26, 0.95) 100%)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(59, 130, 246, 0.1)',
-          boxShadow: '0 4px 30px rgba(0, 0, 0, 0.3), 0 0 40px rgba(59, 130, 246, 0.05)'
-        }}>
-          <div className="flex items-center justify-between py-3 px-6">
-            {/* Left side - Logo with Ring Glow */}
-            <div className="flex items-center gap-3 group">
-              <div className="relative">
-                {/* Outer glow ring */}
-                <div className="absolute -inset-1 rounded-xl opacity-75 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{
-                    background: 'linear-gradient(135deg, #3b82f6, #06b6d4)',
-                    filter: 'blur(8px)'
-                  }} />
-                {/* Logo container */}
-                <div className="relative w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.95))',
-                    border: '1px solid rgba(59, 130, 246, 0.4)',
-                    boxShadow: 'inset 0 0 20px rgba(59, 130, 246, 0.1)'
-                  }}>
-                  <img src="/logo.png" alt="American Club" className="w-7 h-7 object-contain relative z-10" />
-                </div>
-              </div>
-              <div>
-                <h1 className="font-bold text-white text-sm tracking-wide" 
-                  style={{ textShadow: '0 0 20px rgba(96, 165, 250, 0.4)' }}>
-                  American Club
-                </h1>
-                <p className="text-[10px] text-blue-400/80 font-medium tracking-wider uppercase">IVR Call System</p>
-              </div>
-            </div>
+        {/* Glass Morphism Header with Double Border */}
+        <div className="relative">
+          {/* Outer glow border */}
+          <div className="absolute inset-0 opacity-50" style={{
+            background: 'linear-gradient(180deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%)',
+            filter: 'blur(1px)'
+          }} />
+          
+          {/* Main Glass Container */}
+          <div className="relative" style={{
+            background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.75) 0%, rgba(10, 14, 26, 0.85) 100%)',
+            backdropFilter: 'blur(24px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 80px rgba(59, 130, 246, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+          }}>
+            {/* Inner glow line */}
+            <div className="absolute bottom-0 left-0 right-0 h-[1px]" style={{
+              background: 'linear-gradient(90deg, transparent 0%, rgba(59, 130, 246, 0.3) 20%, rgba(6, 182, 212, 0.3) 50%, rgba(59, 130, 246, 0.3) 80%, transparent 100%)'
+            }} />
             
-            {/* Right side - Credits & User */}
-            <div className="flex items-center gap-4">
-              {/* Credits Display - Enhanced */}
-              <div className="flex items-center gap-2 rounded-xl px-4 py-2 transition-all duration-300 hover:scale-105"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(251, 191, 36, 0.05))',
-                  border: '1px solid rgba(251, 191, 36, 0.3)',
-                  boxShadow: '0 0 20px rgba(251, 191, 36, 0.1), inset 0 0 20px rgba(251, 191, 36, 0.05)'
-                }}>
-                <Coins className="w-4 h-4 text-yellow-400" style={{ filter: 'drop-shadow(0 0 4px rgba(251, 191, 36, 0.5))' }} />
+            <div className="flex items-center justify-between py-3 px-6">
+              {/* Left side - Logo with Ring Glow */}
+              <div className="flex items-center gap-4 group">
+                <div className="relative">
+                  {/* Outer glow ring */}
+                  <div className="absolute -inset-1.5 rounded-xl opacity-60 group-hover:opacity-100 transition-all duration-500"
+                    style={{
+                      background: 'linear-gradient(135deg, #3b82f6, #06b6d4, #8b5cf6)',
+                      filter: 'blur(10px)',
+                      animation: 'glow-pulse 2s ease-in-out infinite'
+                    }} />
+                  {/* Logo container with glass effect */}
+                  <div className="relative w-11 h-11 rounded-xl flex items-center justify-center overflow-hidden"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.9))',
+                      border: '1px solid rgba(59, 130, 246, 0.4)',
+                      boxShadow: 'inset 0 0 20px rgba(59, 130, 246, 0.15), 0 4px 12px rgba(0, 0, 0, 0.3)'
+                    }}>
+                    <img src="/logo.png" alt="American Club" className="w-7 h-7 object-contain relative z-10" />
+                  </div>
+                </div>
                 <div>
-                  <span className="font-mono text-lg font-bold text-yellow-400" data-testid="user-credits"
-                    style={{ textShadow: '0 0 10px rgba(251, 191, 36, 0.3)' }}>{userCredits}</span>
-                  <span className="text-[10px] text-yellow-500/70 ml-1 uppercase tracking-wider">credits</span>
+                  <h1 className="font-bold text-white text-base tracking-wide" 
+                    style={{ textShadow: '0 0 30px rgba(96, 165, 250, 0.5)' }}>
+                    American Club
+                  </h1>
+                  <p className="text-[10px] text-blue-400/90 font-semibold tracking-widest uppercase">IVR Call System</p>
                 </div>
               </div>
               
-              {/* User Info - Enhanced */}
-              <div className="flex items-center gap-3">
-                <div className="text-right">
-                  <p className="text-sm font-semibold text-white">{user?.name}</p>
-                  <p className="text-[10px] text-slate-400">{user?.email}</p>
-                </div>
-                {/* Avatar with glow */}
-                <div className="relative group/avatar">
-                  <div className="absolute -inset-0.5 rounded-full opacity-60 group-hover/avatar:opacity-100 transition-opacity duration-300"
-                    style={{
-                      background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
-                      filter: 'blur(4px)'
+              {/* Center - Status Bar */}
+              <div className="hidden md:flex items-center gap-3 px-4 py-1.5 rounded-full"
+                style={{
+                  background: 'rgba(15, 23, 42, 0.6)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  boxShadow: 'inset 0 0 10px rgba(0, 0, 0, 0.2)'
+                }}>
+                {/* System Status */}
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <div className="w-2 h-2 rounded-full bg-emerald-400" style={{
+                      boxShadow: '0 0 8px rgba(52, 211, 153, 0.8)',
+                      animation: 'glow-pulse 2s ease-in-out infinite'
                     }} />
-                  <div className="relative w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                  </div>
+                  <span className="text-[10px] text-emerald-400 font-medium uppercase tracking-wider">System Online</span>
+                </div>
+                <div className="w-[1px] h-4 bg-white/10" />
+                {/* Call Status */}
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full ${callStatus === 'IDLE' ? 'bg-slate-400' : callStatus === 'IN_PROGRESS' ? 'bg-amber-400' : 'bg-blue-400'}`} 
+                    style={{ boxShadow: callStatus !== 'IDLE' ? '0 0 8px currentColor' : 'none' }} />
+                  <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">{callStatus}</span>
+                </div>
+              </div>
+              
+              {/* Right side - Credits & User */}
+              <div className="flex items-center gap-4">
+                {/* Credits Display - Glass Enhanced */}
+                <div className="relative group/credits">
+                  <div className="absolute -inset-0.5 rounded-xl opacity-0 group-hover/credits:opacity-100 transition-all duration-300"
                     style={{
-                      background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
-                      boxShadow: 'inset 0 0 10px rgba(255, 255, 255, 0.1)'
+                      background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(251, 191, 36, 0.1))',
+                      filter: 'blur(8px)'
+                    }} />
+                  <div className="relative flex items-center gap-2 rounded-xl px-4 py-2 transition-all duration-300 hover:scale-105"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(251, 191, 36, 0.04))',
+                      border: '1px solid rgba(251, 191, 36, 0.25)',
+                      boxShadow: '0 4px 20px rgba(251, 191, 36, 0.1), inset 0 0 20px rgba(251, 191, 36, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
                     }}>
-                    {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                    <Coins className="w-4 h-4 text-yellow-400" style={{ filter: 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.6))' }} />
+                    <div>
+                      <span className="font-mono text-lg font-bold text-yellow-400" data-testid="user-credits"
+                        style={{ textShadow: '0 0 15px rgba(251, 191, 36, 0.4)' }}>{userCredits}</span>
+                      <span className="text-[10px] text-yellow-500/80 ml-1 uppercase tracking-wider font-medium">credits</span>
+                    </div>
                   </div>
                 </div>
-                {/* Logout button - Enhanced */}
+                
+                {/* User Info - Glass Enhanced */}
+                <div className="flex items-center gap-3 px-3 py-1.5 rounded-xl transition-all duration-300"
+                  style={{
+                    background: 'rgba(15, 23, 42, 0.4)',
+                    border: '1px solid rgba(255, 255, 255, 0.05)'
+                  }}>
+                  <div className="text-right">
+                    <p className="text-sm font-semibold text-white">{user?.name}</p>
+                    <p className="text-[10px] text-slate-400">{user?.email}</p>
+                  </div>
+                  {/* Avatar with enhanced glow */}
+                  <div className="relative group/avatar">
+                    <div className="absolute -inset-1 rounded-full opacity-50 group-hover/avatar:opacity-100 transition-all duration-300"
+                      style={{
+                        background: 'linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4)',
+                        filter: 'blur(6px)',
+                        animation: 'glow-pulse 3s ease-in-out infinite'
+                      }} />
+                    <div className="relative w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                      style={{
+                        background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+                        boxShadow: 'inset 0 2px 4px rgba(255, 255, 255, 0.15), 0 2px 8px rgba(0, 0, 0, 0.3)'
+                      }}>
+                      {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Logout button - Glass Style */}
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={onLogout}
-                  className="text-slate-400 hover:text-red-400 hover:bg-red-500/10 border border-slate-700/50 hover:border-red-500/30 rounded-lg transition-all duration-300"
+                  className="text-slate-400 hover:text-red-400 hover:bg-red-500/10 border border-white/5 hover:border-red-500/30 rounded-xl transition-all duration-300 backdrop-blur-sm"
                   data-testid="logout-btn"
+                  style={{ boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.05)' }}
                 >
                   <LogOut className="w-4 h-4" />
                 </Button>

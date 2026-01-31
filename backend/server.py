@@ -14,6 +14,16 @@ import asyncio
 import json
 import httpx
 
+# Import security middleware
+from security_advanced import (
+    SecurityHeadersMiddleware,
+    RequestSizeLimiterMiddleware,
+    sanitize_dict,
+    scan_for_attacks,
+    log_security_event,
+    get_client_ip as security_get_ip
+)
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 

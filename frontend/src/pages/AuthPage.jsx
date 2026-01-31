@@ -175,6 +175,20 @@ export default function AuthPage({ onLogin }) {
           }}
         >
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Honeypot field - hidden from users, bots will fill it */}
+            <div className="absolute opacity-0 -z-50 pointer-events-none" aria-hidden="true" tabIndex={-1}>
+              <label htmlFor="website">Website</label>
+              <input
+                type="text"
+                id="website"
+                name="website"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+                tabIndex={-1}
+                autoComplete="off"
+              />
+            </div>
+
             {!isLogin && (
               <>
                 {/* Invite Code */}

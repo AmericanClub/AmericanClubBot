@@ -658,16 +658,16 @@ export default function AdminDashboard({ user, token, onLogout }) {
                 <thead>
                   <tr style={{ borderBottom: '1px solid rgba(59, 130, 246, 0.15)' }}>
                     <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Code</th>
-                    <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Credits</th>
-                    <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Status</th>
-                    <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Used By</th>
-                    <th className="text-left text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Notes</th>
-                    <th className="text-right text-xs font-medium text-white/70 uppercase tracking-wider px-4 py-3">Actions</th>
+                    <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Credits</th>
+                    <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Status</th>
+                    <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Used By</th>
+                    <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Notes</th>
+                    <th className="text-right text-xs font-medium text-slate-400 uppercase tracking-wider px-4 py-3">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody>
                   {inviteCodes.map((code) => (
-                    <tr key={code.id} className="rounded-xl-row">
+                    <tr key={code.id} style={{ borderBottom: '1px solid rgba(59, 130, 246, 0.1)' }} className="hover:bg-white/5">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <span className="font-mono text-sm text-white">{code.code}</span>

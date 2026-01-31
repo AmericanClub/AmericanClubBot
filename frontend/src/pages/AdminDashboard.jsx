@@ -1483,8 +1483,8 @@ function ProvidersTab({ authHeaders }) {
         </div>
 
         {/* Infobip Card */}
-        <div className="rounded-xl overflow-hidden">
-          <div className="p-5" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+        <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(59, 130, 246, 0.15)' }}>
+          <div className="p-5" style={{ borderBottom: '1px solid rgba(59, 130, 246, 0.15)' }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center"

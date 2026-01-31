@@ -874,20 +874,21 @@ function UserCallPanel({ user, token, onLogout }) {
   return (
     <div className="app-container" data-testid="app-container">
       {/* User Header Bar */}
-      <div className="fixed top-0 left-0 right-0 z-50 px-4 py-2"
+      <div className="fixed top-0 left-0 right-0 z-50"
         style={{
-          background: 'rgba(15, 10, 30, 0.8)',
+          background: 'linear-gradient(180deg, rgba(10, 14, 26, 0.98) 0%, rgba(10, 14, 26, 0.95) 100%)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
+          borderBottom: '1px solid rgba(59, 130, 246, 0.15)'
         }}>
-        <div className="max-w-[1800px] mx-auto flex items-center justify-between">
+        <div className="main-grid py-3">
+          {/* Left side - aligns with logs panel */}
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden"
               style={{
-                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.2))',
-                border: '1px solid rgba(96, 165, 250, 0.3)',
-                boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)'
+                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1))',
+                border: '1px solid rgba(59, 130, 246, 0.3)',
+                boxShadow: '0 0 20px rgba(59, 130, 246, 0.2)'
               }}>
               <img src="/logo.png" alt="American Club" className="w-7 h-7 object-contain" />
             </div>
@@ -896,7 +897,9 @@ function UserCallPanel({ user, token, onLogout }) {
               <p className="text-[10px] text-blue-400/70">IVR Call System</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          
+          {/* Right side - aligns with control panel */}
+          <div className="flex items-center justify-end gap-4">
             {/* Credits Display */}
             <div className="flex items-center gap-2 rounded-lg px-4 py-2"
               style={{
@@ -915,14 +918,18 @@ function UserCallPanel({ user, token, onLogout }) {
                 <p className="text-sm font-semibold text-white">{user?.name}</p>
                 <p className="text-[10px] text-slate-500">{user?.email}</p>
               </div>
-              <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold bg-blue-600">
+              <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                style={{
+                  background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+                  boxShadow: '0 0 15px rgba(59, 130, 246, 0.3)'
+                }}>
                 {user?.name?.charAt(0)?.toUpperCase() || "U"}
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onLogout}
-                className="text-slate-500 hover:text-red-400 hover:bg-red-500/10"
+                className="text-slate-500 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20"
                 data-testid="logout-btn"
               >
                 <LogOut className="w-4 h-4" />
@@ -932,7 +939,7 @@ function UserCallPanel({ user, token, onLogout }) {
         </div>
       </div>
       
-      <div className="main-grid pt-14">
+      <div className="main-grid pt-16">
         {/* Left Panel - Bot Logs */}
         <div className="logs-panel" data-testid="logs-panel">
           <div className="logs-header">

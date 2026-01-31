@@ -201,18 +201,35 @@ export default function AdminDashboard({ user, token, onLogout }) {
     }
   }, [fetchStats, fetchUsers, fetchInviteCodes, fetchSecurityLogs, isSuperAdmin]);
 
-  // Get dangerous events for dashboard (high/medium severity, excluding success events)
+  // Get dangerous events for dashboard (high/medium severity, excluding success events and already seen)
   const dangerousEvents = securityLogs.filter(log => 
     (log.severity === 'high' || log.severity === 'medium' || log.severity === 'critical') &&
     !log.event_type.includes('success') &&
-    !log.event_type.includes('cleared')
+    !log.event_type.includes('cleared') &&
+    !seenAlertIds.includes(log.id)
   ).slice(0, 5);
 
-  // Count high severity events for badge
+  // Count high severity events for badge (only unseen)
   const highSeverityCount = securityLogs.filter(log => 
     (log.severity === 'high' || log.severity === 'critical') &&
-    !log.event_type.includes('success')
+    !log.event_type.includes('success') &&
+    !seenAlertIds.includes(log.id)
   ).length;
+
+  // Mark all current dangerous alerts as seen
+  const markAlertsAsSeen = () => {
+    const dangerousIds = securityLogs
+      .filter(log => 
+        (log.severity === 'high' || log.severity === 'medium' || log.severity === 'critical') &&
+        !log.event_type.includes('success') &&
+        !log.event_type.includes('cleared')
+      )
+      .map(log => log.id);
+    
+    const newSeenIds = [...new Set([...seenAlertIds, ...dangerousIds])];
+    setSeenAlertIds(newSeenIds);
+    localStorage.setItem('seenSecurityAlerts', JSON.stringify(newSeenIds));
+  };
 
   // Create invite code
   const handleCreateCode = async () => {

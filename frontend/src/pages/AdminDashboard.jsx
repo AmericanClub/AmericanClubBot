@@ -777,7 +777,13 @@ export default function AdminDashboard({ user, token, onLogout }) {
         {activeTab === "invite-codes" && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-white">Invite Codes</h2>
+              <div className="flex items-center gap-3">
+                <h2 className="text-2xl font-bold text-white">Invite Codes</h2>
+                <span className="flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  Live
+                </span>
+              </div>
               <div className="flex gap-2">
                 <Button 
                   onClick={async () => {

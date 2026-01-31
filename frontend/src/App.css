@@ -1,5 +1,17 @@
 /* Bot Calling App Styles - Dark Navy Modern Theme */
 
+/* Header Shimmer Animation */
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Header glow pulse */
+@keyframes glow-pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
 /* Main app container with gradient accent */
 .app-container {
     height: 100vh;

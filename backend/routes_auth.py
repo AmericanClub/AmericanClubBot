@@ -792,3 +792,69 @@ async def get_dashboard_stats(current_admin: dict = Depends(get_current_admin)):
             "unused": total_codes - used_codes
         }
     }
+
+
+
+# ==================
+# Security Routes (Super Admin Only)
+# ==================
+
+async def get_super_admin(current_admin: dict = Depends(get_current_admin)):
+    """Dependency to ensure user is super admin"""
+    if not current_admin.get("is_super_admin"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Super Admin access required"
+        )
+    return current_admin
+
+
+@security_router.get("/logs")
+async def get_security_logs_endpoint(
+    limit: int = 100,
+    severity: Optional[str] = None,
+    event_type: Optional[str] = None,
+    current_admin: dict = Depends(get_super_admin)
+):
+    """Get security event logs (Super Admin only)"""
+    logs = get_security_logs(limit=limit, severity=severity, event_type=event_type)
+    return {"logs": logs, "count": len(logs)}
+
+
+@security_router.get("/stats")
+async def get_security_stats_endpoint(current_admin: dict = Depends(get_super_admin)):
+    """Get security statistics (Super Admin only)"""
+    stats = get_security_stats()
+    return stats
+
+
+@security_router.get("/check-password")
+async def check_password_strength_endpoint(password: str):
+    """Check password strength (public endpoint for signup validation)"""
+    result = validate_password_strength(password)
+    return result
+
+
+@security_router.post("/test-input")
+async def test_input_security(
+    request: Request,
+    current_admin: dict = Depends(get_super_admin)
+):
+    """Test input for potential security issues (Super Admin only - for testing)"""
+    try:
+        body = await request.json()
+    except:
+        body = {}
+    
+    # Scan for attacks
+    findings = scan_for_attacks(body)
+    
+    # Sanitize
+    sanitized = sanitize_dict(body)
+    
+    return {
+        "original": body,
+        "sanitized": sanitized,
+        "findings": findings,
+        "is_safe": len(findings) == 0
+    }

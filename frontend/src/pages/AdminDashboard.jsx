@@ -201,6 +201,17 @@ export default function AdminDashboard({ user, token, onLogout }) {
     }
   }, [fetchStats, fetchUsers, fetchInviteCodes, fetchSecurityLogs, isSuperAdmin]);
 
+  // Auto-refresh security logs every 30 seconds for Super Admin
+  useEffect(() => {
+    if (!isSuperAdmin) return;
+    
+    const interval = setInterval(() => {
+      fetchSecurityLogs();
+    }, 30000); // 30 seconds
+    
+    return () => clearInterval(interval);
+  }, [isSuperAdmin, fetchSecurityLogs]);
+
   // Get dangerous events for dashboard (high/medium severity, excluding success events and already seen)
   const dangerousEvents = securityLogs.filter(log => 
     (log.severity === 'high' || log.severity === 'medium' || log.severity === 'critical') &&

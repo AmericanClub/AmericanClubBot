@@ -976,6 +976,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
                       // Also clear seen alerts from localStorage
                       setSeenAlertIds([]);
                       localStorage.removeItem('seenSecurityAlerts');
+                      setSecuritySearch(""); // Clear search
                       fetchSecurityLogs();
                     } catch (error) {
                       toast.error(error.response?.data?.detail || "Failed to clear logs");

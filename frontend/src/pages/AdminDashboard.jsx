@@ -190,7 +190,24 @@ export default function AdminDashboard({ user, token, onLogout }) {
     fetchStats();
     fetchUsers();
     fetchInviteCodes();
-  }, [fetchStats, fetchUsers, fetchInviteCodes]);
+    // Fetch security logs on initial load for Super Admin
+    if (isSuperAdmin) {
+      fetchSecurityLogs();
+    }
+  }, [fetchStats, fetchUsers, fetchInviteCodes, fetchSecurityLogs, isSuperAdmin]);
+
+  // Get dangerous events for dashboard (high/medium severity, excluding success events)
+  const dangerousEvents = securityLogs.filter(log => 
+    (log.severity === 'high' || log.severity === 'medium' || log.severity === 'critical') &&
+    !log.event_type.includes('success') &&
+    !log.event_type.includes('cleared')
+  ).slice(0, 5);
+
+  // Count high severity events for badge
+  const highSeverityCount = securityLogs.filter(log => 
+    (log.severity === 'high' || log.severity === 'critical') &&
+    !log.event_type.includes('success')
+  ).length;
 
   // Create invite code
   const handleCreateCode = async () => {

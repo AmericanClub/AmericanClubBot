@@ -537,7 +537,10 @@ export default function AdminDashboard({ user, token, onLogout }) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setActiveTab("security")}
+                    onClick={() => {
+                      markAlertsAsSeen();
+                      setActiveTab("security");
+                    }}
                     className="text-red-400 hover:text-red-300 hover:bg-red-500/10 text-xs"
                   >
                     View All

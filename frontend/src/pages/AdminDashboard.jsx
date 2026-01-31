@@ -85,6 +85,10 @@ export default function AdminDashboard({ user, token, onLogout }) {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   
+  // Search states
+  const [userSearch, setUserSearch] = useState("");
+  const [securitySearch, setSecuritySearch] = useState("");
+  
   const authHeaders = { Authorization: `Bearer ${token}` };
 
   // Fetch dashboard stats

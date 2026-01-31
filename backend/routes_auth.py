@@ -171,14 +171,33 @@ async def signup(user_data: UserCreate, request: Request):
 
 
 @auth_router.post("/login")
-async def login(user_data: UserLogin, request: Request):
-    """Login user - invalidates previous sessions (single device)"""
+async def login(user_data: LoginWithCaptcha, request: Request):
+    """Login user with CAPTCHA verification - invalidates previous sessions (single device)"""
     from server import db
+    
+    ip = security_get_client_ip(request)
+    
+    # Check rate limit first
+    is_allowed, blocked_seconds = check_rate_limit(ip)
+    if not is_allowed:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Too many login attempts. Please try again in {blocked_seconds} seconds."
+        )
+    
+    # Verify CAPTCHA
+    if not verify_captcha(user_data.captcha_id, user_data.captcha_answer):
+        record_login_attempt(ip, success=False)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired security check answer"
+        )
     
     # Find user
     user = await db.users.find_one({"email": user_data.email.lower()}, {"_id": 0})
     
     if not user:
+        record_login_attempt(ip, success=False)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"
@@ -186,6 +205,7 @@ async def login(user_data: UserLogin, request: Request):
     
     # Verify password
     if not verify_password(user_data.password, user["password"]):
+        record_login_attempt(ip, success=False)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"
@@ -197,6 +217,9 @@ async def login(user_data: UserLogin, request: Request):
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Account is disabled"
         )
+    
+    # Successful login - reset rate limit
+    record_login_attempt(ip, success=True)
     
     # Create new session (this invalidates any previous session)
     token, session_id = create_access_token(

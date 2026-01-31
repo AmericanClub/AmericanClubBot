@@ -112,6 +112,21 @@ export default function AdminDashboard({ user, token, onLogout }) {
     }
   }, [token]);
 
+  // Fetch security logs (Super Admin only)
+  const fetchSecurityLogs = useCallback(async () => {
+    if (!isSuperAdmin) return;
+    try {
+      const [logsRes, statsRes] = await Promise.all([
+        axios.get(`${API}/security/logs?limit=50`, { headers: authHeaders }),
+        axios.get(`${API}/security/stats`, { headers: authHeaders })
+      ]);
+      setSecurityLogs(logsRes.data.logs);
+      setSecurityStats(statsRes.data);
+    } catch (error) {
+      console.error("Error fetching security logs:", error);
+    }
+  }, [token, isSuperAdmin]);
+
   // Create new admin
   const handleCreateAdmin = async () => {
     if (!newAdminName || !newAdminEmail || !newAdminPassword) {

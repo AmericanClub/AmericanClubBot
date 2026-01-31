@@ -1833,10 +1833,11 @@ def create_laml_gather(message: str, num_digits: int, action: str, voice: str = 
     return Response(content=laml, media_type="application/xml")
 
 # Include routers
-from routes_auth import auth_router, admin_router
+from routes_auth import auth_router, admin_router, security_router
 from routes_providers import provider_router, user_provider_router
 api_router.include_router(auth_router)
 api_router.include_router(admin_router)
+api_router.include_router(security_router)
 api_router.include_router(provider_router)
 api_router.include_router(user_provider_router)
 app.include_router(api_router)

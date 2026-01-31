@@ -1376,6 +1376,13 @@ function ProvidersTab({ authHeaders }) {
 
   useEffect(() => {
     fetchProviders();
+    
+    // Auto-refresh every 15 seconds
+    const interval = setInterval(() => {
+      fetchProviders();
+    }, 15000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   const handleSaveSignalWire = async () => {

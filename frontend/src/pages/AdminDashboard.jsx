@@ -479,6 +479,7 @@ export default function AdminDashboard({ user, token, onLogout }) {
                   await fetchStats();
                   await fetchUsers();
                   await fetchInviteCodes();
+                  if (isSuperAdmin) await fetchSecurityLogs();
                   setTimeout(() => setIsRefreshing(false), 500);
                 }} 
                 variant="outline" 

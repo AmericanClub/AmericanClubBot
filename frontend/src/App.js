@@ -904,58 +904,31 @@ function UserCallPanel({ user, token, onLogout }) {
             }} />
             
             <div className="flex items-center justify-between py-3 px-6">
-              {/* Left side - Logo with Ring Glow */}
+              {/* Left side - Logo with Subtle Glow */}
               <div className="flex items-center gap-4 group">
                 <div className="relative">
-                  {/* Outer glow ring */}
-                  <div className="absolute -inset-1.5 rounded-xl opacity-60 group-hover:opacity-100 transition-all duration-500"
+                  {/* Subtle outer glow - reduced */}
+                  <div className="absolute -inset-0.5 rounded-xl opacity-50 group-hover:opacity-80 transition-all duration-500"
                     style={{
-                      background: 'linear-gradient(135deg, #3b82f6, #06b6d4, #8b5cf6)',
-                      filter: 'blur(10px)',
-                      animation: 'glow-pulse 2s ease-in-out infinite'
+                      background: 'linear-gradient(135deg, #3b82f6, #06b6d4)',
+                      filter: 'blur(4px)'
                     }} />
                   {/* Logo container with glass effect */}
                   <div className="relative w-11 h-11 rounded-xl flex items-center justify-center overflow-hidden"
                     style={{
-                      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.9))',
-                      border: '1px solid rgba(59, 130, 246, 0.4)',
-                      boxShadow: 'inset 0 0 20px rgba(59, 130, 246, 0.15), 0 4px 12px rgba(0, 0, 0, 0.3)'
+                      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.95))',
+                      border: '1px solid rgba(59, 130, 246, 0.35)',
+                      boxShadow: 'inset 0 0 15px rgba(59, 130, 246, 0.1), 0 4px 12px rgba(0, 0, 0, 0.3)'
                     }}>
                     <img src="/logo.png" alt="American Club" className="w-7 h-7 object-contain relative z-10" />
                   </div>
                 </div>
                 <div>
                   <h1 className="font-bold text-white text-base tracking-wide" 
-                    style={{ textShadow: '0 0 30px rgba(96, 165, 250, 0.5)' }}>
+                    style={{ textShadow: '0 0 20px rgba(96, 165, 250, 0.4)' }}>
                     American Club
                   </h1>
                   <p className="text-[10px] text-blue-400/90 font-semibold tracking-widest uppercase">IVR Call System</p>
-                </div>
-              </div>
-              
-              {/* Center - Status Bar */}
-              <div className="hidden md:flex items-center gap-3 px-4 py-1.5 rounded-full"
-                style={{
-                  background: 'rgba(15, 23, 42, 0.6)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  boxShadow: 'inset 0 0 10px rgba(0, 0, 0, 0.2)'
-                }}>
-                {/* System Status */}
-                <div className="flex items-center gap-2">
-                  <div className="relative">
-                    <div className="w-2 h-2 rounded-full bg-emerald-400" style={{
-                      boxShadow: '0 0 8px rgba(52, 211, 153, 0.8)',
-                      animation: 'glow-pulse 2s ease-in-out infinite'
-                    }} />
-                  </div>
-                  <span className="text-[10px] text-emerald-400 font-medium uppercase tracking-wider">System Online</span>
-                </div>
-                <div className="w-[1px] h-4 bg-white/10" />
-                {/* Call Status */}
-                <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${callStatus === 'IDLE' ? 'bg-slate-400' : callStatus === 'IN_PROGRESS' ? 'bg-amber-400' : 'bg-blue-400'}`} 
-                    style={{ boxShadow: callStatus !== 'IDLE' ? '0 0 8px currentColor' : 'none' }} />
-                  <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">{callStatus}</span>
                 </div>
               </div>
               

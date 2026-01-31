@@ -120,20 +120,52 @@ Build a full-stack bot-calling website with multi-provider support (Infobip, Sig
 
 ## Security Features ✅ (Jan 31, 2026)
 
-### Rate Limiting
+### Layer 1: Rate Limiting
 - Maximum 5 login attempts per minute per IP
 - After exceeding limit, IP blocked for 5 minutes
 - Automatically resets on successful login
 
-### Math CAPTCHA (Security Check)
+### Layer 2: Math CAPTCHA (Security Check)
 - Simple math questions: addition, subtraction, multiplication
 - CAPTCHA expires after 5 minutes
 - New CAPTCHA generated on each failed login
 - Refresh button to get new question
 
+### Layer 3: Honeypot Field
+- Hidden field only bots will fill
+- If filled, request silently rejected
+- No user interaction needed
+
+### Layer 4: Security Headers
+- X-Content-Type-Options: nosniff
+- X-Frame-Options: DENY
+- X-XSS-Protection: 1; mode=block
+- Referrer-Policy: strict-origin-when-cross-origin
+- Permissions-Policy: geolocation=(), microphone=(), camera=()
+- Content-Security-Policy: frame-ancestors 'none'
+- Strict-Transport-Security: max-age=31536000
+
+### Layer 5: Request Size Limiter
+- Maximum request body: 1MB
+- Prevents DoS via large payloads
+
+### Layer 6: Input Validation & NoSQL Injection Prevention
+- Sanitizes all input strings
+- Detects and blocks NoSQL injection patterns ($where, $regex, $gt, etc.)
+- Detects XSS patterns (<script>, javascript:, etc.)
+- Logs suspicious activity
+
+### Layer 7: Security Monitoring Dashboard (Super Admin)
+- Real-time security event logs
+- Statistics: High/Medium severity, Total events, Unique IPs
+- Event types: login_success, login_failed, captcha_failed, rate_limit_exceeded
+- Filter by severity and event type
+
 ### Implementation Files
-- `/app/backend/security.py` - Rate limiting & CAPTCHA logic
+- `/app/backend/security.py` - Rate limiting & CAPTCHA
+- `/app/backend/security_advanced.py` - Headers, validation, logging
 - `/app/frontend/src/pages/AuthPage.jsx` - Security Check UI
+- `/app/frontend/src/pages/AdminDashboard.jsx` - Security Monitor tab
 
 ## Test Credentials
 - **Super Admin:** admin@american.club / 123 (is_super_admin: true)

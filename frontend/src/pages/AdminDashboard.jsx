@@ -201,16 +201,33 @@ export default function AdminDashboard({ user, token, onLogout }) {
     }
   }, [fetchStats, fetchUsers, fetchInviteCodes, fetchSecurityLogs, isSuperAdmin]);
 
-  // Auto-refresh security logs every 30 seconds for Super Admin
+  // Auto-refresh all data every 15 seconds based on active tab
   useEffect(() => {
-    if (!isSuperAdmin) return;
-    
     const interval = setInterval(() => {
-      fetchSecurityLogs();
-    }, 30000); // 30 seconds
+      // Always refresh security logs for Super Admin (for badge updates)
+      if (isSuperAdmin) {
+        fetchSecurityLogs();
+      }
+      
+      // Refresh data based on active tab
+      switch (activeTab) {
+        case 'dashboard':
+          fetchStats();
+          break;
+        case 'users':
+          fetchUsers();
+          break;
+        case 'invite-codes':
+          fetchInviteCodes();
+          break;
+        // providers tab has its own refresh in ProvidersTab component
+        default:
+          break;
+      }
+    }, 15000); // 15 seconds
     
     return () => clearInterval(interval);
-  }, [isSuperAdmin, fetchSecurityLogs]);
+  }, [activeTab, isSuperAdmin, fetchStats, fetchUsers, fetchInviteCodes, fetchSecurityLogs]);
 
   // Get dangerous events for dashboard (high/medium severity, excluding success events and already seen)
   const dangerousEvents = securityLogs.filter(log => 

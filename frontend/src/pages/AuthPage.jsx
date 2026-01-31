@@ -19,6 +19,9 @@ export default function AuthPage({ onLogin }) {
   const [name, setName] = useState("");
   const [inviteCode, setInviteCode] = useState("");
   
+  // Honeypot field (anti-bot) - should always be empty
+  const [website, setWebsite] = useState("");
+  
   // CAPTCHA state
   const [captchaId, setCaptchaId] = useState("");
   const [captchaQuestion, setCaptchaQuestion] = useState("");

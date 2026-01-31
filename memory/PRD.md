@@ -118,6 +118,23 @@ Build a full-stack bot-calling website with multi-provider support (Infobip, Sig
 - **call_logs:** id, user_id, provider, status, recording_url, credits_used
 - **credit_transactions:** id, user_id, type, amount, reason, call_id
 
+## Security Features ✅ (Jan 31, 2026)
+
+### Rate Limiting
+- Maximum 5 login attempts per minute per IP
+- After exceeding limit, IP blocked for 5 minutes
+- Automatically resets on successful login
+
+### Math CAPTCHA (Security Check)
+- Simple math questions: addition, subtraction, multiplication
+- CAPTCHA expires after 5 minutes
+- New CAPTCHA generated on each failed login
+- Refresh button to get new question
+
+### Implementation Files
+- `/app/backend/security.py` - Rate limiting & CAPTCHA logic
+- `/app/frontend/src/pages/AuthPage.jsx` - Security Check UI
+
 ## Test Credentials
 - **Super Admin:** admin@american.club / 123 (is_super_admin: true)
 - **User:** fak@american.club / 123

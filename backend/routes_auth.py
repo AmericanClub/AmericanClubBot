@@ -178,6 +178,14 @@ async def login(user_data: LoginWithCaptcha, request: Request):
     
     ip = security_get_client_ip(request)
     
+    # Check honeypot field - if filled, it's a bot
+    if user_data.hp_field:
+        # Silently reject bots - don't give them useful feedback
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password"
+        )
+    
     # Check rate limit first
     is_allowed, blocked_seconds = check_rate_limit(ip)
     if not is_allowed:

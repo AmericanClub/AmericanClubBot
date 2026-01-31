@@ -870,6 +870,9 @@ export default function AdminDashboard({ user, token, onLogout }) {
                     try {
                       await axios.delete(`${API}/security/logs`, { headers: authHeaders });
                       toast.success("Security logs cleared");
+                      // Also clear seen alerts from localStorage
+                      setSeenAlertIds([]);
+                      localStorage.removeItem('seenSecurityAlerts');
                       fetchSecurityLogs();
                     } catch (error) {
                       toast.error(error.response?.data?.detail || "Failed to clear logs");

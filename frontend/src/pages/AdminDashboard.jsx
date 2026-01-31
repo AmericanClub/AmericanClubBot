@@ -1024,6 +1024,23 @@ export default function AdminDashboard({ user, token, onLogout }) {
               </div>
             )}
 
+            {/* Search Box */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              <Input
+                type="text"
+                placeholder="Search by event type, IP, severity, or email..."
+                value={securitySearch}
+                onChange={(e) => setSecuritySearch(e.target.value)}
+                className="pl-10 bg-slate-900/50 border-slate-700/50 text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-blue-500/20 rounded-lg h-10"
+              />
+              {securitySearch && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+                  {filteredSecurityLogs.length} result{filteredSecurityLogs.length !== 1 ? 's' : ''}
+                </span>
+              )}
+            </div>
+
             {/* Security Logs Table */}
             <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(59, 130, 246, 0.15)' }}>
               <table className="w-full">
@@ -1037,13 +1054,13 @@ export default function AdminDashboard({ user, token, onLogout }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {securityLogs.length === 0 ? (
+                  {filteredSecurityLogs.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
-                        No security events recorded yet
+                        {securitySearch ? `No logs found matching "${securitySearch}"` : 'No security events recorded yet'}
                       </td>
                     </tr>
-                  ) : securityLogs.map((log) => (
+                  ) : filteredSecurityLogs.map((log) => (
                     <tr key={log.id} style={{ borderBottom: '1px solid rgba(59, 130, 246, 0.1)' }} className="hover:bg-white/5">
                       <td className="px-4 py-3 text-xs text-slate-400 font-mono">
                         {new Date(log.timestamp).toLocaleString()}

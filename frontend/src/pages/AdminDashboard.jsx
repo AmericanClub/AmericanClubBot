@@ -1387,14 +1387,18 @@ function ProvidersTab({ authHeaders }) {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-white ">Provider Settings</h2>
         <Button 
-          onClick={fetchProviders} 
+          onClick={async () => {
+            setIsRefreshing(true);
+            await fetchProviders();
+            setTimeout(() => setIsRefreshing(false), 500);
+          }} 
           variant="outline" 
           size="sm"
-          className="rounded-xl border-white/20 text-white/80 hover:bg-white/10 hover:text-white"
-          style={{ backdropFilter: 'blur(10px)' }}
+          disabled={isRefreshing}
+          className="border-blue-500/30 text-white hover:bg-blue-500/10"
         >
-          <RefreshCw className="w-4 h-4 mr-2" />
-          Refresh
+          <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+          {isRefreshing ? 'Refreshing...' : 'Refresh'}
         </Button>
       </div>
 

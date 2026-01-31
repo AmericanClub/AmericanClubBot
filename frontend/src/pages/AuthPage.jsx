@@ -54,6 +54,15 @@ export default function AuthPage({ onLogin }) {
     e.preventDefault();
     setIsLoading(true);
 
+    // Honeypot check - if filled, it's a bot
+    if (website) {
+      // Silently reject (don't tell the bot why)
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Fake delay
+      toast.error("Authentication failed");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       if (isLogin) {
         // Validate CAPTCHA answer
@@ -67,7 +76,8 @@ export default function AuthPage({ onLogin }) {
           email, 
           password,
           captcha_id: captchaId,
-          captcha_answer: parseInt(captchaAnswer)
+          captcha_answer: parseInt(captchaAnswer),
+          hp_field: website // Send honeypot to backend for double-check
         });
         const { access_token, user } = response.data;
         localStorage.setItem("token", access_token);

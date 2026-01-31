@@ -738,16 +738,40 @@ export default function AdminDashboard({ user, token, onLogout }) {
                 <ShieldAlert className="w-5 h-5 text-red-400" />
                 Security Monitor
               </h2>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={fetchSecurityLogs}
-                disabled={isRefreshing}
-                className="text-white border-blue-500/30 hover:bg-blue-500/10"
-              >
-                <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-                Refresh
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={async () => {
+                    setIsRefreshing(true);
+                    await fetchSecurityLogs();
+                    setTimeout(() => setIsRefreshing(false), 500);
+                  }}
+                  disabled={isRefreshing}
+                  className="text-white border-blue-500/30 hover:bg-blue-500/10"
+                >
+                  <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={async () => {
+                    if (!window.confirm("Are you sure you want to clear all security logs? This action cannot be undone.")) return;
+                    try {
+                      await axios.delete(`${API}/security/logs`, { headers: authHeaders });
+                      toast.success("Security logs cleared");
+                      fetchSecurityLogs();
+                    } catch (error) {
+                      toast.error(error.response?.data?.detail || "Failed to clear logs");
+                    }
+                  }}
+                  className="text-red-400 border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Clear Logs
+                </Button>
+              </div>
             </div>
 
             {/* Security Stats Cards */}

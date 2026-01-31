@@ -50,11 +50,20 @@ SIGNALWIRE_FROM_NUMBER = os.environ.get('SIGNALWIRE_FROM_NUMBER', '')
 # Webhook URL for callbacks - uses APP_URL from environment or falls back to empty
 WEBHOOK_BASE_URL = os.environ.get('WEBHOOK_BASE_URL') or os.environ.get('APP_URL', '')
 
-# Create the main app
-app = FastAPI(title="Bot Calling API")
+# Create the main app with docs configuration
+app = FastAPI(
+    title="Bot Calling API",
+    docs_url="/api/docs",  # Move docs behind /api prefix for security
+    redoc_url="/api/redoc",
+    openapi_url="/api/openapi.json"
+)
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
+
+# Add Security Middleware (order matters - first added = last executed)
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(RequestSizeLimiterMiddleware)
 
 # Configure logging
 logging.basicConfig(

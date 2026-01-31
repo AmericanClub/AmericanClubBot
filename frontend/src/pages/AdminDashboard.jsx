@@ -24,7 +24,11 @@ import {
   Mail,
   User as UserIcon,
   Shield,
-  Lock
+  Lock,
+  ShieldAlert,
+  Activity,
+  AlertTriangle,
+  Eye
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

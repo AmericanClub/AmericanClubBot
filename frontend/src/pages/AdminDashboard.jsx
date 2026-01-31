@@ -729,6 +729,116 @@ export default function AdminDashboard({ user, token, onLogout }) {
         {activeTab === "providers" && (
           <ProvidersTab authHeaders={authHeaders} />
         )}
+
+        {/* Security Tab (Super Admin Only) */}
+        {activeTab === "security" && isSuperAdmin && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <ShieldAlert className="w-5 h-5 text-red-400" />
+                Security Monitor
+              </h2>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={fetchSecurityLogs}
+                disabled={isRefreshing}
+                className="text-white border-blue-500/30 hover:bg-blue-500/10"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+            </div>
+
+            {/* Security Stats Cards */}
+            {securityStats && (
+              <div className="grid grid-cols-4 gap-4">
+                <div className="rounded-xl p-4" style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertTriangle className="w-4 h-4 text-red-400" />
+                    <span className="text-xs text-red-400 uppercase font-semibold">High Severity</span>
+                  </div>
+                  <p className="text-2xl font-bold text-red-400">{securityStats.events_by_severity?.high || 0}</p>
+                </div>
+                <div className="rounded-xl p-4" style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Activity className="w-4 h-4 text-yellow-400" />
+                    <span className="text-xs text-yellow-400 uppercase font-semibold">Medium</span>
+                  </div>
+                  <p className="text-2xl font-bold text-yellow-400">{securityStats.events_by_severity?.medium || 0}</p>
+                </div>
+                <div className="rounded-xl p-4" style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Eye className="w-4 h-4 text-blue-400" />
+                    <span className="text-xs text-blue-400 uppercase font-semibold">Total Events</span>
+                  </div>
+                  <p className="text-2xl font-bold text-blue-400">{securityStats.total_events || 0}</p>
+                </div>
+                <div className="rounded-xl p-4" style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Users className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs text-emerald-400 uppercase font-semibold">Unique IPs</span>
+                  </div>
+                  <p className="text-2xl font-bold text-emerald-400">{securityStats.unique_ips || 0}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Security Logs Table */}
+            <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(59, 130, 246, 0.15)' }}>
+              <table className="w-full">
+                <thead>
+                  <tr style={{ borderBottom: '1px solid rgba(59, 130, 246, 0.15)' }}>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-slate-400 uppercase">Time</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-slate-400 uppercase">Event</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-slate-400 uppercase">IP Address</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-slate-400 uppercase">Severity</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-slate-400 uppercase">Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {securityLogs.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                        No security events recorded yet
+                      </td>
+                    </tr>
+                  ) : securityLogs.map((log) => (
+                    <tr key={log.id} style={{ borderBottom: '1px solid rgba(59, 130, 246, 0.1)' }} className="hover:bg-white/5">
+                      <td className="px-4 py-3 text-xs text-slate-400 font-mono">
+                        {new Date(log.timestamp).toLocaleString()}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`text-xs font-medium ${
+                          log.event_type.includes('success') ? 'text-emerald-400' :
+                          log.event_type.includes('failed') ? 'text-red-400' :
+                          log.event_type.includes('blocked') ? 'text-yellow-400' :
+                          'text-blue-400'
+                        }`}>
+                          {log.event_type.replace(/_/g, ' ').toUpperCase()}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 font-mono text-xs text-white/70">{log.ip}</td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
+                          log.severity === 'critical' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                          log.severity === 'high' ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' :
+                          log.severity === 'medium' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' :
+                          'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                        }`}>
+                          {log.severity}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-slate-400 max-w-xs truncate">
+                        {log.details?.email || log.details?.user_id?.slice(0, 8) || '-'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Create Code Modal */}
